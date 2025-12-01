@@ -2,5 +2,11 @@
     display: flex;
     justify-content: center;
 
-    
+    & .project-section {
+
+        & .section-header {
+            margin-inline: 1rem;
+            margin-block: 1.5rem;
+        }
+    }
 }

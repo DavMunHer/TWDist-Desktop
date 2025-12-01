@@ -1,10 +1,12 @@
 <section class="project-section-container">
-    <header>
-        <section-title [title]="'Desarrollo de interfaces'" [titleStyle]="'bold'" />
-    </header>
-    <main>
-        @for (task of tasksList(); track $index) {
-            <task [taskInfo]="task" />
-        }
-    </main>
+    <div class="project-section">
+        <header class="section-header">
+            <section-title [title]="'Desarrollo de interfaces'" [titleStyle]="'bold'" />
+        </header>
+        <main>
+            @for (task of tasksList(); track $index) {
+                <task [taskInfo]="task" />
+            }
+        </main>
+    </div>
 </section>
