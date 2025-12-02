@@ -7,69 +7,83 @@
   min-width: 30vh;
 
   & .test {
-    padding: 10px;
+    padding-block: 5px;
+    padding-inline: 10px;
     height: 100%;
 
-    & .sidebar-profile {
+    & .top-section {
       display: flex;
       align-items: center;
-      padding: 10px 0;
+      justify-content: space-between;
 
-      & .profile-dropdown {
-        position: relative;
+      & .sidebar-profile {
         display: flex;
         align-items: center;
-        cursor: pointer;
-        padding: 5px;
+        padding: 10px 0;
 
-        &.open {
-          background-color: #eaeaea;
-          border-radius: 8px;
-        }
+        & .profile-dropdown {
+          position: relative;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          padding: 5px;
 
-        &.open .dropdown-content {
-          display: block;
-        }
+          &.open {
+            background-color: #eaeaea;
+            border-radius: 8px;
+          }
 
-        & .profile-avatar {
-          height: 38px;
-          margin-right: 10px;
-          border-radius: 50%;
-        }
-
-        & .profile-name {
-          font-weight: bold;
-          margin-right: 5px;
-        }
-
-        & .dropdown-content {
-          display: none;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background-color: #f1f1f1;
-          min-width: 120px;
-          box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-          z-index: 1;
-          border-radius: 4px;
-          overflow: hidden;
-
-          & a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
+          &.open .dropdown-content {
             display: block;
+          }
 
-            &:hover {
-              background-color: #ddd;
+          & .profile-avatar {
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 50%;
+          }
+
+          & .profile-name {
+            font-weight: bold;
+            margin-right: 5px;
+          }
+
+          & .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #f1f1f1;
+            min-width: 120px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+
+            & a {
+              color: black;
+              padding: 12px 16px;
+              text-decoration: none;
+              display: block;
+
+              &:hover {
+                background-color: #ddd;
+              }
             }
           }
-        }
 
-        &:hover {
-          background-color: #eaeaea;
-          border-radius: 8px;
+          &:hover {
+            background-color: #eaeaea;
+            border-radius: 8px;
+          }
         }
+      }
+
+      & .notification-toggleview{
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        width: 25%;
       }
     }
 
