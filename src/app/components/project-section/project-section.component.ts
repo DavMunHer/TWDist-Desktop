@@ -15,22 +15,18 @@ export class ProjectSectionComponent {
     {
       taskName: 'Task 1',
       completed: false,
-      startDate: new Date()
+      startDate: new Date(),
     },
     {
       taskName: 'Task 2',
       completed: false,
-      startDate: new Date()
+      startDate: new Date(),
     },
   ]);
 
   protected updateTaskToCompleted(task: TWDTask) {
-    let taskToModify = this.tasksList().find((element => element == task))
-    if (taskToModify) {
-      taskToModify.completed = true
-    } else {
-      console.log("No task found!");
-    }
+    this.tasksList.update((tasks) =>
+      tasks.map((t) => (t === task ? { ...t, completed: true } : t))
+    );
   }
-
 }
