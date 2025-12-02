@@ -26,7 +26,7 @@ export class ProjectSectionComponent {
 
   protected updateTaskToCompleted(task: TWDTask) {
     this.tasksList.update((tasks) =>
-      tasks.map((t) => (t === task ? { ...t, completed: true } : t))
+      tasks.map((t) => (t === task ? { ...t, completed: !t.completed } : t))
     );
   }
 }
