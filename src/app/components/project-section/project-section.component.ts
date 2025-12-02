@@ -24,4 +24,13 @@ export class ProjectSectionComponent {
     },
   ]);
 
+  protected updateTaskToCompleted(task: TWDTask) {
+    let taskToModify = this.tasksList().find((element => element == task))
+    if (taskToModify) {
+      taskToModify.completed = true
+    } else {
+      console.log("No task found!");
+    }
+  }
+
 }
