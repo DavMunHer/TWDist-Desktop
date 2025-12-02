@@ -15,13 +15,18 @@ export class ProjectSectionComponent {
     {
       taskName: 'Task 1',
       completed: false,
-      startDate: new Date()
+      startDate: new Date(),
     },
     {
       taskName: 'Task 2',
       completed: false,
-      startDate: new Date()
+      startDate: new Date(),
     },
   ]);
 
+  protected updateTaskToCompleted(task: TWDTask) {
+    this.tasksList.update((tasks) =>
+      tasks.map((t) => (t === task ? { ...t, completed: !t.completed } : t))
+    );
+  }
 }

@@ -5,7 +5,7 @@
         </header>
         <main>
             @for (task of tasksList(); track $index) {
-                <task [taskInfo]="task" />
+                <task [taskInfo]="task" (onTaskCompleted)="updateTaskToCompleted(task)" />
             }
         </main>
     </div>
