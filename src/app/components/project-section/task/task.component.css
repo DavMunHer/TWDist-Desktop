@@ -1,0 +1,12 @@
+.task-container {
+    display: flex;
+    align-items: center;
+    padding-block: 10px;
+    padding-inline: 25px;
+    border: 1px solid #222a;
+    border-radius: 10px;
+
+    & .completed-button-container {
+        margin-right: 5px;
+    }
+}
