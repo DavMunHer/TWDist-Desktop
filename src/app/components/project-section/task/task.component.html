@@ -5,7 +5,7 @@
             <span class="radio-mark"></span>
         </label>
     </div>
-    <div class="task-name-container">
+    <div class="task-name-container" [ngClass]="{'completed': taskInfo().completed}">
         {{taskInfo().taskName}}
     </div>
 </div>
