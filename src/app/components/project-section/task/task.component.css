@@ -22,8 +22,8 @@
             
 
             & .radio-mark {
-                width: 15px;
-                height: 15px;
+                width: 14px;
+                height: 14px;
                 border-radius: 50%;
                 border: 1px solid #555;
                 position: relative;
@@ -43,5 +43,9 @@
             } */
 
         }
+    }
+
+    & .task-name-container {
+        /* text-decoration: line-through; */
     }
 }
