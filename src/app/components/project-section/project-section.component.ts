@@ -17,11 +17,21 @@ export class ProjectSectionComponent {
       completed: false,
       startDate: new Date(),
     },
-    // {
-    //   taskName: 'Task 2',
-    //   completed: false,
-    //   startDate: new Date(),
-    // },
+    {
+      taskName: 'Task 2',
+      completed: false,
+      startDate: new Date(),
+    },
+    {
+      taskName: 'Task 3',
+      completed: false,
+      startDate: new Date(),
+    },
+    {
+      taskName: 'Task 4',
+      completed: false,
+      startDate: new Date(),
+    },
   ]);
 
   protected updateTaskToCompleted(task: TWDTask) {

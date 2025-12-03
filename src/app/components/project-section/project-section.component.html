@@ -3,7 +3,7 @@
         <header class="section-header">
             <section-title [title]="'Desarrollo de interfaces'" [titleStyle]="'bold'" />
         </header>
-        <main>
+        <main class="tasks-container">
             @for (task of tasksList(); track $index) {
                 <task [taskInfo]="task" (onTaskCompleted)="updateTaskToCompleted(task)" />
             }
