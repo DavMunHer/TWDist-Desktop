@@ -1,0 +1,11 @@
+<div class="task-container">
+    <div class="completed-button-container">
+        <label class="completed-button-label" (click)="sendTaskCompletedChange()">
+            <input class="completed-button" [checked]="taskInfo().completed"  type="checkbox" name="completed-task">
+            <span class="radio-mark"></span>
+        </label>
+    </div>
+    <div class="task-name-container" [ngClass]="{'completed': taskInfo().completed}">
+        {{taskInfo().taskName}}
+    </div>
+</div>

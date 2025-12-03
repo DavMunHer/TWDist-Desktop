@@ -1,0 +1,79 @@
+:host {
+    --task-border-color: #6663;
+    --checkbox-input-color: #5559;
+    --hover-tick-color: #444d;
+    --text-color: #222;
+}
+
+
+.task-container {
+    display: flex;
+    align-items: center;
+    padding-block: 10px;
+    padding-inline: 25px;
+    border: 1px solid var(--task-border-color);
+    border-radius: 10px;
+    font-size: 0.9em;
+
+    &:hover {
+        box-shadow: 1px 1px 1px 1px color-mix(in srgb, var(--task-border-color) 80%, #fff 20%);
+        transition: box-shadow 0.2s;
+    }
+
+    & .completed-button-container {
+        margin-right: 5px;
+
+        & .completed-button-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+
+            & .completed-button {
+                display: none;
+            }
+
+            
+
+            & .radio-mark {
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                border: 1px solid var(--checkbox-input-color);
+                position: relative;
+            }
+
+            /* This block allows to custom the point inside the radio button */
+            /* The below is for the hover*/
+            & .completed-button:hover + .radio-mark::after {
+                content: "✓";
+                color: var(--hover-tick-color);
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            
+            /* This is for when it's already checked */
+            & .completed-button:checked + .radio-mark::after {
+                content: "✓";
+                color: var(--hover-tick-color);
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            & .radio-mark::after {
+                content: "";
+            }
+
+        }
+    }
+
+    & .task-name-container {
+        color: var(--text-color);
+        &.completed {
+            text-decoration: line-through;
+        }
+    }
+}

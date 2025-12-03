@@ -1,1 +1,12 @@
-<p>project-section works!</p>
+<section class="project-section-container">
+    <div class="project-section">
+        <header class="section-header">
+            <section-title [title]="'Desarrollo de interfaces'" [titleStyle]="'bold'" />
+        </header>
+        <main class="tasks-container">
+            @for (task of tasksList(); track $index) {
+                <task [taskInfo]="task" (onTaskCompleted)="updateTaskToCompleted(task)" />
+            }
+        </main>
+    </div>
+</section>
