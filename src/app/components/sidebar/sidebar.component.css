@@ -71,19 +71,22 @@
               }
             }
           }
-
-          &:hover {
-            background-color: #eaeaea;
-            border-radius: 8px;
-          }
         }
       }
 
-      & .notification-toggleview{
+      & .notification-toggleview {
         display: flex;
         flex-direction: row;
-        gap: 15px;
+        gap: 5px;
         width: 25%;
+
+        & .icon-nt {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 5px;
+          cursor: pointer;
+        }
       }
     }
 
@@ -93,4 +96,9 @@
       }
     }
   }
+}
+
+.sidebar-hover:hover {
+  background-color: #eaeaea;
+  border-radius: 8px;
 }
