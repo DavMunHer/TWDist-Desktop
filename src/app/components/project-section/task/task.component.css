@@ -35,6 +35,7 @@
             }
 
             /* This block allows to custom the point inside the radio button */
+            /* The below is for the hover*/
             & .completed-button:hover + .radio-mark::after {
                 content: "✓";
                 color: #666;
@@ -42,6 +43,20 @@
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
+            }
+            
+            /* This is for when it's already checked */
+            & .completed-button:checked + .radio-mark::after {
+                content: "✓";
+                color: #666;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            & .radio-mark::after {
+                content: "";
             }
 
         }
