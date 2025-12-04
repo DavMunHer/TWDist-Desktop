@@ -2,14 +2,19 @@
     /* In case we need variables */
 }
 
-.project-view-section {
+.project-section {
     margin-inline: 20px;
     padding: 5px;
 
-    & .project-view-header {
+    & .project-header {
         font-size: 1.5em;
         font-weight: bolder;
         padding: 5px;
         margin-block: 15px;
+    }
+
+    & .project-main-container {
+        display: flex;
+        column-gap: 20px;
     }
 }
