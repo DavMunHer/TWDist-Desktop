@@ -1,7 +1,7 @@
 <section class="project-section-container">
     <div class="project-section">
         <header class="section-header">
-            <section-title [title]="'Desarrollo de interfaces'" [titleStyle]="'bold'" />
+            <section-title [title]="sectionInfo().name" [titleStyle]="'bold'" />
         </header>
         <main class="tasks-container">
             @for (task of sectionInfo().tasksList; track $index) {

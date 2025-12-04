@@ -15,6 +15,5 @@
 
     & .project-main-container {
         display: flex;
-        column-gap: 20px;
     }
 }
