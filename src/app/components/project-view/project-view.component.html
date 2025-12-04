@@ -1,3 +1,11 @@
-@for (section of projectInfo().sectionsList; track $index) {
-    <project-section [sectionInfo]="section" (onTaskUpdate)="updateTaskToCompleted(section, $event)" />
-}
+<section class="project-view-section">
+    <header class="project-view-header">
+            {{projectInfo().name}}
+    </header>
+
+    <main>
+        @for (section of projectInfo().sectionsList; track $index) {
+            <project-section [sectionInfo]="section" (onTaskUpdate)="updateTaskToCompleted(section, $event)" />
+        }
+    </main>
+</section>

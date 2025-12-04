@@ -48,6 +48,7 @@ export class ProjectViewComponent {
     ],
   });
 
+  // FIXME: Change this logic using either immer or ngrx/signals -> patchState when we need to update many thing from subcomponents
   protected updateTaskToCompleted(section: TWDSection, task: TWDTask) {
     this.projectInfo.update((project: TWDProject) => {
       return {
