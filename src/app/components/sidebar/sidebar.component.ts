@@ -1,9 +1,11 @@
 import { NgClass } from '@angular/common';
 import { Component, signal } from '@angular/core';
+import { TWDSidebarMenu } from '../../types/sidebar/sidebar-menu';
+import { MenuSectionComponent } from './menu-section/menu-section.component';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [NgClass],
+  imports: [NgClass, MenuSectionComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
@@ -33,4 +35,21 @@ export class SidebarComponent {
       pendingTasks: 6
     }
   ])
+
+  protected navMenuSectionInfo = signal<TWDSidebarMenu>({
+    title: "Navigation",
+    items: [
+      {
+        name: "Hoy",
+        pendingTasks: 2,
+        icon: 'today'
+      },
+      {
+        name: "Próximo",
+        pendingTasks: 0,
+        icon: 'upcoming'
+      }
+    ]
+  })
+
 }
