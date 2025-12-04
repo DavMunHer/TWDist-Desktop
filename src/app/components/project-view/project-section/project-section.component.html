@@ -4,7 +4,7 @@
             <section-title [title]="'Desarrollo de interfaces'" [titleStyle]="'bold'" />
         </header>
         <main class="tasks-container">
-            @for (task of tasksList(); track $index) {
+            @for (task of sectionInfo().tasksList; track $index) {
                 <task [taskInfo]="task" (onTaskCompleted)="updateTaskToCompleted(task)" />
             }
         </main>

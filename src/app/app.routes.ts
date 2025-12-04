@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { ProjectSectionComponent } from './components/project-view/project-section/project-section.component';
+import { ProjectViewComponent } from './components/project-view/project-view.component';
 
 export const routes: Routes = [
     {
-        component: ProjectSectionComponent,
-        path: "project-section",
+        component: ProjectViewComponent,
+        path: "project-view",
     }
 ];

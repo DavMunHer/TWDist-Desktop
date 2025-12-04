@@ -1,11 +1,54 @@
 import { Component, signal } from '@angular/core';
+import { TWDProject } from '../../types/project';
+import { TWDTask } from '../../types/task';
+import { TWDSection } from '../../types/section';
+import { ProjectSectionComponent } from './project-section/project-section.component';
 
 @Component({
   selector: 'app-project-view',
-  imports: [],
+  imports: [ProjectSectionComponent],
   templateUrl: './project-view.component.html',
-  styleUrl: './project-view.component.css'
+  styleUrl: './project-view.component.css',
 })
 export class ProjectViewComponent {
-  protected projectInfo = signal("") //FIXME: change later
+  // FIXME: The below variable should be initialized doing an http request
+  protected projectInfo = signal<TWDProject>({
+    name: 'Project 1',
+    sectionsList: [
+      {
+        name: 'Section example',
+        tasksList: [
+          {
+            taskName: 'Task 1',
+            completed: false,
+            startDate: new Date(),
+          },
+          {
+            taskName: 'Task 2',
+            completed: false,
+            startDate: new Date(),
+          },
+        ],
+      },
+      {
+        name: 'Section 2',
+        tasksList: [
+          {
+            taskName: 'Task 1',
+            completed: false,
+            startDate: new Date(),
+          },
+          {
+            taskName: 'Task 2',
+            completed: false,
+            startDate: new Date(),
+          },
+        ],
+      },
+    ],
+  });
+
+  protected updateTaskToCompleted(section: TWDSection, task: TWDTask) {
+    
+  }
 }

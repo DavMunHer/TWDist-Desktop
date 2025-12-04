@@ -1,42 +1,23 @@
-import { Component, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { SectionTitleComponent } from './section-title/section-title.component';
 import { TaskComponent } from './task/task.component';
 import { TWDTask } from '../../../types/task';
+import { TWDSection } from '../../../types/section';
 
 @Component({
-  selector: 'app-project-section',
+  selector: 'project-section',
   imports: [SectionTitleComponent, TaskComponent],
   templateUrl: './project-section.component.html',
   styleUrl: './project-section.component.css',
 })
 export class ProjectSectionComponent {
-  // FIXME: The below variable should be initialized doing an http request or via input in the project component
-  protected tasksList = signal<TWDTask[]>([
-    {
-      taskName: 'Task 1',
-      completed: false,
-      startDate: new Date(),
-    },
-    {
-      taskName: 'Task 2',
-      completed: false,
-      startDate: new Date(),
-    },
-    {
-      taskName: 'Task 3',
-      completed: false,
-      startDate: new Date(),
-    },
-    {
-      taskName: 'Task 4',
-      completed: false,
-      startDate: new Date(),
-    },
-  ]);
+  public sectionInfo = input.required<TWDSection>();
+  public onTaskUpdate = output<TWDTask>();
 
   protected updateTaskToCompleted(task: TWDTask) {
-    this.tasksList.update((tasks) =>
-      tasks.map((t) => (t === task ? { ...t, completed: !t.completed } : t))
-    );
+    this.onTaskUpdate.emit(task);
+    // this.tasksList.update((tasks) =>
+    //   tasks.map((t) => (t === task ? { ...t, completed: !t.completed } : t))
+    // );
   }
 }
