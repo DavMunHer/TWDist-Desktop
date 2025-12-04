@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ProjectSectionComponent } from './components/project-section/project-section.component';
+import { ProjectSectionComponent } from './components/project-view/project-section/project-section.component';
 
 export const routes: Routes = [
     {

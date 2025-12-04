@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { SectionTitleComponent } from './section-title/section-title.component';
-import { TWDTask } from '../../types/task';
 import { TaskComponent } from './task/task.component';
+import { TWDTask } from '../../../types/task';
 
 @Component({
   selector: 'app-project-section',
