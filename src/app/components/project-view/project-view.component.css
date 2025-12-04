@@ -3,14 +3,14 @@
 }
 
 .project-section {
-    margin-inline: 20px;
+    margin-top: 20px;
     padding: 5px;
 
     & .project-header {
         font-size: 1.5em;
         font-weight: bolder;
         padding: 5px;
-        margin-block: 15px;
+        margin-top: 15px;
     }
 
     & .project-main-container {
