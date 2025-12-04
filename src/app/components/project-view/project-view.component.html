@@ -1,3 +1,3 @@
 @for (section of projectInfo().sectionsList; track $index) {
-    <project-section [sectionInfo]="section" />
+    <project-section [sectionInfo]="section" (onTaskUpdate)="updateTaskToCompleted(section, $event)" />
 }

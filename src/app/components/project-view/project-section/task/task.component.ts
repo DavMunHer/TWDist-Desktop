@@ -15,6 +15,5 @@ export class TaskComponent {
   protected sendTaskCompletedChange() {
     this.onTaskCompleted.emit()
   }
-
   
 }

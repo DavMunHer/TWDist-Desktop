@@ -49,6 +49,17 @@ export class ProjectViewComponent {
   });
 
   protected updateTaskToCompleted(section: TWDSection, task: TWDTask) {
-    
+    this.projectInfo.update((project: TWDProject) => {
+      return {
+        ...project,
+        sectionsList: project.sectionsList.map((s: TWDSection) => {
+          if (s !== section) return s;
+          return {
+            ...s,
+            tasksList: section.tasksList.map((t) => (t === task ? { ...t, completed: !t.completed } : t))
+          }
+        })
+      }
+    })
   }
 }

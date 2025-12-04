@@ -5,7 +5,7 @@
         </header>
         <main class="tasks-container">
             @for (task of sectionInfo().tasksList; track $index) {
-                <task [taskInfo]="task" (onTaskCompleted)="updateTaskToCompleted(task)" />
+                <task [taskInfo]="task" (onTaskCompleted)="emitTaskToCompleted(task)" />
             }
         </main>
     </div>

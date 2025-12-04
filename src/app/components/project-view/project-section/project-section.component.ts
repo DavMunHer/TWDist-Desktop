@@ -14,10 +14,7 @@ export class ProjectSectionComponent {
   public sectionInfo = input.required<TWDSection>();
   public onTaskUpdate = output<TWDTask>();
 
-  protected updateTaskToCompleted(task: TWDTask) {
+  protected emitTaskToCompleted(task: TWDTask) {
     this.onTaskUpdate.emit(task);
-    // this.tasksList.update((tasks) =>
-    //   tasks.map((t) => (t === task ? { ...t, completed: !t.completed } : t))
-    // );
   }
 }
