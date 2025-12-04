@@ -102,14 +102,15 @@
           & .ico {
             visibility: hidden;
             opacity: 0;
-            padding: 2px;
+            padding: 3px;
+            margin-left: 5px;
+            border-radius: 5px;
           }
 
           &:hover {
             & .ico {
               visibility: visible;
               opacity: 1;
-              border-radius: 8px;
             }
           }
 
