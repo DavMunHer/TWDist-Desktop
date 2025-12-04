@@ -69,4 +69,11 @@ export class SidebarComponent {
         return { name: p.name, pendingTasks: p.pendingTasks, icon: 'project' };
       }),
   });
+
+  protected projectsMenuSectionInfo = signal<TWDSidebarMenu>({
+    title: 'My Projects',
+    items: this.projects().map((p) => {
+      return { name: p.name, pendingTasks: p.pendingTasks, icon: 'project' };
+    }),
+  });
 }
