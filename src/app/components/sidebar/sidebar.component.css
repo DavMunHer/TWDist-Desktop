@@ -25,7 +25,6 @@
           position: relative;
           display: flex;
           align-items: center;
-          cursor: pointer;
           padding: 5px;
 
           &.open {
@@ -85,7 +84,6 @@
           align-items: center;
           justify-content: center;
           padding: 5px;
-          cursor: pointer;
         }
       }
     }
@@ -93,6 +91,38 @@
     & .sidebar-menu {
       & .menu-section {
         padding: 10px 0;
+
+        & .menu-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #666;
+        }
+
+        & ul {
+          display: block;
+          margin-block: 1em;
+
+          & li {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            padding-block: 6px;
+            justify-content: space-between;
+            font-size: 14px;
+            line-height: 16px;
+
+            & .project-start {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            }
+
+            & .pending-tasks {
+              color: #5559;
+              font-size: 13px;
+            }
+          }
+        }
       }
     }
   }
@@ -101,4 +131,5 @@
 .sidebar-hover:hover {
   background-color: #eaeaea;
   border-radius: 8px;
+  cursor: pointer;
 }

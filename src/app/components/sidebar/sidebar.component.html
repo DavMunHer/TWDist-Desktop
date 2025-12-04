@@ -2,7 +2,8 @@
   <div class="test">
     <div class="top-section">
       <div class="sidebar-profile ">
-        <div class="profile-dropdown sidebar-hover" [ngClass]="{'open' : toggleDropdownVal()}" (click)="toggleDropdown()">
+        <div class="profile-dropdown sidebar-hover" [ngClass]="{'open' : toggleDropdownVal()}"
+          (click)="toggleDropdown()">
           <img class="profile-avatar" src="\Default_pfp.png" alt="Profile Picture">
           <span class="profile-name">Oscar</span>
           <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -45,9 +46,90 @@
       </div>
     </div>
     <div class="sidebar-menu">
-      <div class="menu-section menu-navigation">Navigation</div>
-      <div class="menu-section menu-projects">My Projects</div>
-      <div class="menu-section menu-fav-projects">Favorite Projects</div>
+      <div class="menu-section menu-navigation">
+        <span class="menu-title">Navigation</span>
+        <ul>
+          <li class="sidebar-hover">
+            <div class="project-start">
+              <svg width="24px" height="24px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M16.5 18.401c0-2.901 4-2.401 4-.401 0 2.5-4 2.434-4 5h4M11.5 16.5H13V23"></path>
+                  <path stroke="#000000" stroke-linejoin="round" stroke-width="2"
+                    d="M5 8a2 2 0 012-2h18a2 2 0 012 2v18a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"></path>
+                  <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 12h22M21 8V4M11 8V4"></path>
+                </g>
+              </svg>
+              <span>Hoy</span>
+            </div>
+            <span class="pending-tasks">2</span>
+          </li>
+          <li class="sidebar-hover">
+            <div class="project-start">
+              <svg width="24px" height="24px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path stroke="#000000" stroke-linejoin="round" stroke-width="2"
+                    d="M5 8a2 2 0 012-2h18a2 2 0 012 2v18a2 2 0 01-2 2H7a2 2 0 01-2-2V8z"></path>
+                  <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 12h22M21 8V4M11 8V4"></path>
+                  <circle cx="11.5" cy="19.5" r="1.5" fill="#000000"></circle>
+                  <path fill="#000000" d="M17.5 19.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                  <circle cx="20.5" cy="19.5" r="1.5" fill="#000000"></circle>
+                </g>
+              </svg>
+              <span>Próximo</span>
+            </div>
+            <span class="pending-tasks">2</span>
+          </li>
+        </ul>
+      </div>
+      <div class="menu-section menu-fav-projects">
+        <span class="menu-title">Favorite Projects</span>
+        <ul>
+          @for (project of projects(); track $index) {
+          @if (project.favorite == true){
+          <li class="sidebar-hover">
+            <div class="project-start">
+              <svg width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                [attr.stroke]="colors()[$index]" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 9H20" />
+                <path d="M4 15H19" />
+                <path d="M17.52 3L12.69 21" />
+                <path d="M6.48 21L11.31 3" />
+              </svg>
+              <span>{{project.name}}</span>
+            </div>
+            <span class="pending-tasks">{{project.pendingTasks}}</span>
+          </li>
+          }
+          }
+        </ul>
+      </div>
+      <div class="menu-section menu-projects">
+        <span class="menu-title">My Projects</span>
+        <ul>
+          @for (project of projects(); track $index) {
+          <li class="sidebar-hover">
+            <div class="project-start">
+              <svg width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                [attr.stroke]="colors()[$index]" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 9H20" />
+                <path d="M4 15H19" />
+                <path d="M17.52 3L12.69 21" />
+                <path d="M6.48 21L11.31 3" />
+              </svg>
+              <span>{{project.name}}</span>
+            </div>
+            <span class="pending-tasks">{{project.pendingTasks}}</span>
+          </li>
+          }
+        </ul>
+      </div>
     </div>
   </div>
 </div>
