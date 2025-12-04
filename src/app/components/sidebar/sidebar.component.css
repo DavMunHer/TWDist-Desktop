@@ -92,15 +92,41 @@
       & .menu-section {
         padding: 10px 0;
 
-        & .menu-title {
-          font-size: 14px;
-          font-weight: 600;
-          color: #666;
+        & .title-section {
+          padding-block: 5px;
+          padding-inline: 3px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          & .ico {
+            visibility: hidden;
+            opacity: 0;
+            padding: 2px;
+          }
+
+          &:hover {
+            & .ico {
+              visibility: visible;
+              opacity: 1;
+              border-radius: 8px;
+            }
+          }
+
+          & .ico:hover {
+            background-color: #dadada;
+          }
+
+          & .menu-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+          }
         }
 
         & ul {
           display: block;
-          margin-block: 1em;
+          margin-left: 5px;
 
           & li {
             display: flex;
