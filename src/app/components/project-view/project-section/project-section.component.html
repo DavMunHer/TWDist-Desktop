@@ -1,0 +1,12 @@
+<section class="project-section-container">
+    <div class="project-section">
+        <header class="section-header">
+            <section-title [title]="sectionInfo().name" [titleStyle]="'bold'" />
+        </header>
+        <main class="tasks-container">
+            @for (task of sectionInfo().tasksList; track $index) {
+                <task [taskInfo]="task" (onTaskCompleted)="emitTaskToCompleted(task)" />
+            }
+        </main>
+    </div>
+</section>

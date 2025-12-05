@@ -1,12 +1,13 @@
 .project-section-container {
     display: flex;
-    justify-content: center;
 
     & .project-section {
+        padding-inline: 15px;
+        padding-block: 10px;
+        width: 250px;
 
         & .section-header {
-            margin-inline: 1rem;
-            margin-block: 1.5rem;
+            margin-block: 10px;
         }
 
         & .tasks-container {

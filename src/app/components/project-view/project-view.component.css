@@ -1,0 +1,19 @@
+:host {
+    /* In case we need variables */
+}
+
+.project-section {
+    margin-top: 20px;
+    padding: 5px;
+
+    & .project-header {
+        font-size: 1.5em;
+        font-weight: bolder;
+        padding: 5px;
+        margin-top: 15px;
+    }
+
+    & .project-main-container {
+        display: flex;
+    }
+}

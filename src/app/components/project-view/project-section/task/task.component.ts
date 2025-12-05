@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
-import { TWDTask } from '../../../types/task';
 import { NgClass } from '@angular/common';
+import { TWDTask } from '../../../../types/task';
 
 @Component({
   selector: 'task',
@@ -15,6 +15,5 @@ export class TaskComponent {
   protected sendTaskCompletedChange() {
     this.onTaskCompleted.emit()
   }
-
   
 }
