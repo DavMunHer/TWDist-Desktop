@@ -1,6 +1,6 @@
 :host {
     --icon-size: 22px;
-
+    --main-color: #666;
 }
 
 .main-container {
@@ -12,19 +12,16 @@
         display: flex;
         align-items: center;
         padding-block: 10px;
+        color: var(--main-color);
 
         &:hover {
-            background-color: #ddd;
+            background-color: #eee;
             border-radius: 5px;
-            font-weight: bold;
             cursor: pointer;
+            color: #000;
 
-            & .icon {
-                filter: 
-    drop-shadow(0.5px 0 black)
-    drop-shadow(-0.5px 0 black)
-    drop-shadow(0 0.5px black)
-    drop-shadow(0 -0.5px black);
+            & path {
+                fill: #000 !important;
             }
         }
 
@@ -35,6 +32,10 @@
             & .icon {
                 height: var(--icon-size);
                 aspect-ratio: 1 / 1;
+
+                & path {
+                    fill: var(--main-color);
+                }
             }
         }
 
