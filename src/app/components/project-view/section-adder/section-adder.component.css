@@ -1,7 +1,28 @@
+:host {
+    --icon-size: 22px;
+
+}
+
 .main-container {
     padding-inline: 15px;
-    padding-block: 10px;
+    padding-top: 10px;
     width: 250px;
-    display: flex;
-    align-items: center;
+
+    & .content {
+        display: flex;
+        align-items: center;
+        margin-block: 10px;
+
+        & .icon-container {
+            margin-right: 5px;
+            height: var(--icon-size);
+
+            & .icon {
+                height: var(--icon-size);
+                aspect-ratio: 1 / 1;
+            }
+        }
+
+    }
+
 }
