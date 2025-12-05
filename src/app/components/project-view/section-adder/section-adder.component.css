@@ -11,7 +11,22 @@
     & .content {
         display: flex;
         align-items: center;
-        margin-block: 10px;
+        padding-block: 10px;
+
+        &:hover {
+            background-color: #ddd;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+
+            & .icon {
+                filter: 
+    drop-shadow(0.5px 0 black)
+    drop-shadow(-0.5px 0 black)
+    drop-shadow(0 0.5px black)
+    drop-shadow(0 -0.5px black);
+            }
+        }
 
         & .icon-container {
             margin-right: 5px;
