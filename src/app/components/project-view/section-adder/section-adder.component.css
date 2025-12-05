@@ -1,0 +1,44 @@
+:host {
+    --icon-size: 22px;
+    --main-color: #444;
+}
+
+.main-container {
+    padding-inline: 15px;
+    padding-top: 10px;
+    width: 250px;
+
+    & .content {
+        display: flex;
+        align-items: center;
+        padding-block: 10px;
+        color: var(--main-color);
+
+        &:hover {
+            background-color: #eee;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #000;
+
+            & path {
+                fill: #000 !important;
+            }
+        }
+
+        & .icon-container {
+            margin-right: 5px;
+            height: var(--icon-size);
+
+            & .icon {
+                height: var(--icon-size);
+                aspect-ratio: 1 / 1;
+
+                & path {
+                    fill: var(--main-color);
+                }
+            }
+        }
+
+    }
+
+}
