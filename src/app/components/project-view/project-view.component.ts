@@ -6,7 +6,7 @@ import { ProjectSectionComponent } from './project-section/project-section.compo
 import { SectionAdderComponent } from './section-adder/section-adder.component';
 
 @Component({
-  selector: 'app-project-view',
+  selector: 'project-view',
   imports: [ProjectSectionComponent, SectionAdderComponent],
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.css',

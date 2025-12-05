@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from "./components/sidebar/sidebar.component";
-import { ProjectSectionComponent } from "./components/project-section/project-section.component";
+import { ProjectViewComponent } from "./components/project-view/project-view.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SidebarComponent, ProjectSectionComponent],
+  imports: [RouterOutlet, SidebarComponent, ProjectViewComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
