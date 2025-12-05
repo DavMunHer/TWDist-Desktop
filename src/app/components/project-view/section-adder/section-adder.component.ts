@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 
 @Component({
   selector: 'section-adder',
@@ -8,5 +8,10 @@ import { Component } from '@angular/core';
   styleUrl: './section-adder.component.css'
 })
 export class SectionAdderComponent {
+  public onAdderClick = output()
 
+
+  protected handleClick() {
+    this.onAdderClick.emit()
+  }
 }
