@@ -20,7 +20,7 @@ export class ProjectViewComponent {
         name: 'Section example',
         tasksList: [
           {
-            taskName: 'Task 1',
+            taskName: 'Very long task name that should fit if everything has been properly managed',
             completed: false,
             startDate: new Date(),
           },
