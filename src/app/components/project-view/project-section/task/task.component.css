@@ -78,6 +78,7 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
         user-select: none;
+        line-height: 1.3;
 
 
         &.completed {
