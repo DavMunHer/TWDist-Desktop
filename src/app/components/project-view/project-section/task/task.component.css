@@ -32,8 +32,6 @@
                 display: none;
             }
 
-            
-
             & .radio-mark {
                 width: 14px;
                 height: 14px;
@@ -44,7 +42,7 @@
 
             /* This block allows to custom the point inside the radio button */
             /* The below is for the hover*/
-            & .completed-button:hover + .radio-mark::after {
+            & .completed-button:hover+.radio-mark::after {
                 content: "✓";
                 color: var(--hover-tick-color);
                 position: absolute;
@@ -52,9 +50,9 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
             }
-            
+
             /* This is for when it's already checked */
-            & .completed-button:checked + .radio-mark::after {
+            & .completed-button:checked+.radio-mark::after {
                 content: "✓";
                 color: var(--hover-tick-color);
                 position: absolute;
@@ -72,6 +70,14 @@
 
     & .task-name-container {
         color: var(--text-color);
+        line-clamp: 2;
+        overflow-wrap: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+
+
         &.completed {
             text-decoration: line-through;
         }
