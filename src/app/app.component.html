@@ -1,8 +1,12 @@
 
 <main class="main">
-  <div class="content" style="display: flex; height: 100vh;">
-    <app-sidebar></app-sidebar>
-    <project-view ></project-view>
+  <div class="content">
+    <aside class="sidebar-container">
+      <app-sidebar></app-sidebar>
+    </aside>
+    <section class="view-section">
+      <project-view ></project-view>
+    </section>
   </div>
 </main>
 <router-outlet />
