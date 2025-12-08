@@ -1,0 +1,57 @@
+.breadcrumb {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100vh;
+
+  & .breadcrumb-left-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-inline: 5px;
+    gap: 5px;
+    width: 50%;
+    gap: 0px;
+
+    & .breadcrumb-link-name {
+      text-decoration: none;
+      padding: 5px;
+
+      & .breadcrumb-name {
+        font-size: 13px;
+        color: #666;
+      }
+
+      & :hover {
+        color: black;
+      }
+    }
+
+    & .breadcrumb-slash,
+    & .breadcrumb-route {
+      font-size: 13px;
+      color: #666;
+    }
+
+    & .breadcrumb-route {
+      padding: 5px;
+    }
+  }
+
+  & .breadcrumb-right-section {
+    display: flex;
+    justify-content: flex-end;
+    padding-inline: 10px;
+    width: 50%;
+
+    & .breadcrumb-ico {
+      padding: 2px 2px 0px 2px;
+    }
+  }
+}
+
+.breadcrumb-hover:hover {
+  background-color: #eaeaea;
+  border-radius: 8px;
+  cursor: pointer;
+}
