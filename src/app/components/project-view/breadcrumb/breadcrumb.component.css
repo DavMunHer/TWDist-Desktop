@@ -1,14 +1,36 @@
 .breadcrumb {
   display: flex;
   flex-direction: row;
-  gap: 5px;
-  padding-inline: 10px;
+  align-items: center;
+  width: 100vh;
 
-  .breadcrumb-link-name {
-    text-decoration: none;
-    .breadcrumb-name {
+  .breadcrumb-left-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-inline: 10px;
+    gap: 5px;
+    width: 50%;
+
+    .breadcrumb-link-name {
+      text-decoration: none;
+
+      .breadcrumb-name {
+        font-size: 13px;
+        color: #666;
+      }
+    }
+
+    .breadcrumb-route {
       font-size: 13px;
       color: #666;
     }
+  }
+
+  .breadcrumb-right-section {
+    display: flex;
+    justify-content: flex-end;
+    padding-inline: 10px;
+    width: 50%;
   }
 }

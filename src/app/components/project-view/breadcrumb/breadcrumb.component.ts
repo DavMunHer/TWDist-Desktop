@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'breadcrumb',
@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './breadcrumb.component.css'
 })
 export class BreadcrumbComponent {
-
+  public route = input<string>("default-route")
 }
