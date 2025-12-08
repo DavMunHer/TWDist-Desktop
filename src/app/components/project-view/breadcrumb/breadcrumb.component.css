@@ -1,0 +1,14 @@
+.breadcrumb {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  padding-inline: 10px;
+
+  .breadcrumb-link-name {
+    text-decoration: none;
+    .breadcrumb-name {
+      font-size: 13px;
+      color: #666;
+    }
+  }
+}

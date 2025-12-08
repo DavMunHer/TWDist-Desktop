@@ -1,12 +1,15 @@
 <section class="project-section">
-    <header class="project-header">
-            {{projectInfo().name}}
-    </header>
+  <nav>
+    <breadcrumb />
+  </nav>
+  <header class="project-header">
+    {{projectInfo().name}}
+  </header>
 
-    <main class="project-main-container">
-        @for (section of projectInfo().sectionsList; track $index) {
-            <project-section [sectionInfo]="section" (onTaskUpdate)="updateTaskToCompleted(section, $event)" />
-        }
-        <section-adder/>
-    </main>
+  <main class="project-main-container">
+    @for (section of projectInfo().sectionsList; track $index) {
+    <project-section [sectionInfo]="section" (onTaskUpdate)="updateTaskToCompleted(section, $event)" />
+    }
+    <section-adder />
+  </main>
 </section>

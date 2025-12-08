@@ -4,10 +4,11 @@ import { TWDTask } from '../../types/task';
 import { TWDSection } from '../../types/section';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
+import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
 
 @Component({
   selector: 'project-view',
-  imports: [ProjectSectionComponent, SectionAdderComponent],
+  imports: [ProjectSectionComponent, SectionAdderComponent, BreadcrumbComponent],
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.css',
 })
