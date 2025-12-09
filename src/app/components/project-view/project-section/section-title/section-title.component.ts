@@ -8,6 +8,6 @@ import { Component, input } from '@angular/core';
   styleUrl: './section-title.component.css'
 })
 export class SectionTitleComponent {
-  public title = input<string>("")
+  public title = input.required<string>()
   public titleStyle = input<"normal" | "bold">("normal")
 }

@@ -18,7 +18,7 @@ export class ProjectViewComponent {
     name: 'Project 1',
     sectionsList: [
       {
-        name: 'Section example',
+        name: 'Very large section title that should be managed properly',
         tasksList: [
           {
             taskName: 'Very long task name that should fit if everything has been properly managed',
