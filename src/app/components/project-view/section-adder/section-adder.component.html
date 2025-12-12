@@ -2,7 +2,7 @@
     @if (showSectionForm()) {
         <div class="new-section-container">
             <div class="form-container">
-                <input type="text" name="" id="">
+                <input class="section-input" type="text" placeholder="New section name">
             </div>
             <div class="form-actions-container">
                 <button (click)="handleFormSubmission()">Add section</button>
@@ -10,7 +10,7 @@
             </div>
         </div>
     } @else {
-    <div class="content" (click)="openSectionForm()">
+    <div class="add-section-button-container" (click)="openSectionForm()">
         <div class="icon-container">
             <svg class="icon add-section-icon" viewBox="0 0 29 29" fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg">

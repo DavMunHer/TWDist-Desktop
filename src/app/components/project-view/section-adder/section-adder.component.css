@@ -1,6 +1,9 @@
 :host {
     --icon-size: 22px;
     --main-color: #444;
+    
+    /* Form styles */
+    --input-font-size: 1.2em;
 }
 
 .main-container {
@@ -8,7 +11,32 @@
     padding-top: 10px;
     width: 250px;
 
-    & .content {
+
+    & .new-section-container {
+        display: flex;
+        flex-direction: column;
+        row-gap: 5px;
+
+        & .form-container {
+            
+            & .section-input {
+                font-size: var(--input-font-size);
+            }
+        }
+
+        & .form-actions-container {
+            display: flex;
+            column-gap: 10px;
+            & button {
+                font-size: var(--action-button-font-size);
+            }
+        }
+    }
+
+
+
+    /* Here is where the other view (Add button) starts */
+    & .add-section-button-container {
         display: flex;
         align-items: center;
         padding-block: 10px;

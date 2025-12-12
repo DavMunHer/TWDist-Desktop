@@ -7,7 +7,7 @@
     padding: 5px;
 
     & .project-header {
-        font-size: 1.5em;
+        font-size: var(--section-title-size);
         font-weight: bolder;
         padding: 5px;
         margin-top: 15px;
