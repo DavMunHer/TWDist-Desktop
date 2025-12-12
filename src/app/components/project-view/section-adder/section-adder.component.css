@@ -72,6 +72,7 @@
         align-items: center;
         padding-block: 10px;
         color: var(--main-color);
+        user-select: none;
 
         &:hover {
             background-color: #eee;
