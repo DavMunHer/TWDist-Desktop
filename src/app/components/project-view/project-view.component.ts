@@ -65,4 +65,13 @@ export class ProjectViewComponent {
       }
     })
   }
+
+  protected handleSectionAddition(newSection: TWDSection) {
+    this.projectInfo.update((project: TWDProject) => {
+      return {
+        ...project,
+        sectionsList: [...project.sectionsList, newSection]
+      }
+    })
+  }
 }

@@ -1,6 +1,12 @@
 :host {
     --icon-size: 22px;
     --main-color: #444;
+    
+    /* Form styles */
+    --input-x-padding: 10px;
+    /* The 2px are from the font size */
+    --input-width: calc(250px - calc(var(--input-x-padding) * 2) - 2px);
+    --action-buttons-font-size: 12px;
 }
 
 .main-container {
@@ -8,11 +14,65 @@
     padding-top: 10px;
     width: 250px;
 
-    & .content {
+
+    & .new-section-container {
+        display: flex;
+        flex-direction: column;
+        row-gap: 5px;
+
+        & .form-container {
+            
+            & .section-input {
+                width: var(--input-width);
+                border-radius: 5px;
+                border: 1px solid #4444;
+                padding: 3px 6px;
+            }
+        }
+
+        & .form-actions-container {
+            display: flex;
+            column-gap: 10px;
+
+            & button {
+                font-size: var(--action-buttons-font-size);
+                padding: 5px 10px;
+                border-radius: 5px;
+                color: var(--main-color);
+                font-weight: bold;
+            }
+
+            & .confirm-button {
+                /* FIXME: Change blue by the primary color of the app (should be defined in the styles.css file)  */
+                color: #fff;
+                background-color: rgb(from #0b6efd r g b / 0.85);
+                
+                &:hover {
+                    background-color: #0b6efd;
+                }
+                
+            }   
+            
+            & .cancel-button {
+                background-color: #eeed;
+                
+                &:hover {
+                    color: #111;
+                    background-color: #dddd;
+                }
+            }
+        }
+    }
+
+
+
+    /* Here is where the other view (Add button) starts */
+    & .add-section-button-container {
         display: flex;
         align-items: center;
         padding-block: 10px;
         color: var(--main-color);
+        user-select: none;
 
         &:hover {
             background-color: #eee;

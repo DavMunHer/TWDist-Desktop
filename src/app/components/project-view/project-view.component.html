@@ -10,6 +10,6 @@
     @for (section of projectInfo().sectionsList; track $index) {
     <project-section [sectionInfo]="section" (onTaskUpdate)="updateTaskToCompleted(section, $event)" />
     }
-    <section-adder />
+    <section-adder (onNewSectionCreated)="handleSectionAddition($event)" />
   </main>
 </section>
