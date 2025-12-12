@@ -4,7 +4,6 @@
     
 
     /* Form styles */
-    --input-font-size: 1.1em;
     --input-x-padding: 10px;
     /* The 2px are from the font size */
     --input-width: calc(250px - calc(var(--input-x-padding) * 2) - 2px);
@@ -26,7 +25,6 @@
             
             & .section-input {
                 width: var(--input-width);
-                font-size: var(--input-font-size);
                 border-radius: 5px;
                 border: 1px solid #4444;
                 padding: 3px 6px;
@@ -52,7 +50,6 @@
                 
                 &:hover {
                     background-color: #0b6efd;
-                    /* background-color: rgb(from #0b6efd r g b / 0.7); */
                 }
                 
             }   

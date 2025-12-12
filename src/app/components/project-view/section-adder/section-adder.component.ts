@@ -1,8 +1,9 @@
 import { Component, output, signal } from '@angular/core';
+import { AutoFocusDirective } from '../../../directives/auto-focus.directive';
 
 @Component({
   selector: 'section-adder',
-  imports: [],
+  imports: [AutoFocusDirective],
   templateUrl: './section-adder.component.html',
   styleUrl: './section-adder.component.css'
 })
