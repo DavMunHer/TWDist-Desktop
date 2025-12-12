@@ -1,17 +1,32 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { Component, output } from '@angular/core';
+import { Component, output, signal } from '@angular/core';
 
 @Component({
   selector: 'section-adder',
-  imports: [NgTemplateOutlet],
+  imports: [],
   templateUrl: './section-adder.component.html',
   styleUrl: './section-adder.component.css'
 })
 export class SectionAdderComponent {
-  public onAdderClick = output()
+  protected showSectionForm = signal<boolean>(false)
 
 
   protected handleClick() {
-    this.onAdderClick.emit()
+    this.showSectionForm.set(true);
   }
+
+  protected openSectionForm() {
+    // This will also hid the current "Add section" button, being replaced by the section form
+    this.showSectionForm.set(true)
+  }
+  
+  protected closeSectionForm() {
+    // When section form is closed, the add section button appears again!
+    this.showSectionForm.set(false);
+  }
+
+  protected handleFormSubmission() {
+    // TODO: Send info of the form to the backend
+    this.closeSectionForm()
+  }
+
 }
