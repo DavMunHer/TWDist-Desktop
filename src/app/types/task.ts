@@ -1,4 +1,5 @@
 export interface TWDTask {
+    id: number,
     taskName: string,
     completed: boolean,
     startDate: Date,
