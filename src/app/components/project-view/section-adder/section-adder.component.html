@@ -1,14 +1,14 @@
 <section class="main-container">
     @if (showSectionForm()) {
-        <div class="new-section-container">
+        <form class="new-section-container" (submit)="handleFormSubmission($event)">
             <div class="form-container">
-                <input twdAutoFocus [formControl]="newSectionName" class="section-input" type="text" placeholder="New section name">
+                <input twdAutoFocus [formControl]="newSectionNameCtrl" class="section-input" type="text" placeholder="New section name">
             </div>
             <div class="form-actions-container">
-                <button class="confirm-button" (click)="handleFormSubmission()">Add section</button>
-                <button class="cancel-button" (click)="closeSectionForm()">Cancel</button>
+                <button class="confirm-button" type="submit">Add section</button>
+                <button class="cancel-button" type="button" (click)="closeSectionForm()">Cancel</button>
             </div>
-        </div>
+        </form>
     } @else {
     <div class="add-section-button-container" (click)="openSectionForm()">
         <div class="icon-container">
