@@ -2,6 +2,7 @@
     --icon-size: 22px;
     --main-color: #444;
     
+
     /* Form styles */
     --input-font-size: 1.1em;
     --input-x-padding: 10px;
@@ -34,8 +35,32 @@
         & .form-actions-container {
             display: flex;
             column-gap: 10px;
+
             & button {
-                font-size: var(--action-button-font-size);
+                padding: 5px 10px;
+                border-radius: 5px;
+                color: var(--main-color);
+            }
+
+            & .confirm-button {
+                /* FIXME: Change blue by the primary color of the app (should be defined in the styles.css file)  */
+                color: #fff;
+                background-color: rgb(from #0b6efd r g b / 0.85);
+                
+                &:hover {
+                    background-color: #0b6efd;
+                    /* background-color: rgb(from #0b6efd r g b / 0.7); */
+                }
+                
+            }   
+            
+            & .cancel-button {
+                background-color: #eeed;
+                
+                &:hover {
+                    color: #111;
+                    background-color: #dddd;
+                }
             }
         }
     }
