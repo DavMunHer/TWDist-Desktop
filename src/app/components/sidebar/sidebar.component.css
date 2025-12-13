@@ -15,11 +15,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-top: 20px;
 
       & .sidebar-profile {
         display: flex;
         align-items: center;
-        padding: 10px 0;
+        /* padding: 10px 0; */
 
         & .profile-dropdown {
           position: relative;
