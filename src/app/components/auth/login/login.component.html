@@ -21,14 +21,14 @@
       <div class="login-info">
         <h2>Welcome back!</h2>
         <p>Fill the form to login</p>
-        <form class="login-form">
+        <form class="login-form" [formGroup]="loginForm" (submit)="login()">
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="JhonDoe@email.com" required>
+            <input type="email" id="email" name="email" formControlName="email" placeholder="JhonDoe@email.com" required>
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="********" required>
+            <input type="password" id="password" name="password" formControlName="password" placeholder="********" required>
           </div>
           <button type="submit">Login</button>
         </form>
