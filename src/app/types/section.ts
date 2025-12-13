@@ -1,7 +1,7 @@
 import { TWDTask } from "./task";
 
 export interface TWDSection {
-    id: number,
+    id: string,
     name: string,
     tasksList: TWDTask[]
 }
