@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { TWDSidebarMenu } from '../../types/sidebar/sidebar-menu';
 import { MenuSectionComponent } from './menu-section/menu-section.component';
 
@@ -10,7 +10,14 @@ import { MenuSectionComponent } from './menu-section/menu-section.component';
   styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
-  protected toggleDropdownVal = signal<Boolean>(false);
+  protected toggleDropdownVal = signal<boolean>(false);
+
+  public sidebarVisible = signal(true);
+  public sidebarVisibleInput = input<boolean>(true);
+
+  public toggleSidebar() {
+    this.sidebarVisible.set(!this.sidebarVisible());
+  }
 
   toggleDropdown() {
     this.toggleDropdownVal.set(!this.toggleDropdownVal());

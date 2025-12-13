@@ -6,6 +6,11 @@
   width: 100%;
   min-width: 30vh;
 
+  &.invisible {
+    opacity: 0%;
+    display: none;
+  }
+
   & .test {
     padding-block: 5px;
     padding-inline: 10px;
