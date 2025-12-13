@@ -1,4 +1,4 @@
-import { TWDTask } from '../../models/task';
+import { TWDTask } from '../../../models/task';
 import { TaskDto } from '../dto/task.dto';
 
 // Leaf mapper

@@ -1,5 +1,5 @@
-import { TWDSection } from '../../models/section';
-import { TWDTask } from '../../models/task';
+import { TWDSection } from '../../../models/section';
+import { TWDTask } from '../../../models/task';
 import { SectionDto } from '../dto/section.dto';
 import { taskFromDto } from './task.mapper';
 
