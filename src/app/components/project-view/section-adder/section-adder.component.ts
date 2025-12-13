@@ -1,8 +1,8 @@
 import { Component, input, output, signal } from '@angular/core';
 import { AutoFocusDirective } from '../../../directives/auto-focus.directive';
-import { TWDSection } from '../../../models/section';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { SectionView } from '../../../models/model-views/view.types';
 
 @Component({
   selector: 'section-adder',
@@ -13,7 +13,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class SectionAdderComponent {
   protected showSectionForm = signal<boolean>(false);
 
-  public onNewSectionCreated = output<TWDSection>();
+  public onNewSectionCreated = output<SectionView>();
 
   protected newSectionNameCtrl = new FormControl('', { nonNullable: true });
   protected newSectionSig = toSignal(this.newSectionNameCtrl.valueChanges, {
@@ -37,7 +37,7 @@ export class SectionAdderComponent {
   protected handleFormSubmission(event: Event) {
     event.preventDefault() // For not reloading the page when sending form
     // TODO: Send info of the form to the backend and show feedback to the user when something went wrong
-    const newSection: TWDSection = {
+    const newSection: SectionView = {
       id: crypto.randomUUID(),
       name: this.newSectionSig(),
       tasksList: [],

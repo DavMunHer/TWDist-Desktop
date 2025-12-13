@@ -1,5 +1,6 @@
 export interface TWDTask {
     id: string,
+    sectionId: string,
     taskName: string,
     completed: boolean,
     startDate: Date,
@@ -8,3 +9,5 @@ export interface TWDTask {
     end_date?: Date
     completed_date?: Date    
 }
+
+export type TWDTaskRecord = Record<string, TWDTask>
