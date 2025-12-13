@@ -1,1 +1,45 @@
-<p>signup works!</p>
+<div class="signup">
+  <div class="signup-wrapper">
+    <div class="signup-main">
+      <div class="signup-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 140" width="420" height="140">
+          <g transform="translate(0,20)">
+            <rect x="0" y="0" rx="14" ry="14" width="60" height="60" style="fill:#0b6efd;" />
+            <polygon points="16,30 25,9 25,50 16,50" style="fill:white;" />
+            <polygon points="35,9 44,9 44,30 35,50" style="fill:white;" />
+          </g>
+          <text x="70" y="55" dominant-baseline="middle"
+            style="font-family:'Inter', system-ui, sans-serif; font-weight:700; font-size:52px; fill:#0f1724;">
+            TWD
+          </text>
+          <text x="200" y="55" dominant-baseline="middle"
+            style="font-family:'Inter', system-ui, sans-serif; font-weight:600; font-size:34px; fill:#6b7280;">
+            ist
+          </text>
+        </svg>
+      </div>
+      <div class="signup-info">
+        <h2>Register</h2>
+        <p>Fill the form with your information</p>
+        <form class="signup-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="JhonDoe@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="JhonDoe123" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="********" required>
+          </div>
+          <button type="submit">Sign Up</button>
+        </form>
+        <p>By continuing, you agree to TWDist <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+        <hr>
+        <p class="go-signup">Already Signed In? <a href="/#/auth/login">Go to login</a></p>
+      </div>
+    </div>
+  </div>
+</div>
