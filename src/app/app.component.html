@@ -1,12 +1,1 @@
-
-<main class="main">
-  <div class="content">
-    <aside class="sidebar-container">
-      <app-sidebar [sidebarVisibleInput]="visibleSidebar()" (onSidebarClose)="toggleSidebar($event)"></app-sidebar>
-    </aside>
-    <section class="view-section">
-      <project-view [showIcon]="visibleSidebar()" (onShowIconChange)="toggleSidebar($event)"></project-view>
-    </section>
-  </div>
-</main>
 <router-outlet />
