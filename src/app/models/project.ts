@@ -1,9 +1,7 @@
-import { TWDSection } from "./section";
-
 export interface TWDProject {
     id: string
     name: string,
-    sectionsList: TWDSection[]
+    sectionIds: string[]
 }
 
 export interface PartialTWDProject {
