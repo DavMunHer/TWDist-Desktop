@@ -1,11 +1,15 @@
-import { TWDSection } from "./section";
-
 export interface TWDProject {
+    id: string
     name: string,
-    sectionsList: TWDSection[]
+    sectionIds: string[]
 }
 
+
+
+// This type might not be used 
 export interface PartialTWDProject {
+    id: string,
     name: string,
     favorite: boolean
 }
+
