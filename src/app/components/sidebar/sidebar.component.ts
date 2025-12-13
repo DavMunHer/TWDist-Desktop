@@ -12,11 +12,12 @@ import { MenuSectionComponent } from './menu-section/menu-section.component';
 export class SidebarComponent {
   protected toggleDropdownVal = signal<boolean>(false);
 
-  public sidebarVisible = signal(true);
-  public sidebarVisibleInput = input<boolean>(true);
+  public sidebarVisibleInput = input.required<boolean>();
+  public onSidebarClose = output<boolean>();
 
-  public toggleSidebar() {
-    this.sidebarVisible.set(!this.sidebarVisible());
+  toggleSidebar() {
+    // When the action of clicking the icon is triggered, we will send an output to update the value of the sidebarVisible
+    this.onSidebarClose.emit(false)
   }
 
   toggleDropdown() {

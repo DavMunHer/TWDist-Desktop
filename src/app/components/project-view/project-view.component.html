@@ -1,6 +1,6 @@
 <section class="project-section">
   <nav>
-    <breadcrumb />
+    <breadcrumb [showIcon]="showIcon()" (onIconClick)="handleIconChange()"/>
   </nav>
   <header class="project-header">
     {{projectInfo().name}}

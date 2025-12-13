@@ -2,10 +2,10 @@
 <main class="main">
   <div class="content">
     <aside class="sidebar-container">
-      <app-sidebar></app-sidebar>
+      <app-sidebar [sidebarVisibleInput]="visibleSidebar()" (onSidebarClose)="toggleSidebar($event)"></app-sidebar>
     </aside>
     <section class="view-section">
-      <project-view ></project-view>
+      <project-view [showIcon]="visibleSidebar()" (onShowIconChange)="toggleSidebar($event)"></project-view>
     </section>
   </div>
 </main>

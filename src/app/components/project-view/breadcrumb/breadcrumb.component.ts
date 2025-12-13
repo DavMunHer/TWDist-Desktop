@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 @Component({
   selector: 'breadcrumb',
@@ -9,7 +9,11 @@ import { Component, input } from '@angular/core';
 })
 export class BreadcrumbComponent {
   public route = input<string>("default-route")
-  public invisible = input<boolean>(false);
 
+  public showIcon = input.required<boolean>();
+  public onIconClick = output<boolean>();
 
+  openSidebar(){
+    this.onIconClick.emit(true)
+  }
 }

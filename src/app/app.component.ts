@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from "./components/sidebar/sidebar.component";
 import { ProjectViewComponent } from "./components/project-view/project-view.component";
@@ -11,4 +11,10 @@ import { ProjectViewComponent } from "./components/project-view/project-view.com
 })
 export class AppComponent {
   title = 'TWDist-desktop';
+  protected visibleSidebar = signal<boolean>(true);
+
+  toggleSidebar(newValue: boolean) {
+    this.visibleSidebar.set(newValue)
+  }
+
 }

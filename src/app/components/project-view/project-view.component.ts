@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { TWDProject } from '../../types/project';
 import { TWDTask } from '../../types/task';
 import { TWDSection } from '../../types/section';
@@ -13,6 +13,14 @@ import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
   styleUrl: './project-view.component.css',
 })
 export class ProjectViewComponent {
+  // Tunnel for hidding icon when sidebar is visible
+  public onShowIconChange = output<boolean>();
+  public showIcon = input.required<boolean>();
+
+  handleIconChange() {
+    this.onShowIconChange.emit(true)
+  }
+
   // FIXME: The below variable should be initialized doing an http request
   protected projectInfo = signal<TWDProject>({
     name: 'Project 1',
