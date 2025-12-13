@@ -1,8 +1,8 @@
 import { Component, input, output, signal } from '@angular/core';
-import { AutoFocusDirective } from '../../../directives/auto-focus.directive';
+import { AutoFocusDirective } from '../../../../directives/auto-focus.directive';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { SectionView } from '../../../models/model-views/view.types';
+import { SectionView } from '../../../../models/model-views/view.types';
 
 @Component({
   selector: 'section-adder',

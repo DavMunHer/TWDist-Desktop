@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { TaskView } from '../../../../models/model-views/view.types';
+import { TaskView } from '../../../../../models/model-views/view.types';
 
 @Component({
   selector: 'task',

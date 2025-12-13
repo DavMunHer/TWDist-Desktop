@@ -1,7 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import { SectionTitleComponent } from './section-title/section-title.component';
 import { TaskComponent } from './task/task.component';
-import { SectionView, TaskView } from '../../../models/model-views/view.types';
+import { SectionView, TaskView } from '../../../../models/model-views/view.types';
 
 @Component({
   selector: 'project-section',
