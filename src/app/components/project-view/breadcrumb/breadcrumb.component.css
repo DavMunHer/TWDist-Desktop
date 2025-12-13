@@ -15,6 +15,7 @@
     & .breadcrumb-toggle-ico {
       display: flex;
       margin-right: 10px;
+      padding: 5px;
     }
 
     & .invisible {
