@@ -22,6 +22,6 @@ export const routes: Routes = [
   {
     path: "**",
     //TODO: Make 404 page
-    redirectTo: "auth/signup"
+    redirectTo: "projects/1"
   }
 ];
