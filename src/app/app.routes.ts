@@ -6,6 +6,7 @@ import { HomeComponent } from './components/home/home.component';
 export const routes: Routes = [
   { path: 'projects/:id', component: HomeComponent },
   { path: 'projects/upcoming', component: HomeComponent },
+  { path: 'projects/today', component: HomeComponent },
   {
     path: 'projects',
     //TODO: Projects view
