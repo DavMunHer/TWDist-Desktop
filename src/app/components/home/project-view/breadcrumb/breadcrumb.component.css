@@ -7,15 +7,26 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding-inline: 5px;
+    /* padding-inline: 5px; */
     gap: 5px;
     width: 50%;
     gap: 0px;
 
+    & .breadcrumb-toggle-ico {
+      display: flex;
+      margin-right: 10px;
+      padding: 5px;
+    }
+
+    & .invisible {
+      opacity: 0%;
+      display: none;
+    }
+
     & .breadcrumb-link-name {
       text-decoration: none;
-      padding: 4px;
-      margin: 4px;
+      padding: 4px 4px 4px 0;
+      margin: 4px 4px 4px 5px;
 
       & .breadcrumb-name {
         font-size: 13px;

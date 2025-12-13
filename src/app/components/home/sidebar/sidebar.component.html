@@ -1,4 +1,4 @@
-<div class="sidebar">
+<div class="sidebar" [ngClass]="{'invisible': !sidebarVisibleInput()}">
   <div class="test">
     <div class="top-section">
       <div class="sidebar-profile ">
@@ -35,7 +35,7 @@
             </g>
           </svg>
         </div>
-        <div class="icon-nt icon-view sidebar-hover">
+        <div class="icon-nt icon-view sidebar-hover" (click)="toggleSidebar()">
           <svg width="20px" height="20px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none"
             stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="1" width="14" height="14" rx="2" ry="2" />

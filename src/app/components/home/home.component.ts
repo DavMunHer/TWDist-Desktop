@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { ProjectViewComponent } from './project-view/project-view.component';
 
@@ -9,5 +9,9 @@ import { ProjectViewComponent } from './project-view/project-view.component';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
+  protected visibleSidebar = signal<boolean>(true);
 
+  toggleSidebar(newValue: boolean) {
+    this.visibleSidebar.set(newValue)
+  }
 }

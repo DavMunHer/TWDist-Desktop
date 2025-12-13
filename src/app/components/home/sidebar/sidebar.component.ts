@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { TWDSidebarMenu } from '../../../models/sidebar/sidebar-menu';
 import { MenuSectionComponent } from './menu-section/menu-section.component';
 
@@ -10,7 +10,15 @@ import { MenuSectionComponent } from './menu-section/menu-section.component';
   styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
-  protected toggleDropdownVal = signal<Boolean>(false);
+  protected toggleDropdownVal = signal<boolean>(false);
+
+  public sidebarVisibleInput = input.required<boolean>();
+  public onSidebarClose = output<boolean>();
+
+  toggleSidebar() {
+    // When the action of clicking the icon is triggered, we will send an output to update the value of the sidebarVisible
+    this.onSidebarClose.emit(false)
+  }
 
   toggleDropdown() {
     this.toggleDropdownVal.set(!this.toggleDropdownVal());

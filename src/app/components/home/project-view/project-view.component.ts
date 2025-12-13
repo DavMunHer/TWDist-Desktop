@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
 import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
@@ -11,6 +11,14 @@ import { ProjectView, SectionView, TaskView } from '../../../models/model-views/
   styleUrl: './project-view.component.css',
 })
 export class ProjectViewComponent {
+  // Tunnel for hidding icon when sidebar is visible
+  public onShowIconChange = output<boolean>();
+  public showIcon = input.required<boolean>();
+
+  handleIconChange() {
+    this.onShowIconChange.emit(true)
+  }
+
   // FIXME: The below variable should be initialized doing an http request
   protected projectInfo = signal<ProjectView>({
     id: "1",

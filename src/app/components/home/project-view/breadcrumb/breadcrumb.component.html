@@ -1,5 +1,12 @@
 <div class="breadcrumb">
   <div class="breadcrumb-left-section">
+    <div class="breadcrumb-toggle-ico breadcrumb-hover" [ngClass]="{'invisible': showIcon()}" (click)="openSidebar()">
+      <svg width="20px" height="20px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#000"
+        stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="1" width="14" height="14" rx="2" ry="2" />
+        <line x1="5" y1="1" x2="5" y2="15" />
+      </svg>
+    </div>
     <a href="#" class="breadcrumb-link-name breadcrumb-hover">
       <span class="breadcrumb-name">My Projects</span>
     </a>
@@ -10,8 +17,7 @@
   </div>
   <div class="breadcrumb-right-section">
     <div class="breadcrumb-hover breadcrumb-ico">
-      <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"
-        xmlns="http://www.w3.org/2000/svg">
+      <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
         <g id="SVGRepo_iconCarrier">
