@@ -1,8 +1,8 @@
 import { Component, input, output, signal } from '@angular/core';
 import { SectionTitleComponent } from './section-title/section-title.component';
 import { TaskComponent } from './task/task.component';
-import { TWDTask } from '../../../types/task';
-import { TWDSection } from '../../../types/section';
+import { TWDTask } from '../../../models/task';
+import { TWDSection } from '../../../models/section';
 
 @Component({
   selector: 'project-section',

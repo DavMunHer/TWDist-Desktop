@@ -1,6 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { AutoFocusDirective } from '../../../directives/auto-focus.directive';
-import { TWDSection } from '../../../types/section';
+import { TWDSection } from '../../../models/section';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 

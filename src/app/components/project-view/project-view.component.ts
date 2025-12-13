@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
-import { TWDProject } from '../../types/project';
-import { TWDTask } from '../../types/task';
-import { TWDSection } from '../../types/section';
+import { TWDProject } from '../../models/project';
+import { TWDTask } from '../../models/task';
+import { TWDSection } from '../../models/section';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
 import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
