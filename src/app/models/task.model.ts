@@ -9,3 +9,5 @@ export interface TWDTask {
     end_date?: Date
     completed_date?: Date    
 }
+
+export type TWDTaskRecord = Record<string, TWDTask>

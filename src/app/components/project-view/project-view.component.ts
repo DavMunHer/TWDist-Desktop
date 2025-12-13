@@ -1,10 +1,8 @@
 import { Component, signal } from '@angular/core';
-import { TWDProject } from '../../models/project';
-import { TWDTask } from '../../models/task';
-import { TWDSection } from '../../models/section';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
 import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
+import { ProjectView, SectionView, TaskView } from '../../models/model-views/view.types';
 
 @Component({
   selector: 'project-view',
@@ -14,7 +12,7 @@ import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
 })
 export class ProjectViewComponent {
   // FIXME: The below variable should be initialized doing an http request
-  protected projectInfo = signal<TWDProject>({
+  protected projectInfo = signal<ProjectView>({
     id: "1",
     name: 'Project 1',
     sectionsList: [
@@ -58,11 +56,11 @@ export class ProjectViewComponent {
   });
 
   // FIXME: Change this logic using either immer or ngrx/signals -> patchState when we need to update many thing from subcomponents
-  protected updateTaskToCompleted(section: TWDSection, task: TWDTask) {
-    this.projectInfo.update((project: TWDProject) => {
+  protected updateTaskToCompleted(section: SectionView, task: TaskView) {
+    this.projectInfo.update((project: ProjectView) => {
       return {
         ...project,
-        sectionsList: project.sectionsList.map((s: TWDSection) => {
+        sectionsList: project.sectionsList.map((s: SectionView) => {
           if (s.id != section.id) return s;
           return {
             ...s,
@@ -73,8 +71,8 @@ export class ProjectViewComponent {
     })
   }
 
-  protected handleSectionAddition(newSection: TWDSection) {
-    this.projectInfo.update((project: TWDProject) => {
+  protected handleSectionAddition(newSection: SectionView) {
+    this.projectInfo.update((project: ProjectView) => {
       return {
         ...project,
         sectionsList: [...project.sectionsList, newSection]

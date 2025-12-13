@@ -5,3 +5,5 @@ export interface TWDSection {
     projectId: string,
     tasksIds: string[]
 }
+
+export type TWDSectionsRecord = Record<string, TWDSection>

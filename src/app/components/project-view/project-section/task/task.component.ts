@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { TWDTask } from '../../../../models/task';
+import { TaskView } from '../../../../models/model-views/view.types';
 
 @Component({
   selector: 'task',
@@ -9,7 +9,7 @@ import { TWDTask } from '../../../../models/task';
   styleUrl: './task.component.css'
 })
 export class TaskComponent {
-  public taskInfo = input.required<TWDTask>()
+  public taskInfo = input.required<TaskView>()
   public onTaskCompleted = output()
 
   protected sendTaskCompletedChange() {

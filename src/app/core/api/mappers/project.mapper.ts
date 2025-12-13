@@ -1,6 +1,6 @@
-import { TWDProject } from '../../../models/project';
-import { TWDSection } from '../../../models/section';
-import { TWDTask } from '../../../models/task';
+import { TWDProject } from '../../../models/project.model';
+import { TWDSection } from '../../../models/section.model';
+import { TWDTask } from '../../../models/task.model';
 import { ProjectDto } from '../dto/project/project.dto';
 import { sectionFromDto } from './section.mapper';
 
