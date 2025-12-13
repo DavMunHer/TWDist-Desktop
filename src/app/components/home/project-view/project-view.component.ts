@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
 import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
-import { ProjectView, SectionView, TaskView } from '../../models/model-views/view.types';
+import { ProjectView, SectionView, TaskView } from '../../../models/model-views/view.types';
 
 @Component({
   selector: 'project-view',

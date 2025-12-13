@@ -1,5 +1,5 @@
 import { Component, input, signal } from '@angular/core';
-import { TWDSidebarMenu } from '../../../models/sidebar/sidebar-menu';
+import { TWDSidebarMenu } from '../../../../models/sidebar/sidebar-menu';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 
 @Component({
