@@ -1,4 +1,4 @@
-import { SectionDto } from "./section.dto";
+import { SectionDto } from "../section/section.dto";
 
 export interface ProjectDto {
     id: number,

@@ -1,5 +1,5 @@
 import { TWDTask } from '../../../models/task';
-import { TaskDto } from '../dto/task.dto';
+import { TaskDto } from '../dto/task/task.dto';
 
 // Leaf mapper
 export function taskFromDto(dto: TaskDto, sectionId: string): TWDTask {

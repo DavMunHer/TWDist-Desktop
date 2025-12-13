@@ -1,6 +1,6 @@
 import { TWDSection } from '../../../models/section';
 import { TWDTask } from '../../../models/task';
-import { SectionDto } from '../dto/section.dto';
+import { SectionDto } from '../dto/section/section.dto';
 import { taskFromDto } from './task.mapper';
 
 // Leaf mapper

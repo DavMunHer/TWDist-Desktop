@@ -1,7 +1,7 @@
 import { TWDProject } from '../../../models/project';
 import { TWDSection } from '../../../models/section';
 import { TWDTask } from '../../../models/task';
-import { ProjectDto } from '../dto/project.dto';
+import { ProjectDto } from '../dto/project/project.dto';
 import { sectionFromDto } from './section.mapper';
 
 // Aggregate mapper

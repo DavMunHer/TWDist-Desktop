@@ -1,4 +1,4 @@
-import { TaskDto } from "./task.dto";
+import { TaskDto } from "../task/task.dto";
 
 export interface SectionDto {
     id: number,
