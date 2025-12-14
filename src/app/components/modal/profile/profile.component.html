@@ -1,17 +1,41 @@
 <div class="profile-modal">
   <section>
     <h3>Profile Picture</h3>
+    <div>
+      <img src="\Default_pfp.png" alt="Profile Picture">
+      <button class="btn default" (click)="changePicture()">Change Picture</button>
+      <button class="btn delete" (click)="deletePicture()">Delete Picture</button>
+    </div>
   </section>
   <section>
     <h3>Name</h3>
+    <div>
+      <input type="text" [(ngModel)]="name">
+      <button class="btn default" (click)="updateName()">Update</button>
+    </div>
   </section>
   <section>
     <h3>Email</h3>
+    <div>
+      <input type="text" [(ngModel)]="email">
+      <button class="btn default" (click)="updateEmail()">Update</button>
+    </div>
   </section>
   <section>
     <h3>Password</h3>
+    <div>
+      <label>Old Password</label>
+      <input type="text" [(ngModel)]="oldPassword">
+      <label>New Password</label>
+      <input type="text" [(ngModel)]="newPassword">
+      <button class="btn default" (click)="updatePassword()">Update</button>
+    </div>
   </section>
   <section>
     <h3>Delete Account</h3>
+    <div>
+      <p>Deleting your account is permanent. You will lose access to all your information.</p>
+      <button class="btn delete" (click)="deleteAccount()">Delete</button>
+    </div>
   </section>
 </div>
