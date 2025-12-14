@@ -10,9 +10,14 @@ import { ConfigurationComponent } from "./configuration/configuration.component"
   styleUrl: './modal.component.css'
 })
 export class ModalComponent {
-  modalType = computed(()=> this.modalService.modalType())
+  modalType = computed(() => this.modalService.modalType())
 
   constructor(private modalService: ModalService) { }
+
+  modalTitle = computed(() => {
+    const data = this.modalService.modalData();
+    return data?.title ?? '';
+  });
 
   close() {
     this.modalService.close();

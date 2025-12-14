@@ -1,12 +1,16 @@
 @if (modalType()) {
 <div class="modal-backdrop" (click)="close()">
   <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">{{ modalTitle() }}</span>
+      <button class="modal-close" (click)="close()">✕</button>
+    </div>
+    <hr>
     @switch (modalType()) {
     @case ('configuration') {
     <configuration-modal />
     }
     }
-    <button class="modal-close" (click)="close()">✕</button>
   </div>
 </div>
 }

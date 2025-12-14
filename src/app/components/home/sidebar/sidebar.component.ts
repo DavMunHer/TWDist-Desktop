@@ -18,8 +18,8 @@ export class SidebarComponent {
 
   constructor(private modalService: ModalService) { }
 
-  openModal(type: string) {
-    this.modalService.open(type);
+  openModal(type: string, title: string) {
+    this.modalService.open(type, { title });
   }
 
   toggleSidebar() {
