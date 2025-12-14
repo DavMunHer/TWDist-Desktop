@@ -2,6 +2,7 @@ import { NgClass } from '@angular/common';
 import { Component, input, output, signal } from '@angular/core';
 import { TWDSidebarMenu } from '../../../models/sidebar/sidebar-menu';
 import { MenuSectionComponent } from './menu-section/menu-section.component';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -14,6 +15,12 @@ export class SidebarComponent {
 
   public sidebarVisibleInput = input.required<boolean>();
   public onSidebarClose = output<boolean>();
+
+  constructor(private modalService: ModalService) { }
+
+  openModal(type: string) {
+    this.modalService.open(type);
+  }
 
   toggleSidebar() {
     // When the action of clicking the icon is triggered, we will send an output to update the value of the sidebarVisible

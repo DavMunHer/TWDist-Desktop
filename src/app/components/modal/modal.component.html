@@ -2,7 +2,7 @@
 <div class="modal-backdrop" (click)="close()">
   <div class="modal-container" (click)="$event.stopPropagation()">
     @switch (modalType()) {
-    @case ('option1') {
+    @case ('configuration') {
     <configuration-modal />
     }
     }
