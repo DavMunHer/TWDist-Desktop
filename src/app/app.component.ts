@@ -2,10 +2,11 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from "./components/home/sidebar/sidebar.component";
 import { ProjectViewComponent } from "./components/home/project-view/project-view.component";
+import { ModalComponent } from "./components/modal/modal.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
