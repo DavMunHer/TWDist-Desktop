@@ -1,0 +1,11 @@
+@if (modalType()) {
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    @switch (modalType()) {
+    @case ('option1') {
+    }
+    }
+    <button class="modal-close" (click)="close()">✕</button>
+  </div>
+</div>
+}
