@@ -3,6 +3,7 @@
   <div class="modal-container" (click)="$event.stopPropagation()">
     @switch (modalType()) {
     @case ('option1') {
+    <configuration-modal />
     }
     }
     <button class="modal-close" (click)="close()">✕</button>
