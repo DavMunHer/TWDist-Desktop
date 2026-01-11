@@ -1,8 +1,11 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output } from '@angular/core';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
 import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
-import { ProjectView, SectionView, TaskView } from '../../../models/model-views/view.types';
+import { ProjectViewModel, SectionViewModel, TaskViewModel } from '../../../features/projects/presentation/models/project.view-model';
+import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
+import { ToggleTaskCompletionUseCase } from '../../../features/projects/application/use-cases/toggle-task-completion.use-case';
+import { CreateSectionUseCase } from '../../../features/projects/application/use-cases/create-section.use-case';
 
 @Component({
   selector: 'project-view',
@@ -10,7 +13,11 @@ import { ProjectView, SectionView, TaskView } from '../../../models/model-views/
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.css',
 })
-export class ProjectViewComponent {
+export class ProjectViewComponent implements OnInit {
+  private projectStore = inject(ProjectStore);
+  private toggleTaskCompletionUseCase = inject(ToggleTaskCompletionUseCase);
+  private createSectionUseCase = inject(CreateSectionUseCase);
+
   // Tunnel for hidding icon when sidebar is visible
   public onShowIconChange = output<boolean>();
   public showIcon = input.required<boolean>();
@@ -19,72 +26,41 @@ export class ProjectViewComponent {
     this.onShowIconChange.emit(true)
   }
 
-  // FIXME: The below variable should be initialized doing an http request
-  protected projectInfo = signal<ProjectView>({
-    id: "1",
-    name: 'Project 1',
-    sectionsList: [
-      {
-        id: "1",
-        name: 'Very large section title that should be managed properly',
-        tasksList: [
-          {
-            id: "1",
-            taskName: 'Very long task name that should fit if everything has been properly managed',
-            completed: false,
-            startDate: new Date(),
-          },
-          {
-            id: "2",
-            taskName: 'Task 2',
-            completed: false,
-            startDate: new Date(),
-          },
-        ],
-      },
-      {
-        id: "2",
-        name: 'Section 2',
-        tasksList: [
-          {
-            id: "3",
-            taskName: 'Task 1',
-            completed: false,
-            startDate: new Date(),
-          },
-          {
-            id: "4",
-            taskName: 'Task 2',
-            completed: false,
-            startDate: new Date(),
-          },
-        ],
-      },
-    ],
-  });
+  protected projectInfo = computed(() => this.projectStore.projectView());
 
-  // FIXME: Change this logic using either immer or ngrx/signals -> patchState when we need to update many thing from subcomponents
-  protected updateTaskToCompleted(section: SectionView, task: TaskView) {
-    this.projectInfo.update((project: ProjectView) => {
-      return {
-        ...project,
-        sectionsList: project.sectionsList.map((s: SectionView) => {
-          if (s.id != section.id) return s;
-          return {
-            ...s,
-            tasksList: section.tasksList.map((t) => (t.id === task.id ? { ...t, completed: !t.completed } : t))
-          }
-        })
-      }
-    })
+  ngOnInit(): void {
+    // Load project - in real app, get ID from route params
+    this.projectStore.loadProject('1');
   }
 
-  protected handleSectionAddition(newSection: SectionView) {
-    this.projectInfo.update((project: ProjectView) => {
-      return {
-        ...project,
-        sectionsList: [...project.sectionsList, newSection]
-      }
-    })
+  protected updateTaskToCompleted(section: SectionViewModel, task: TaskViewModel) {
+    this.toggleTaskCompletionUseCase.execute(task.id).subscribe({
+      next: (updatedTask) => {
+        console.log('Task toggled:', updatedTask);
+        // The store will handle re-rendering automatically via signals
+      },
+      error: (error) => {
+        console.error('Failed to toggle task:', error);
+      },
+    });
+  }
+
+  protected handleSectionAddition(newSection: SectionViewModel) {
+    // Get project ID from current project
+    const projectId = this.projectInfo()?.id;
+    if (!projectId) {
+      console.error('No project loaded');
+      return;
+    }
+
+    this.createSectionUseCase.execute(projectId, newSection.name).subscribe({
+      next: (createdSection) => {
+        console.log('Section created:', createdSection);
+        // The store will handle re-rendering automatically via signals
+      },
+      error: (error) => {
+        console.error('Failed to create section:', error);
+      },
+    });
   }
 }

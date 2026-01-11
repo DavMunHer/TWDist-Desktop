@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { TaskView } from '../../../../../models/model-views/view.types';
+import { TaskViewModel } from '../../../../../features/projects/presentation/models/project.view-model';
 
 @Component({
   selector: 'task',
@@ -9,7 +9,7 @@ import { TaskView } from '../../../../../models/model-views/view.types';
   styleUrl: './task.component.css'
 })
 export class TaskComponent {
-  public taskInfo = input.required<TaskView>()
+  public taskInfo = input.required<TaskViewModel>()
   public onTaskCompleted = output()
 
   protected sendTaskCompletedChange() {

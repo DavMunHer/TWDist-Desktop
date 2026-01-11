@@ -1,0 +1,28 @@
+import { Provider } from '@angular/core';
+import { ProjectRepository } from './domain/repositories/project.repository';
+import { SectionRepository } from './domain/repositories/section.repository';
+import { TaskRepository } from './domain/repositories/task.repository';
+import { HttpProjectRepository } from './infrastructure/repositories/http-project.repository';
+import { HttpSectionRepository } from './infrastructure/repositories/http-section.repository';
+import { HttpTaskRepository } from './infrastructure/repositories/http-task.repository';
+import { LoadProjectUseCase } from './application/use-cases/load-project.use-case';
+import { CreateSectionUseCase } from './application/use-cases/create-section.use-case';
+import { CreateTaskUseCase } from './application/use-cases/create-task.use-case';
+import { ToggleTaskCompletionUseCase } from './application/use-cases/toggle-task-completion.use-case';
+import { ProjectStore } from './presentation/store/project.store';
+
+export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
+  // Repositories
+  { provide: ProjectRepository, useClass: HttpProjectRepository },
+  { provide: SectionRepository, useClass: HttpSectionRepository },
+  { provide: TaskRepository, useClass: HttpTaskRepository },
+  
+  // Use Cases
+  LoadProjectUseCase,
+  CreateSectionUseCase,
+  CreateTaskUseCase,
+  ToggleTaskCompletionUseCase,
+  
+  // Presentation
+  ProjectStore,
+];
