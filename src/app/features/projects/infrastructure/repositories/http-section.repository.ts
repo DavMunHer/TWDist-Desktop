@@ -17,19 +17,19 @@ export class HttpSectionRepository extends SectionRepository {
   create(section: Section): Observable<Section> {
     const dto = SectionMapper.toCreateDto(section);
     return this.http
-      .post<SectionDto>(`/api/projects/${section.projectId}/sections`, dto)
+      .post<SectionDto>(`/projects/${section.projectId}/sections`, dto)
       .pipe(map(responseDto => SectionMapper.toDomain(responseDto, section.projectId)));
   }
 
   update(section: Section): Observable<Section> {
     const dto = SectionMapper.toDto(section);
     return this.http
-      .put<SectionDto>(`/api/sections/${section.id}`, dto)
+      .put<SectionDto>(`/sections/${section.id}`, dto)
       .pipe(map(responseDto => SectionMapper.toDomain(responseDto, section.projectId)));
   }
 
   delete(sectionId: string): Observable<void> {
-    return this.http.delete<void>(`/api/sections/${sectionId}`);
+    return this.http.delete<void>(`/sections/${sectionId}`);
   }
 
   findById(sectionId: string): Observable<Section> {
