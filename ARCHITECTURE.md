@@ -5,21 +5,27 @@ This project follows **Clean Architecture** principles with a **feature-based or
 ## Architecture Overview
 
 ```
-features/
-├── projects/              # Projects feature module
-│   ├── domain/           # Business logic (pure TypeScript)
-│   │   ├── entities/     # Domain models (Project, Section, Task)
-│   │   └── repositories/ # Repository interfaces (ports)
-│   ├── application/      # Use cases / Application services
-│   │   └── use-cases/    # Business operations
-│   ├── infrastructure/   # External concerns
-│   │   ├── dto/         # Data Transfer Objects
-│   │   ├── mappers/     # DTO <-> Entity mappers
-│   │   └── repositories/ # Repository implementations
-│   └── presentation/     # UI layer
-│       ├── models/       # View models
-│       └── store/        # State management
-└── shared/               # Shared utilities
+src/app/
+├── features/
+│   └── projects/              # Projects feature module
+│       ├── domain/           # Business logic (pure TypeScript)
+│       │   ├── entities/     # Domain models (Project, Section, Task)
+│       │   └── repositories/ # Repository interfaces (ports)
+│       ├── application/      # Use cases / Application services
+│       │   └── use-cases/    # Business operations
+│       ├── infrastructure/   # External concerns
+│       │   ├── dto/         # Data Transfer Objects
+│       │   ├── mappers/     # DTO <-> Entity mappers
+│       │   └── repositories/ # Repository implementations
+│       └── presentation/     # UI layer
+│           ├── models/       # View models
+│           └── store/        # State management
+├── components/               # UI Components (presentation only)
+│   ├── auth/                # Authentication components
+│   └── home/                # Home and project views
+├── directives/              # Shared directives
+└── shared/                  # Shared utilities
+    └── utils/               # Helper functions
 ```
 
 ## Layer Responsibilities
@@ -66,8 +72,19 @@ features/
 **UI-specific concerns**
 
 - **View Models**: UI-optimized data structures
+  - `ProjectViewModel`, `SectionViewModel`, `TaskViewModel`
+  - Simplified versions of domain entities for display
+  - Located in `features/*/presentation/models/`
+  
 - **Stores**: State management using Angular signals
-- **Components**: Live in `components/` directory
+  - `ProjectStore` - Manages project state and coordinates use cases
+  - Exposes computed signals for reactive UI updates
+  - Located in `features/*/presentation/store/`
+  
+- **Components**: UI components that consume view models
+  - Located in `components/` directory
+  - Import view models from feature's presentation layer
+  - Inject stores for state management
 
 ## Dependency Flow
 
@@ -103,11 +120,19 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
 ];
 ```
 
-Registered in [app.config.ts](../app.config.ts):
+Registered in [app.config.ts](src/app/app.config.ts):
 ```typescript
-providers: [
-  ...PROJECT_FEATURE_PROVIDERS,
-]
+import { provideHttpClient } from '@angular/common/http';
+import { PROJECT_FEATURE_PROVIDERS } from './features/projects';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes, withHashLocation()),
+    provideHttpClient(),
+    ...PROJECT_FEATURE_PROVIDERS,
+  ],
+};
 ```
 
 ## How to Use
@@ -115,29 +140,88 @@ providers: [
 ### In Components
 
 ```typescript
+import { ProjectViewModel, SectionViewModel, TaskViewModel } from '../../../features/projects';
+
 @Component({...})
-export class ProjectViewComponent {
+export class ProjectViewComponent implements OnInit {
   private projectStore = inject(ProjectStore);
   
+  // Computed signal from store
   projectInfo = computed(() => this.projectStore.projectView());
   
   ngOnInit() {
     this.projectStore.loadProject('1');
   }
+  
+  updateTask(section: SectionViewModel, task: TaskViewModel) {
+    // Use cases will be called through the store
+  }
 }
+```
+
+**Template usage:**
+```html
+<header class="project-header">
+  {{projectInfo()?.name}}
+</header>
+
+<main>
+  @for (section of projectInfo()?.sections; track section.id) {
+    <project-section [sectionInfo]="section" />
+  }
+</main>
 ```
 
 ### In Store
 
 ```typescript
+import { toRecord } from '../../../shared/utils';
+
 @Injectable()
 export class ProjectStore {
   private loadProjectUseCase = inject(LoadProjectUseCase);
+
+  private readonly state = signal<ProjectState>({
+    project: null,
+    sections: {},
+    tasks: {},
+  });
+
+  // Computed view model for UI consumption
+  readonly projectView = computed<ProjectViewModel | null>(() => {
+    const { project, sections, tasks } = this.state();
+    if (!project) return null;
+
+    return {
+      id: project.id,
+      name: project.name,
+      sections: project.sectionIds
+        .map(id => sections[id])
+        .filter(Boolean)
+        .map(section => ({
+          id: section.id,
+          name: section.name,
+          tasks: section.taskIds
+            .map(id => tasks[id])
+            .filter(Boolean)
+            .map(task => ({
+              id: task.id,
+              name: task.name,
+              completed: task.completed,
+              startDate: task.startDate,
+            })),
+        })),
+    };
+  });
   
   loadProject(projectId: string) {
     this.loadProjectUseCase.execute(projectId).subscribe({
       next: ({ project, sections, tasks }) => {
-        // Update state
+        this.state.set({
+          project,
+          sections: toRecord(sections),
+          tasks: toRecord(tasks),
+        });
       }
     });
   }
@@ -183,18 +267,46 @@ export class LoadProjectUseCase {
 6. Wire dependencies in `my-feature.providers.ts`
 7. Register in `app.config.ts`
 
-## Migration Notes
+## Migration Status
 
-- Old models in `models/` → Now in `features/*/domain/entities/`
-- Old `ProjectApiService` → Now `HttpProjectRepository`
-- Old `ProjectStoreService` → Now `ProjectStore`
-- Old view types → Now in `presentation/models/`
+### ✅ Completed
+- ✅ Created clean architecture structure in `features/projects/`
+- ✅ Implemented domain entities (Project, Section, Task)
+- ✅ Created repository interfaces and implementations
+- ✅ Implemented use cases (LoadProject, CreateSection, CreateTask, ToggleTaskCompletion)
+- ✅ Created presentation layer with view models and store
+- ✅ Migrated all components to use new view models
+- ✅ Removed deprecated directories (`core/`, `state/`, `models/`)
+- ✅ Configured dependency injection in `app.config.ts`
+
+### 📝 View Model Property Mapping
+Old structure → New structure:
+- `ProjectView` → `ProjectViewModel`
+  - `sectionsList` → `sections`
+- `SectionView` → `SectionViewModel`
+  - `tasksList` → `tasks`
+- `TaskView` → `TaskViewModel`
+  - `taskName` → `name`
+
+### 🗂️ Directory Migration
+- `models/project.model.ts` → `features/projects/domain/entities/project.entity.ts`
+- `models/section.model.ts` → `features/projects/domain/entities/section.entity.ts`
+- `models/task.model.ts` → `features/projects/domain/entities/task.entity.ts`
+- `models/model-views/view.types.ts` → `features/projects/presentation/models/project.view-model.ts`
+- `core/api/project-api.service.ts` → `features/projects/infrastructure/repositories/http-project.repository.ts`
+- `core/api/dto/` → `features/projects/infrastructure/dto/`
+- `core/api/mappers/` → `features/projects/infrastructure/mappers/`
+- `state/project/project-store.service.ts` → `features/projects/presentation/store/project.store.ts`
+- `state/utils/normalize.ts` → `shared/utils/normalize.util.ts`
 
 ## Next Steps
 
-- [ ] Complete auth feature with same structure
+- [ ] Implement remaining use cases for mutations (UpdateSection, DeleteSection, UpdateTask, DeleteTask)
+- [ ] Complete auth feature with same clean architecture structure
 - [ ] Add unit tests for domain entities
 - [ ] Add integration tests for repositories
-- [ ] Implement error handling strategy
-- [ ] Add loading states to store
-- [ ] Remove deprecated files from old structure
+- [ ] Implement comprehensive error handling strategy
+- [ ] Add loading and error states to store
+- [ ] Implement optimistic UI updates
+- [ ] Add data persistence layer (offline support)
+- [ ] Create additional features following the same pattern
