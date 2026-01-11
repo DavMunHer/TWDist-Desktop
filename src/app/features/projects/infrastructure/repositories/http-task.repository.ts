@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Task, TaskRepository } from '../../domain';
-import { TaskDto, CreateTaskDto } from '../dto';
+import { Task } from '../../domain/entities/task.entity';
+import { TaskRepository } from '../../domain/repositories/task.repository';
+import { TaskDto } from '../dto/task.dto';
+import { CreateTaskDto } from '../dto/create-task.dto';
 import { TaskMapper } from '../mappers/task.mapper';
 
 @Injectable()

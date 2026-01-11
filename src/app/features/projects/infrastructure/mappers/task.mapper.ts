@@ -1,5 +1,6 @@
-import { Task } from '../../domain';
-import { TaskDto, CreateTaskDto } from '../dto';
+import { Task } from '../../domain/entities/task.entity';
+import { TaskDto } from '../dto/task.dto';
+import { CreateTaskDto } from '../dto/create-task.dto';
 
 export class TaskMapper {
   static toDomain(dto: TaskDto, sectionId: string): Task {

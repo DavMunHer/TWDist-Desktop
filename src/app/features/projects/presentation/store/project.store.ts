@@ -1,6 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { LoadProjectUseCase } from '../../application';
-import { Project, Section, Task } from '../../domain';
+import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
+import { Project } from '../../domain/entities/project.entity';
+import { Section } from '../../domain/entities/section.entity';
+import { Task } from '../../domain/entities/task.entity';
 import { ProjectViewModel } from '../models/project.view-model';
 
 export interface ProjectState {

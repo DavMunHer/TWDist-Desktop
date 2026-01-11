@@ -1,5 +1,6 @@
-import { Section } from '../../domain';
-import { SectionDto, CreateSectionDto } from '../dto';
+import { Section } from '../../domain/entities/section.entity';
+import { SectionDto } from '../dto/section.dto';
+import { CreateSectionDto } from '../dto/create-section.dto';
 
 export class SectionMapper {
   static toDomain(dto: SectionDto, projectId: string): Section {

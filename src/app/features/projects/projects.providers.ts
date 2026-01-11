@@ -1,21 +1,15 @@
 import { Provider } from '@angular/core';
-import { 
-  ProjectRepository, 
-  SectionRepository, 
-  TaskRepository 
-} from './domain';
-import { 
-  HttpProjectRepository,
-  HttpSectionRepository,
-  HttpTaskRepository
-} from './infrastructure';
-import {
-  LoadProjectUseCase,
-  CreateSectionUseCase,
-  CreateTaskUseCase,
-  ToggleTaskCompletionUseCase
-} from './application';
-import { ProjectStore } from './presentation';
+import { ProjectRepository } from './domain/repositories/project.repository';
+import { SectionRepository } from './domain/repositories/section.repository';
+import { TaskRepository } from './domain/repositories/task.repository';
+import { HttpProjectRepository } from './infrastructure/repositories/http-project.repository';
+import { HttpSectionRepository } from './infrastructure/repositories/http-section.repository';
+import { HttpTaskRepository } from './infrastructure/repositories/http-task.repository';
+import { LoadProjectUseCase } from './application/use-cases/load-project.use-case';
+import { CreateSectionUseCase } from './application/use-cases/create-section.use-case';
+import { CreateTaskUseCase } from './application/use-cases/create-task.use-case';
+import { ToggleTaskCompletionUseCase } from './application/use-cases/toggle-task-completion.use-case';
+import { ProjectStore } from './presentation/store/project.store';
 
 export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   // Repositories

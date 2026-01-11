@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Section, SectionRepository } from '../../domain';
-import { SectionDto, CreateSectionDto } from '../dto';
+import { Section } from '../../domain/entities/section.entity';
+import { SectionRepository } from '../../domain/repositories/section.repository';
+import { SectionDto } from '../dto/section.dto';
+import { CreateSectionDto } from '../dto/create-section.dto';
 import { SectionMapper } from '../mappers/section.mapper';
 
 @Injectable()

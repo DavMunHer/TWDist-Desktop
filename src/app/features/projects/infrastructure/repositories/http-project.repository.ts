@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ProjectRepository, ProjectAggregate } from '../../domain';
-import { ProjectDto } from '../dto';
+import { ProjectRepository, ProjectAggregate } from '../../domain/repositories/project.repository';
+import { ProjectDto } from '../dto/project.dto';
 import { ProjectMapper } from '../mappers/project.mapper';
 
 @Injectable()

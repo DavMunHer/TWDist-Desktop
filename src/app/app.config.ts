@@ -3,7 +3,7 @@ import { provideRouter, withHashLocation } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
-import { PROJECT_FEATURE_PROVIDERS } from './features/projects';
+import { PROJECT_FEATURE_PROVIDERS } from './features/projects/projects.providers';
 
 export const appConfig: ApplicationConfig = {
   providers: [

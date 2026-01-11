@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Task, TaskRepository } from '../../domain';
+import { Task } from '../../domain/entities/task.entity';
+import { TaskRepository } from '../../domain/repositories/task.repository';
 
 @Injectable()
 export class CreateTaskUseCase {

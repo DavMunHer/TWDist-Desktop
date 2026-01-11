@@ -123,7 +123,7 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
 Registered in [app.config.ts](src/app/app.config.ts):
 ```typescript
 import { provideHttpClient } from '@angular/common/http';
-import { PROJECT_FEATURE_PROVIDERS } from './features/projects';
+import { PROJECT_FEATURE_PROVIDERS } from './features/projects/projects.providers';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -135,12 +135,15 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
+**Note**: Direct import from `projects.providers.ts` - no barrel files used.
+
 ## How to Use
 
 ### In Components
 
 ```typescript
-import { ProjectViewModel, SectionViewModel, TaskViewModel } from '../../../features/projects';
+import { ProjectViewModel, SectionViewModel, TaskViewModel } from '../../../features/projects/presentation/models/project.view-model';
+import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
 
 @Component({...})
 export class ProjectViewComponent implements OnInit {
@@ -172,10 +175,17 @@ export class ProjectViewComponent implements OnInit {
 </main>
 ```
 
+**Note**: Uses direct imports (no barrel files) following modern best practices.
+
 ### In Store
 
 ```typescript
-import { toRecord } from '../../../shared/utils';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
+import { Project } from '../../domain/entities/project.entity';
+import { Section } from '../../domain/entities/section.entity';
+import { Task } from '../../domain/entities/task.entity';
+import { ProjectViewModel } from '../models/project.view-model';
 
 @Injectable()
 export class ProjectStore {
@@ -219,11 +229,18 @@ export class ProjectStore {
       next: ({ project, sections, tasks }) => {
         this.state.set({
           project,
-          sections: toRecord(sections),
-          tasks: toRecord(tasks),
+          sections: this.toRecord(sections),
+          tasks: this.toRecord(tasks),
         });
       }
     });
+  }
+
+  private toRecord<T extends { id: string }>(items: T[]): Record<string, T> {
+    return items.reduce((acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    }, {} as Record<string, T>);
   }
 }
 ```
@@ -243,12 +260,14 @@ export class LoadProjectUseCase {
 
 ## Benefits
 
-✅ **Testability**: Domain logic testable without Angular
-✅ **Maintainability**: Clear separation of concerns
-✅ **Flexibility**: Easy to swap implementations (HTTP → LocalStorage)
-✅ **Scalability**: Each feature is self-contained
-✅ **Type Safety**: Strong typing throughout all layers
-✅ **Independence**: Business logic independent of frameworks
+✅ **Testability**: Domain logic testable without Angular  
+✅ **Maintainability**: Clear separation of concerns  
+✅ **Flexibility**: Easy to swap implementations (HTTP → LocalStorage)  
+✅ **Scalability**: Each feature is self-contained  
+✅ **Type Safety**: Strong typing throughout all layers  
+✅ **Independence**: Business logic independent of frameworks  
+✅ **No Barrel Files**: Direct imports for better tree-shaking and clarity  
+✅ **Smaller Bundles**: Only import what you need
 
 ## Testing Strategy
 

@@ -1,4 +1,6 @@
-import { Project, Section, Task } from '../../domain';
+import { Project } from '../../domain/entities/project.entity';
+import { Section } from '../../domain/entities/section.entity';
+import { Task } from '../../domain/entities/task.entity';
 import { ProjectDto } from '../dto/project.dto';
 import { SectionDto } from '../dto/section.dto';
 import { TaskDto } from '../dto/task.dto';
