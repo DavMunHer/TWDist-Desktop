@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, input, output, signal } from '@angular/core';
-import { TWDSidebarMenu } from '../../../models/sidebar/sidebar-menu';
+import { TWDSidebarMenu } from '../../../shared/models/sidebar-menu';
 import { MenuSectionComponent } from './menu-section/menu-section.component';
 
 @Component({
