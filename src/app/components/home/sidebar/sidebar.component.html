@@ -6,7 +6,8 @@
           (click)="toggleDropdown()">
           <img class="profile-avatar" src="\Default_pfp.png" alt="Profile Picture">
           <span class="profile-name">Oscar</span>
-          <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg id="arrow-down" width="20px" height="20px" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
@@ -16,12 +17,42 @@
             </g>
           </svg>
           <div class="dropdown-content">
-            <a href="#">Option 1</a>
-            <a href="#">Option 2</a>
-            <a href="#">Option 3</a>
+            <div (click)="openModal('profile', 'profile')">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5 18.5C5 15.91 8.134 14 12 14C15.866 14 19 15.91 19 18.5" />
+                <path d="M6 20H18" />
+              </svg>
+              <a>Profile</a>
+            </div>
+            <hr>
+            <div (click)="openModal('configuration', 'configuration')">
+              <svg width="24px" height="24px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
+                stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M14 20C17.3137 20 20 17.3137 20 14C20 10.6863 17.3137 8 14 8C10.6863 8 8 10.6863 8 14C8 17.3137 10.6863 20 14 20ZM18 14C18 16.2091 16.2091 18 14 18C11.7909 18 10 16.2091 10 14C10 11.7909 11.7909 10 14 10C16.2091 10 18 11.7909 18 14Z" />
+                <path
+                  d="M0 13V15C0 16.5478 1.17261 17.822 2.67809 17.9826C2.80588 18.3459 2.95062 18.7011 3.11133 19.0473C2.12484 20.226 2.18536 21.984 3.29291 23.0916L4.70712 24.5058C5.78946 25.5881 7.49305 25.6706 8.67003 24.7531C9.1044 24.9688 9.55383 25.159 10.0163 25.3218C10.1769 26.8273 11.4511 28 12.9993 28H14.9993C16.5471 28 17.8211 26.8279 17.9821 25.3228C18.4024 25.175 18.8119 25.0046 19.2091 24.8129C20.3823 25.6664 22.0344 25.564 23.0926 24.5058L24.5068 23.0916C25.565 22.0334 25.6674 20.3813 24.814 19.2081C25.0054 18.8113 25.1757 18.4023 25.3234 17.9824C26.8282 17.8211 28 16.5472 28 14.9996V12.9996C28 11.452 26.8282 10.1782 25.3234 10.0169C25.1605 9.55375 24.9701 9.10374 24.7541 8.66883C25.6708 7.49189 25.5882 5.78888 24.5061 4.70681L23.0919 3.29259C21.9846 2.18531 20.2271 2.12455 19.0485 3.1103C18.7017 2.94935 18.3459 2.80441 17.982 2.67647C17.8207 1.17177 16.5468 0 14.9993 0H12.9993C11.4514 0 10.1773 1.17231 10.0164 2.6775C9.60779 2.8213 9.20936 2.98653 8.82251 3.17181C7.64444 2.12251 5.83764 2.16276 4.70782 3.29259L3.2936 4.7068C2.16377 5.83664 2.12352 7.64345 3.17285 8.82152C2.98737 9.20877 2.82199 9.60763 2.67809 10.0167C1.17261 10.1773 0 11.4515 0 12.9996Z" />
+              </svg>
+              <a>Configuration</a>
+            </div>
+            <hr>
+            <div>
+              <svg id="log-out-ico" width="24px" height="24px" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg" stroke="#000" stroke-width="1" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 12L13 12" />
+                <path d="M18 15L20.913 12.087C20.961 12.039 20.961 11.961 20.913 11.913L18 9" />
+                <path
+                  d="M16 5V4.5C16 3.67157 15.3284 3 14.5 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H14.5C15.3284 21 16 20.3284 16 19.5V19" />
+              </svg>
+              <a href="#">Log Out</a>
+            </div>
           </div>
         </div>
       </div>
+
       <div class="notification-toggleview">
         <div class="sidebar-hover icon-nt icon-bell">
           <svg fill="#000000" width="20px" height="20px" viewBox="0 0 32 32" version="1.1"
@@ -46,9 +77,9 @@
     </div>
 
     <div class="sidebar-menu">
-      <sidebar-menu-section [menuSectionInfo]="navMenuSectionInfo()"/>
+      <sidebar-menu-section [menuSectionInfo]="navMenuSectionInfo()" />
 
-      <sidebar-menu-section [menuSectionInfo]="favoriteMenuSectionInfo()"/>
+      <sidebar-menu-section [menuSectionInfo]="favoriteMenuSectionInfo()" />
 
       <sidebar-menu-section [showPlusIcon]="true" [menuSectionInfo]="projectsMenuSectionInfo()" />
     </div>
