@@ -15,8 +15,15 @@ export class HttpAuthRepository extends AuthRepository {
   }
 
   login(credentials: LoginCredentialsDto): Observable<User> {
-    return this.http.post<AuthResponseDto>('/auth/login', credentials)
-      .pipe(map(dto => UserMapper.toDomain(dto.user)));
+    return this.http.post<UserResponseDto>('/auth/login', credentials)
+      .pipe(
+        map(dto => {
+          if (!dto || !dto.id) {
+            throw new Error('Invalid login response: missing user data');
+          }
+          return UserMapper.toDomain(dto);
+        })
+      );
   }
 
   logout(): Observable<void> {

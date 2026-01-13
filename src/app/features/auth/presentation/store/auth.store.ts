@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
+import { catchError, of, tap } from "rxjs";
 import { LoginUseCase } from "../../application/use-cases/login.use-case";
 import { LogoutUseCase } from "../../application/use-cases/logout.use-case";
 import { GetCurrentUserUseCase } from "../../application/use-cases/getCurrentUser.use-case";
@@ -24,8 +25,8 @@ export class AuthStore {
   login(credentials: LoginCredentialsDto): void {
     this.state.update(s => ({ ...s, isLoading: true, error: null }));
 
-    this.loginUseCase.execute(credentials).subscribe({
-      next: (user) => {
+    this.loginUseCase.execute(credentials).pipe(
+      tap((user) => {
         // Cookie is already set by server
         // Just update user state
         this.state.update(s => ({
@@ -34,15 +35,16 @@ export class AuthStore {
           isAuthenticated: true,
           isLoading: false,
         }));
-      },
-      error: (error) => {
+      }),
+      catchError((error) => {
         this.state.update(s => ({ 
           ...s, 
           isLoading: false, 
           error: error.message 
         }));
-      },
-    });
+        return of(null);
+      })
+    ).subscribe();
   }
 
   logout(): void {
@@ -60,15 +62,24 @@ export class AuthStore {
   }
 
   // Call this on app initialization
-  checkAuthStatus(): void {
-    this.getCurrentUserUseCase.execute().subscribe({
-      next: (user) => {
+  checkAuthStatus() {
+    return this.getCurrentUserUseCase.execute().pipe(
+      tap((user) => {
         this.state.update(s => ({
           ...s,
           user,
           isAuthenticated: !!user,
         }));
-      },
-    });
+      }),
+      catchError(() => {
+        // Handle 403 or any other error - user is not authenticated
+        this.state.update(s => ({
+          ...s,
+          user: null,
+          isAuthenticated: false,
+        }));
+        return of(null);
+      })
+    );
   }
 }
