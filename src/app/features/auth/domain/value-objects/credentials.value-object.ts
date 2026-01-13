@@ -1,3 +1,5 @@
+import { format } from "path";
+
 export class Credentials {
   constructor(
     public readonly email: string,
@@ -5,6 +7,7 @@ export class Credentials {
   ) {
     // Domain validation
     if (!email || !password) {
+      // TODO: Verify email format
       throw new Error('Email and password are required');
     }
   }
