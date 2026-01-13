@@ -58,22 +58,37 @@
             position: absolute;
             top: 100%;
             left: 0;
-            background-color: #f1f1f1;
-            min-width: 120px;
+            background-color: #fff;
+            min-width: 260px;
             box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 1;
-            border-radius: 4px;
+            border-radius: 10px;
             overflow: hidden;
+            padding-block: 5px;
+            margin-top: 5px;
 
-            & a {
-              color: black;
-              padding: 12px 16px;
-              text-decoration: none;
-              display: block;
-
-              &:hover {
-                background-color: #ddd;
+            & div {
+              display: flex;
+              align-items: center;
+              padding-inline: 7px;
+              margin-inline: 7px;
+              & a {
+                font-size: small;
+                color: black;
+                padding: 8px 16px;
+                text-decoration: none;
+                display: block;
               }
+            }
+            & :hover {
+              background-color: #ddd;
+              border-radius: 10px;
+            }
+            & hr {
+              background-color: #ddd;
+              border: none;
+              height: 1px;
+              margin: 6px 0;
             }
           }
         }
