@@ -14,7 +14,7 @@ export class HttpProjectRepository extends ProjectRepository {
 
   findById(projectId: string): Observable<ProjectAggregate> {
     return this.http
-      .get<ProjectDto>(`/api/projects/${projectId}`)
+      .get<ProjectDto>(`/projects/${projectId}`)
       .pipe(map(dto => ProjectMapper.toDomain(dto)));
   }
 
@@ -24,6 +24,6 @@ export class HttpProjectRepository extends ProjectRepository {
   }
 
   delete(projectId: string): Observable<void> {
-    return this.http.delete<void>(`/api/projects/${projectId}`);
+    return this.http.delete<void>(`/projects/${projectId}`);
   }
 }
