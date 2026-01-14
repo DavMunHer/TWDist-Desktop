@@ -1,0 +1,126 @@
+:host {
+  --scale: 0.6;
+}
+
+.profile-modal {
+  width: 500px;
+  height: 300px;
+  padding: 2rem;
+
+  & .create-project-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    & .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      & label {
+        font-weight: bold;
+      }
+
+      & .favorite-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      & .switch {
+        position: relative;
+        display: inline-block;
+        width: calc(60px * var(--scale));
+        height: calc(34px * var(--scale));
+
+        & input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+
+          &:checked + .slider {
+            background-color: #2196f3;
+          }
+
+          &:checked + .slider::before {
+            transform: translateX(calc(26px * var(--scale)));
+          }
+
+          &:focus + .slider {
+            box-shadow: 0 0 1px #2196f3;
+          }
+        }
+
+        & .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #ccc;
+          transition: 0.4s;
+          border-radius: calc(34px * var(--scale));
+
+          &::before {
+            position: absolute;
+            content: "";
+            height: calc(26px * var(--scale));
+            width: calc(26px * var(--scale));
+            left: calc(4px * var(--scale));
+            bottom: calc(4px * var(--scale));
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+          }
+        }
+      }
+
+      & input,
+      textarea {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+    }
+
+    & hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 1rem 0;
+    }
+
+    & .create-project-buttons-section {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+
+      & button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+
+        &.cancel {
+          background-color: #f5f5f5;
+          color: #595959;
+
+          &:hover {
+            background-color: #e0e0e0;
+          }
+        }
+
+        &.create {
+          background-color: #007bff;
+          color: white;
+
+          &:hover {
+            background-color: #0069d9;
+          }
+        }
+      }
+    }
+  }
+}
