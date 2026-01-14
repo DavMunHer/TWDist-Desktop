@@ -22,22 +22,26 @@ export class AuthStore {
     error: null,
   });
 
+  private readonly registrationSuccess = signal<boolean>(false);
+
   readonly user = computed(() => this.state().user);
   readonly isAuthenticated = computed(() => this.state().isAuthenticated);
+  readonly isRegistrationSuccess = computed(() => this.registrationSuccess());
 
   register(credentials: RegisterCredentialsDto): void {
     this.state.update(s => ({ ...s, isLoading: true, error: null }));
+    this.registrationSuccess.set(false);
 
     this.createUserUseCase.execute(credentials).pipe(
       tap((user) => {
-        // Cookie is already set by server
-        // Just update user state
+        // Registration successful - user created but not authenticated
         this.state.update(s => ({
           ...s,
-          user,
-          isAuthenticated: true,
+          user: null,
+          isAuthenticated: false,
           isLoading: false,
         }));
+        this.registrationSuccess.set(true);
       }),
       catchError((error) => {
         this.state.update(s => ({
@@ -45,6 +49,7 @@ export class AuthStore {
           isLoading: false,
           error: error.message
         }));
+        this.registrationSuccess.set(false);
         return of(null);
       })
     ).subscribe();
