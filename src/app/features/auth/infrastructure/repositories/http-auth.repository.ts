@@ -4,9 +4,9 @@ import { AuthRepository } from "../../domain/repositories/auth.repository";
 import { catchError, map, Observable, of } from "rxjs";
 import { LoginCredentialsDto } from "../dto/request/login-credentials.dto";
 import { User } from "../../domain/entities/user.entity";
-import { AuthResponseDto } from "../dto/response/auth-response.dto";
 import { UserMapper } from "../mappers/user.mapper";
 import { UserResponseDto } from "../dto/response/user-response.dto";
+import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {
@@ -24,6 +24,18 @@ export class HttpAuthRepository extends AuthRepository {
           return UserMapper.toDomain(dto);
         })
       );
+  }
+
+  register(dto: RegisterCredentialsDto): Observable<User> {
+    return this.http.post<UserResponseDto>('/users/create', dto)
+      .pipe(
+        map(userDto => {
+          if (!userDto || !userDto.id) {
+            throw new Error('Invalid register response: missing user data');
+          }
+          return UserMapper.toDomain(userDto);
+        })
+    );
   }
 
   logout(): Observable<void> {
