@@ -1,5 +1,6 @@
 import { User } from "../../domain/entities/user.entity";
-import { UserResponseDto } from "../dto/user-response.dto";
+import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
+import { UserResponseDto } from "../dto/response/user-response.dto";
 
 export class UserMapper {
   static toDomain(dto: UserResponseDto): User {
@@ -8,5 +9,13 @@ export class UserMapper {
       dto.email,
       dto.username
     );
+  }
+
+  static toDto(user: User): RegisterCredentialsDto {
+    return {
+      email: user.email,
+      username: user.username,
+      password: '' // Password is not stored in User entity; placeholder for DTO
+    };
   }
 }
