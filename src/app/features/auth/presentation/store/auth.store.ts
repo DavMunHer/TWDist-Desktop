@@ -4,7 +4,7 @@ import { LoginUseCase } from "../../application/use-cases/login.use-case";
 import { LogoutUseCase } from "../../application/use-cases/logout.use-case";
 import { GetCurrentUserUseCase } from "../../application/use-cases/getCurrentUser.use-case";
 import { AuthState } from "../models/auth-state";
-import { LoginCredentialsDto } from "../../infrastructure/dto/login-credentials.dto";
+import { LoginCredentialsDto } from "../../infrastructure/dto/request/login-credentials.dto";
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore {

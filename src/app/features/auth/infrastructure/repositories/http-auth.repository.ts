@@ -2,11 +2,11 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
 import { catchError, map, Observable, of } from "rxjs";
-import { LoginCredentialsDto } from "../dto/login-credentials.dto";
+import { LoginCredentialsDto } from "../dto/request/login-credentials.dto";
 import { User } from "../../domain/entities/user.entity";
-import { AuthResponseDto } from "../dto/auth-response.dto";
+import { AuthResponseDto } from "../dto/response/auth-response.dto";
 import { UserMapper } from "../mappers/user.mapper";
-import { UserResponseDto } from "../dto/user-response.dto";
+import { UserResponseDto } from "../dto/response/user-response.dto";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {
