@@ -3,6 +3,7 @@ import { Component, input, output, signal } from '@angular/core';
 import { TWDSidebarMenu } from '../../../shared/models/sidebar-menu';
 import { MenuSectionComponent } from './menu-section/menu-section.component';
 import { ModalService } from '../../../services/modal.service';
+import { TWDModalType } from '../../../shared/models/modals-type';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,7 +19,7 @@ export class SidebarComponent {
 
   constructor(private modalService: ModalService) { }
 
-  openModal(type: string, title: string) {
+  openModal(type: TWDModalType, title: string) {
     this.modalService.open(type, { title });
   }
 

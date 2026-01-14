@@ -1,0 +1,25 @@
+<div class="profile-modal">
+  <form class="create-project-form" [formGroup]="createProjetForm" (submit)="create()">
+    <div class="form-group">
+      <label for="projectName">Project Name</label>
+      <input type="text" id="projectName" name="projectName" formControlName="projectName"
+        placeholder="My Awesome Project" required>
+    </div>
+    <div class="form-group">
+      <label for="favorite">Favorite</label>
+      <div class="favorite-toggle">
+        <label class="switch">
+          <input type="checkbox" formControlName="favorite">
+          <span class="slider"></span>
+        </label>
+        <div>Añadir a Favoritos</div>
+      </div>
+    </div>
+    <hr>
+    <div class="create-project-buttons-section">
+      <button class="cancel" type="button" (click)="cancel()">Cancelar</button>
+      <button class="create" type="submit">Create Project</button>
+    </div>
+
+  </form>
+</div>
