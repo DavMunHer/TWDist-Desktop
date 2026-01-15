@@ -42,7 +42,7 @@ export class ProjectStore {
     });
 
     this.loadProjectUseCase.execute(projectId).subscribe({
-      next: ({ project }) => {
+      next: (project) => {
         this.state.set({
           projects: [project],
         });

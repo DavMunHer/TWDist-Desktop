@@ -34,7 +34,7 @@ export class HttpProjectRepository extends ProjectRepository {
       .pipe(map(dtos => dtos.map(dto => ProjectMapper.toDomain(dto))));
   }
 
-  update(project: ProjectDto): Observable<Project> {
+  update(project: Project): Observable<Project> {
     return this.http.put<ProjectResponeDto>(`${this.baseUrl}/${project.id}/update`, project)
       .pipe(map(responseDto => ProjectMapper.toDomain(responseDto)));
   }
