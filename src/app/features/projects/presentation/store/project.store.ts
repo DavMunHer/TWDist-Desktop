@@ -4,66 +4,47 @@ import { Project } from '../../domain/entities/project.entity';
 import { Section } from '../../domain/entities/section.entity';
 import { Task } from '../../domain/entities/task.entity';
 import { ProjectViewModel } from '../models/project.view-model';
+import { ProjectState } from '../models/project-state';
+import { ProjectDto } from '../../infrastructure/dto/project.dto';
+import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
 
-export interface ProjectState {
-  project: Project | null;
-  sections: Record<string, Section>;
-  tasks: Record<string, Task>;
-}
-
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ProjectStore {
   private loadProjectUseCase = inject(LoadProjectUseCase);
+  private createProjectUseCase = inject(CreateProjectUseCase);
 
   private readonly state = signal<ProjectState>({
-    project: null,
-    sections: {},
-    tasks: {},
+    projects: [],
   });
 
-  readonly project = computed(() => this.state().project);
-  readonly sections = computed(() => this.state().sections);
-  readonly tasks = computed(() => this.state().tasks);
+  readonly projects = computed(() => this.state().projects);
 
-  readonly projectView = computed<ProjectViewModel | null>(() => {
-    const { project, sections, tasks } = this.state();
-    if (!project) return null;
+  createProject(projectDto: ProjectDto): void {
+    this.state.set({
+      projects: [],
+    });
 
-    return {
-      id: project.id,
-      name: project.name,
-      sections: project.sectionIds
-        .map(id => sections[id])
-        .filter(Boolean)
-        .map(section => ({
-          id: section.id,
-          name: section.name,
-          tasks: section.taskIds
-            .map(id => tasks[id])
-            .filter(Boolean)
-            .map(task => ({
-              id: task.id,
-              name: task.name,
-              completed: task.completed,
-              startDate: task.startDate,
-            })),
-        })),
-    };
-  });
+    this.createProjectUseCase.execute(projectDto).subscribe({
+      next: (project) => {
+        this.state.set({
+          projects: [project],
+        });
+      },
+      error: (error) => {
+        console.error('Failed to create project:', error);
+      },
+    });
+  }
 
   loadProject(projectId: string): void {
     this.state.set({
-      project: null,
-      sections: {},
-      tasks: {},
+      projects: [],
     });
 
     this.loadProjectUseCase.execute(projectId).subscribe({
-      next: ({ project, sections, tasks }) => {
+      next: ({ project }) => {
         this.state.set({
-          project,
-          sections: this.toRecord(sections),
-          tasks: this.toRecord(tasks),
+          projects: [project],
         });
       },
       error: (error) => {
@@ -72,10 +53,4 @@ export class ProjectStore {
     });
   }
 
-  private toRecord<T extends { id: string }>(items: T[]): Record<string, T> {
-    return items.reduce((acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    }, {} as Record<string, T>);
-  }
 }
