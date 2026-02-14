@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { Project } from '../entities/project.entity';
 import { Section } from '../entities/section.entity';
 import { Task } from '../entities/task.entity';
+import { ProjectDto } from '../../infrastructure/dto/project.dto';
 
 export interface ProjectAggregate {
   project: Project;
@@ -10,7 +11,9 @@ export interface ProjectAggregate {
 }
 
 export abstract class ProjectRepository {
-  abstract findById(projectId: string): Observable<ProjectAggregate>;
-  abstract save(project: Project): Observable<Project>;
+  abstract create(project: ProjectDto): Observable<Project>;
+  abstract findById(projectId: string): Observable<Project>;
+  abstract getAll(): Observable<Project[]>;
+  abstract update(project: ProjectDto): Observable<Project>;
   abstract delete(projectId: string): Observable<void>;
 }

@@ -26,7 +26,8 @@ export class ProjectViewComponent implements OnInit {
     this.onShowIconChange.emit(true)
   }
 
-  protected projectInfo = computed(() => this.projectStore.projectView());
+  // TODO Manage the state
+  // protected projectInfo = computed(() => this.projectStore.projectView());
 
   ngOnInit(): void {
     // Load project - in real app, get ID from route params

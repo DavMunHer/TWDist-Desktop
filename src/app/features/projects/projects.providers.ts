@@ -10,19 +10,21 @@ import { CreateSectionUseCase } from './application/use-cases/create-section.use
 import { CreateTaskUseCase } from './application/use-cases/create-task.use-case';
 import { ToggleTaskCompletionUseCase } from './application/use-cases/toggle-task-completion.use-case';
 import { ProjectStore } from './presentation/store/project.store';
+import { CreateProjectUseCase } from './application/use-cases/create-project.use-case';
 
 export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   // Repositories
   { provide: ProjectRepository, useClass: HttpProjectRepository },
   { provide: SectionRepository, useClass: HttpSectionRepository },
   { provide: TaskRepository, useClass: HttpTaskRepository },
-  
+
   // Use Cases
   LoadProjectUseCase,
+  CreateProjectUseCase,
   CreateSectionUseCase,
   CreateTaskUseCase,
   ToggleTaskCompletionUseCase,
-  
+
   // Presentation
   ProjectStore,
 ];

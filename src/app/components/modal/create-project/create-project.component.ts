@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
 
 @Component({
   selector: 'create-project-modal',
@@ -16,8 +17,13 @@ export class CreateProjectComponent {
     favorite: new FormControl<boolean>(false, { nonNullable: true }),
   });
 
+  private projectStore = inject(ProjectStore);
+
   create() {
-    //TODO Logic for sending the form to the backend
+    this.projectStore.createProject({
+      name: this.createProjetForm.controls.projectName.value,
+      favorite: this.createProjetForm.controls.favorite.value,
+    });
   }
 
   cancel(){
