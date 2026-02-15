@@ -12,7 +12,7 @@ export interface ProjectAggregate {
 
 export abstract class ProjectRepository {
   abstract create(project: ProjectDto): Observable<Project>;
-  abstract findById(projectId: string): Observable<Project>;
+  abstract findById(projectId: string): Observable<ProjectAggregate>;
   abstract getAll(): Observable<Project[]>;
   abstract update(project: ProjectDto): Observable<Project>;
   abstract delete(projectId: string): Observable<void>;
