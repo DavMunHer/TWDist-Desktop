@@ -3,7 +3,12 @@ import { TaskDto } from '../dto/task.dto';
 import { CreateTaskDto } from '../dto/create-task.dto';
 
 export class TaskMapper {
-  static toDomain(dto: TaskDto, sectionId: string): Task {
+  /**
+   * Maps a single TaskDto to a domain Task.
+   * Subtask IDs are derived from the nested `subtasks` array in the DTO.
+   */
+  static toDomain(dto: TaskDto, sectionId: string, parentTaskId?: string): Task {
+    const subtaskIds = (dto.subtasks ?? []).map(s => String(s.id));
     return new Task(
       String(dto.id),
       sectionId,
@@ -12,8 +17,24 @@ export class TaskMapper {
       dto.start_date,
       dto.description,
       dto.label,
-      dto.end_date
+      dto.end_date,
+      undefined,
+      parentTaskId,
+      subtaskIds,
     );
+  }
+
+  /**
+   * Recursively flattens a TaskDto tree into a flat Task array.
+   * Used during normalization so every task (and subtask) gets its own
+   * entry in the store's `tasks` dictionary.
+   */
+  static flattenToDomain(dto: TaskDto, sectionId: string, parentTaskId?: string): Task[] {
+    const task = TaskMapper.toDomain(dto, sectionId, parentTaskId);
+    const subtasks = (dto.subtasks ?? []).flatMap(sub =>
+      TaskMapper.flattenToDomain(sub, sectionId, String(dto.id))
+    );
+    return [task, ...subtasks];
   }
 
   static toCreateDto(task: Task): CreateTaskDto {

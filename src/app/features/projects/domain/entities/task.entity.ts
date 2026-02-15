@@ -8,21 +8,29 @@ export class Task {
     public readonly description?: string,
     public readonly label?: string,
     public readonly endDate?: Date,
-    public readonly completedDate?: Date
+    public readonly completedDate?: Date,
+    public readonly parentTaskId?: string,
+    public readonly subtaskIds: readonly string[] = [],
   ) {}
 
   static create(
     name: string,
     sectionId: string,
     startDate: Date = new Date(),
-    id?: string
+    id?: string,
+    parentTaskId?: string
   ): Task {
     return new Task(
       id || crypto.randomUUID(),
       sectionId,
       name,
       false,
-      startDate
+      startDate,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      parentTaskId,
     );
   }
 
@@ -36,7 +44,9 @@ export class Task {
       this.description,
       this.label,
       this.endDate,
-      new Date()
+      new Date(),
+      this.parentTaskId,
+      this.subtaskIds,
     );
   }
 
@@ -50,7 +60,9 @@ export class Task {
       this.description,
       this.label,
       this.endDate,
-      undefined
+      undefined,
+      this.parentTaskId,
+      this.subtaskIds,
     );
   }
 
@@ -64,7 +76,9 @@ export class Task {
       this.description,
       this.label,
       this.endDate,
-      this.completedDate
+      this.completedDate,
+      this.parentTaskId,
+      this.subtaskIds,
     );
   }
 
@@ -78,7 +92,9 @@ export class Task {
       description,
       this.label,
       this.endDate,
-      this.completedDate
+      this.completedDate,
+      this.parentTaskId,
+      this.subtaskIds,
     );
   }
 
@@ -92,7 +108,9 @@ export class Task {
       this.description,
       label,
       this.endDate,
-      this.completedDate
+      this.completedDate,
+      this.parentTaskId,
+      this.subtaskIds,
     );
   }
 
@@ -106,7 +124,41 @@ export class Task {
       this.description,
       this.label,
       endDate,
-      this.completedDate
+      this.completedDate,
+      this.parentTaskId,
+      this.subtaskIds,
+    );
+  }
+
+  addSubtask(subtaskId: string): Task {
+    return new Task(
+      this.id,
+      this.sectionId,
+      this.name,
+      this.completed,
+      this.startDate,
+      this.description,
+      this.label,
+      this.endDate,
+      this.completedDate,
+      this.parentTaskId,
+      [...this.subtaskIds, subtaskId],
+    );
+  }
+
+  removeSubtask(subtaskId: string): Task {
+    return new Task(
+      this.id,
+      this.sectionId,
+      this.name,
+      this.completed,
+      this.startDate,
+      this.description,
+      this.label,
+      this.endDate,
+      this.completedDate,
+      this.parentTaskId,
+      this.subtaskIds.filter(id => id !== subtaskId),
     );
   }
 }

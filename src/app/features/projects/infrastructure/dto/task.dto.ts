@@ -6,4 +6,6 @@ export interface TaskDto {
   end_date: Date;
   completed: boolean;
   label?: string;
+  parent_task_id?: number;
+  subtasks?: TaskDto[];
 }

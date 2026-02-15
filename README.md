@@ -22,96 +22,97 @@ For starting developing in this project you can just run `bun run start` and it 
 
 ---
 
-## State Handling — Normalized Store
+## State Handling — Normalized Store with Separated Stores
 
 ### Why normalized?
 
-Our UI has a tree-shaped data model: **Projects → Sections → Tasks**.
-A naïve approach would nest them (`Project.sections[].tasks[]`), but that causes two problems:
+Our UI has a tree-shaped data model: **Projects → Sections → Tasks (→ Subtasks)**.
+A naïve approach would nest them (`Project.sections[].tasks[].subtasks[]`), but that causes two problems:
 
 1. **Expensive updates** — changing a single task forces you to spread/clone the entire project and every section above it.
 2. **Duplicated data** — if the same task appears in more than one view (e.g. "today" list), you'd have to keep copies in sync.
 
-Instead, we flatten the tree into **three dictionaries** keyed by ID and express relationships as ID arrays.
+Instead, we flatten the tree into **three separate stores**, each owning a flat dictionary keyed by ID. Relationships are expressed as ID arrays inside the entities.
 
-### State shape
+### Architecture: Three Stores
 
 ```
-ProjectState
-├── projects:          Record<string, Project>   // keyed by project ID
-├── sections:          Record<string, Section>   // keyed by section ID
-├── tasks:             Record<string, Task>      // keyed by task ID
-├── selectedProjectId: string | null
-├── loading:           boolean
-└── error:             string | null
+┌─────────────────────────────────────────────────────┐
+│                   ProjectStore                       │
+│  State: Record<string, Project>                      │
+│  Owns: selectedProjectId, loading, error             │
+│  Exposes: projectView (computed, reads all 3 stores) │
+├─────────────────────────────────────────────────────┤
+│                   SectionStore                       │
+│  State: Record<string, Section>                      │
+│  Owns: section CRUD, addTaskToSection                │
+├─────────────────────────────────────────────────────┤
+│                    TaskStore                          │
+│  State: Record<string, Task>                         │
+│  Owns: task CRUD, subtask CRUD, toggleCompletion     │
+└─────────────────────────────────────────────────────┘
 ```
 
-Each entity stores only the IDs of its children:
+**Why separate stores instead of one big store?**
 
-| Entity    | Relationship field | Points to   |
-|-----------|--------------------|-------------|
-| `Project` | `sectionIds`       | `Section[]` |
-| `Section` | `taskIds`          | `Task[]`    |
+- **Single responsibility** — each store only knows how to mutate its own entity type.
+- **Scalability** — adding task features (drag, reorder, filters) only touches `TaskStore`.
+- **Testability** — stores can be unit-tested in isolation.
+- **No circular deps** — `TaskStore` knows nothing about projects. `SectionStore` knows nothing about projects. Only `ProjectStore` orchestrates across all three.
 
-### How it works in practice
+### State shapes
 
-**Writing (actions/mutations):**
+Each store has its own state interface:
 
-When the store needs to update the state, it only touches the affected dictionary — no deep cloning needed.
+```
+ProjectState                       SectionState                    TaskState
+├── projects: Record<id, Project>  ├── sections: Record<id, Section>  ├── tasks: Record<id, Task>
+├── selectedProjectId: string|null ├── loading: boolean               ├── loading: boolean
+├── loading: boolean               └── error: string|null             └── error: string|null
+└── error: string|null
+```
+
+### Entity relationships (ID arrays)
+
+| Entity    | Field          | Points to      |
+|-----------|----------------|----------------|
+| `Project` | `sectionIds`   | `Section[]`    |
+| `Section` | `taskIds`      | `Task[]`       |
+| `Task`    | `subtaskIds`   | `Task[]`       |
+| `Task`    | `parentTaskId` | parent `Task`  |
+
+### How stores communicate
+
+When an action spans multiple entities, the **ProjectStore** acts as the orchestrator:
 
 ```ts
-// Toggle a task → only the tasks dictionary is touched
-this.state.update(s => ({
-  ...s,
-  tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
-}));
-
-// Add a section → update project's sectionIds + add a section entry
-this.state.update(s => ({
-  ...s,
-  projects: {
-    ...s.projects,
-    [projectId]: project.addSection(section.id),
-  },
-  sections: { ...s.sections, [section.id]: section },
-}));
+// ProjectStore.createTask() — orchestrates SectionStore + TaskStore:
+createTask(sectionId: string, taskName: string): void {
+  this.taskStore.createTask(sectionId, taskName, (task) => {
+    this.sectionStore.addTaskToSection(sectionId, task.id);
+  });
+}
 ```
 
-**Reading (selectors / computed signals):**
+The callback pattern ensures atomic updates: the section only gets the new task ID after the task is confirmed created.
 
-The `ProjectStore` exposes a `projectView` computed signal that reconstructs the tree on‑the‑fly for the template:
+### Subtask support
+
+Subtasks are simply tasks with a `parentTaskId` and live in the same flat `TaskStore.tasks` dictionary. The parent task holds `subtaskIds: string[]` pointing to its children. The `projectView` computed selector recursively builds the tree:
 
 ```ts
-readonly projectView = computed<ProjectViewModel | null>(() => {
-  const project = this.selectedProject();
-  if (!project) return null;
-
-  const { sections, tasks } = this.state();
-
-  return {
-    id: project.id,
-    name: project.name,
-    sections: project.sectionIds
-      .map(sId => sections[sId])
-      .filter(Boolean)
-      .map(section => ({
-        id: section.id,
-        name: section.name,
-        tasks: section.taskIds
-          .map(tId => tasks[tId])
-          .filter(Boolean)
-          .map(task => ({
-            id: task.id,
-            name: task.name,
-            completed: task.completed,
-            startDate: task.startDate,
-          })),
-      })),
-  };
-});
+const buildTaskTree = (taskIds: readonly string[]): TaskViewModel[] =>
+  taskIds
+    .map(tId => tasks[tId])
+    .filter(Boolean)
+    .map(task => ({
+      id: task.id,
+      name: task.name,
+      completed: task.completed,
+      startDate: task.startDate,
+      subtasks: buildTaskTree(task.subtaskIds),  // ← recursive
+    }));
 ```
-
-Because this is a standard Angular `computed()` signal, the template will only re-render when the underlying data actually changes.
 
 ### Data flow
 
@@ -119,21 +120,26 @@ Because this is a standard Angular `computed()` signal, the template will only r
 API Response (nested JSON)
         │
         ▼
-   ProjectMapper.toAggregate()   ← normalizes into { project, sections[], tasks[] }
+   ProjectMapper.toAggregate()       ← normalizes { project, sections[], tasks[] }
+        │                              (TaskMapper.flattenToDomain recursively
+        │                               flattens subtasks into the tasks array)
+        ▼
+   ProjectStore.loadProject()
+        ├── sectionStore.mergeSections(sections)
+        ├── taskStore.mergeTasks(tasks)
+        └── own state: projects[id] = project
         │
         ▼
-   ProjectStore.loadProject()    ← merges into the flat dictionaries
-        │
+   projectView (computed)            ← reads ProjectStore + SectionStore + TaskStore
+        │                              denormalizes into ProjectViewModel tree
         ▼
-   projectView (computed)        ← denormalizes into ProjectViewModel tree
-        │
-        ▼
-   Template                      ← renders the tree
+   Template                          ← renders sections → tasks → subtasks
 ```
 
 ### Rules of thumb
 
 1. **Domain entities stay in the store** — `Project`, `Section`, and `Task` domain classes are used directly in the state. DTOs only exist at the infrastructure boundary.
 2. **View-models are derived** — never store a `ProjectViewModel` in the state. Let `computed()` build it from the normalized data.
-3. **Components call store actions** — components should never subscribe to use-cases directly. Instead, call store methods (`createSection()`, `toggleTaskCompletion()`) and let the store handle the subscription + state update.
-4. **Immutable updates only** — always produce a new object via spread (`{ ...s, ... }`). Domain entity methods like `project.addSection()` already return new instances.
+3. **Components call ProjectStore actions** — components should never subscribe to use-cases directly. Instead, call `ProjectStore` methods which orchestrate across stores.
+4. **Immutable updates only** — always produce a new object via spread (`{ ...s, ... }`). Domain entity methods like `project.addSection()` and `task.addSubtask()` already return new instances.
+5. **One store per entity type** — never put section data into `ProjectState` or task data into `SectionState`. Each store owns exactly one `Record<string, Entity>` dictionary.

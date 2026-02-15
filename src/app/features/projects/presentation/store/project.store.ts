@@ -1,9 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
 import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
-import { CreateSectionUseCase } from '../../application/use-cases/create-section.use-case';
-import { CreateTaskUseCase } from '../../application/use-cases/create-task.use-case';
-import { ToggleTaskCompletionUseCase } from '../../application/use-cases/toggle-task-completion.use-case';
 import { initialProjectState, ProjectState } from '../models/project-state';
 import { ProjectDto } from '../../infrastructure/dto/project.dto';
 import {
@@ -11,34 +8,29 @@ import {
   SectionViewModel,
   TaskViewModel,
 } from '../models/project.view-model';
+import { SectionStore } from './section.store';
+import { TaskStore } from './task.store';
+import { Task } from '../../domain/entities/task.entity';
 
 /**
- * Central **normalized** state store for the Projects feature.
+ * Store for **projects** only.
  *
- * State shape (see {@link ProjectState}):
- * ```
- * {
- *   projects:          Record<string, Project>,
- *   sections:          Record<string, Section>,
- *   tasks:             Record<string, Task>,
- *   selectedProjectId: string | null,
- *   loading:           boolean,
- *   error:             string | null,
- * }
- * ```
+ * Owns `ProjectState` (projects dictionary + selectedProjectId).
+ * Delegates section operations to {@link SectionStore} and task
+ * operations to {@link TaskStore}.
  *
- * Relationships live as ID arrays inside the entities themselves
- * (`Project.sectionIds`, `Section.taskIds`), while computed selectors
- * denormalize on-the-fly for the UI via Angular signals.
+ * The `projectView` computed signal reads across all three stores
+ * to build the denormalized tree the template needs.
  */
 @Injectable({ providedIn: 'root' })
 export class ProjectStore {
   // --------------- Use-case injection ---------------
-  private readonly loadProjectUseCase = inject(LoadProjectUseCase);
+  private readonly loadProjectUseCase   = inject(LoadProjectUseCase);
   private readonly createProjectUseCase = inject(CreateProjectUseCase);
-  private readonly createSectionUseCase = inject(CreateSectionUseCase);
-  private readonly createTaskUseCase = inject(CreateTaskUseCase);
-  private readonly toggleTaskUseCase = inject(ToggleTaskCompletionUseCase);
+
+  // --------------- Peer stores ---------------
+  private readonly sectionStore = inject(SectionStore);
+  private readonly taskStore    = inject(TaskStore);
 
   // --------------- State signal ---------------
   private readonly state = signal<ProjectState>(initialProjectState);
@@ -66,34 +58,41 @@ export class ProjectStore {
   readonly error = computed(() => this.state().error);
 
   // ===================================================================
-  // SELECTORS — denormalized view-models for the UI
+  // SELECTORS — denormalized view-model for the UI
   // ===================================================================
 
   /**
-   * Denormalized view of the selected project, ready for the template.
-   * Reconstructs the `ProjectViewModel` tree from the flat dictionaries.
+   * Denormalized view of the selected project.
+   * Reads from ProjectStore, SectionStore, and TaskStore to build
+   * the full `ProjectViewModel` tree (including subtasks).
    */
   readonly projectView = computed<ProjectViewModel | null>(() => {
     const project = this.selectedProject();
     if (!project) return null;
 
-    const { sections, tasks } = this.state();
+    const sections = this.sectionStore.sections();
+    const tasks    = this.taskStore.tasks();
+
+    /** Recursively build TaskViewModel tree from a flat tasks dict */
+    const buildTaskTree = (taskIds: readonly string[]): TaskViewModel[] =>
+      taskIds
+        .map(tId => tasks[tId])
+        .filter(Boolean)
+        .map(task => ({
+          id: task.id,
+          name: task.name,
+          completed: task.completed,
+          startDate: task.startDate,
+          subtasks: buildTaskTree(task.subtaskIds),
+        }));
 
     const sectionViewModels: SectionViewModel[] = project.sectionIds
-      .map((sId) => sections[sId])
+      .map(sId => sections[sId])
       .filter(Boolean)
-      .map((section) => ({
+      .map(section => ({
         id: section.id,
         name: section.name,
-        tasks: section.taskIds
-          .map((tId) => tasks[tId])
-          .filter(Boolean)
-          .map((task) => ({
-            id: task.id,
-            name: task.name,
-            completed: task.completed,
-            startDate: task.startDate,
-          })),
+        tasks: buildTaskTree(section.taskIds),
       }));
 
     return {
@@ -111,21 +110,24 @@ export class ProjectStore {
   createProject(projectDto: ProjectDto): void {
     this.createProjectUseCase.execute(projectDto).subscribe({
       next: (project) => {
-        this.state.update((s) => ({
+        this.state.update(s => ({
           ...s,
           projects: { ...s.projects, [project.id]: project },
         }));
       },
       error: (error) => {
-        this.state.update((s) => ({ ...s, error: error.message }));
+        this.state.update(s => ({ ...s, error: error.message }));
         console.error('Failed to create project:', error);
       },
     });
   }
 
-  /** Load a full project (with sections & tasks) and normalize it into state */
+  /**
+   * Load a full project (with sections & tasks) from the API,
+   * then distribute the normalized data to each store.
+   */
   loadProject(projectId: string): void {
-    this.state.update((s) => ({
+    this.state.update(s => ({
       ...s,
       loading: true,
       error: null,
@@ -134,37 +136,26 @@ export class ProjectStore {
 
     this.loadProjectUseCase.execute(projectId).subscribe({
       next: ({ project, sections, tasks }) => {
-        const sectionMap: Record<string, (typeof sections)[number]> = {};
-        const taskMap: Record<string, (typeof tasks)[number]> = {};
+        // Distribute to peer stores
+        this.sectionStore.mergeSections(sections);
+        this.taskStore.mergeTasks(tasks);
 
-        for (const section of sections) {
-          sectionMap[section.id] = section;
-        }
-        for (const task of tasks) {
-          taskMap[task.id] = task;
-        }
-
-        this.state.update((s) => ({
+        // Update own state
+        this.state.update(s => ({
           ...s,
           projects: { ...s.projects, [project.id]: project },
-          sections: { ...s.sections, ...sectionMap },
-          tasks: { ...s.tasks, ...taskMap },
           loading: false,
         }));
       },
       error: (error) => {
-        this.state.update((s) => ({
-          ...s,
-          loading: false,
-          error: error.message,
-        }));
+        this.state.update(s => ({ ...s, loading: false, error: error.message }));
         console.error('Failed to load project:', error);
       },
     });
   }
 
   // ===================================================================
-  // ACTIONS — Section
+  // ACTIONS — Section (delegated)
   // ===================================================================
 
   /** Create a section inside the currently selected project */
@@ -175,71 +166,42 @@ export class ProjectStore {
       return;
     }
 
-    this.createSectionUseCase.execute(projectId, sectionName).subscribe({
-      next: (section) => {
-        this.state.update((s) => {
-          const project = s.projects[projectId];
-          if (!project) return s;
+    this.sectionStore.createSection(projectId, sectionName, (section) => {
+      // Link the new section to the project
+      this.state.update(s => {
+        const project = s.projects[projectId];
+        if (!project) return s;
 
-          return {
-            ...s,
-            projects: {
-              ...s.projects,
-              [projectId]: project.addSection(section.id),
-            },
-            sections: { ...s.sections, [section.id]: section },
-          };
-        });
-      },
-      error: (error) => {
-        this.state.update((s) => ({ ...s, error: error.message }));
-        console.error('Failed to create section:', error);
-      },
+        return {
+          ...s,
+          projects: {
+            ...s.projects,
+            [projectId]: project.addSection(section.id),
+          },
+        };
+      });
     });
   }
 
   // ===================================================================
-  // ACTIONS — Task
+  // ACTIONS — Task (delegated)
   // ===================================================================
 
   /** Create a task inside a given section */
   createTask(sectionId: string, taskName: string): void {
-    this.createTaskUseCase.execute(sectionId, taskName).subscribe({
-      next: (task) => {
-        this.state.update((s) => {
-          const section = s.sections[sectionId];
-          if (!section) return s;
-
-          return {
-            ...s,
-            sections: {
-              ...s.sections,
-              [sectionId]: section.addTask(task.id),
-            },
-            tasks: { ...s.tasks, [task.id]: task },
-          };
-        });
-      },
-      error: (error) => {
-        this.state.update((s) => ({ ...s, error: error.message }));
-        console.error('Failed to create task:', error);
-      },
+    this.taskStore.createTask(sectionId, taskName, (task) => {
+      // Link the new task to the section
+      this.sectionStore.addTaskToSection(sectionId, task.id);
     });
+  }
+
+  /** Create a subtask under an existing task */
+  createSubtask(parentTaskId: string, sectionId: string, taskName: string): void {
+    this.taskStore.createSubtask(parentTaskId, sectionId, taskName);
   }
 
   /** Toggle a task's completed status */
   toggleTaskCompletion(taskId: string): void {
-    this.toggleTaskUseCase.execute(taskId).subscribe({
-      next: (updatedTask) => {
-        this.state.update((s) => ({
-          ...s,
-          tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
-        }));
-      },
-      error: (error) => {
-        this.state.update((s) => ({ ...s, error: error.message }));
-        console.error('Failed to toggle task:', error);
-      },
-    });
+    this.taskStore.toggleTaskCompletion(taskId);
   }
 }

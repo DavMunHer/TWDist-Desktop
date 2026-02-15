@@ -30,7 +30,7 @@ export class ProjectMapper {
     for (const sectionDto of dto.sections ?? []) {
       sections.push(SectionMapper.toDomain(sectionDto, projectId));
       for (const taskDto of sectionDto.tasks ?? []) {
-        tasks.push(TaskMapper.toDomain(taskDto, String(sectionDto.id)));
+        tasks.push(...TaskMapper.flattenToDomain(taskDto, String(sectionDto.id)));
       }
     }
 
