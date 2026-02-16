@@ -15,4 +15,5 @@ export interface TaskViewModel {
   name: string;
   completed: boolean;
   startDate: Date;
+  subtasks: TaskViewModel[];
 }

@@ -1,56 +1,207 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
-import { Project } from '../../domain/entities/project.entity';
-import { Section } from '../../domain/entities/section.entity';
-import { Task } from '../../domain/entities/task.entity';
-import { ProjectViewModel } from '../models/project.view-model';
-import { ProjectState } from '../models/project-state';
-import { ProjectDto } from '../../infrastructure/dto/project.dto';
 import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
+import { initialProjectState, ProjectState } from '../models/project-state';
+import { ProjectDto } from '../../infrastructure/dto/project.dto';
+import {
+  ProjectViewModel,
+  SectionViewModel,
+  TaskViewModel,
+} from '../models/project.view-model';
+import { SectionStore } from './section.store';
+import { TaskStore } from './task.store';
+import { Task } from '../../domain/entities/task.entity';
 
+/**
+ * Store for **projects** only.
+ *
+ * Owns `ProjectState` (projects dictionary + selectedProjectId).
+ * Delegates section operations to {@link SectionStore} and task
+ * operations to {@link TaskStore}.
+ *
+ * The `projectView` computed signal reads across all three stores
+ * to build the denormalized tree the template needs.
+ */
 @Injectable({ providedIn: 'root' })
 export class ProjectStore {
-  private loadProjectUseCase = inject(LoadProjectUseCase);
-  private createProjectUseCase = inject(CreateProjectUseCase);
+  // --------------- Use-case injection ---------------
+  private readonly loadProjectUseCase   = inject(LoadProjectUseCase);
+  private readonly createProjectUseCase = inject(CreateProjectUseCase);
 
-  private readonly state = signal<ProjectState>({
-    projects: [],
+  // --------------- Peer stores ---------------
+  private readonly sectionStore = inject(SectionStore);
+  private readonly taskStore    = inject(TaskStore);
+
+  // --------------- State signal ---------------
+  private readonly state = signal<ProjectState>(initialProjectState);
+
+  // ===================================================================
+  // SELECTORS — flat (normalized) reads
+  // ===================================================================
+
+  /** All projects as an array */
+  readonly projects = computed(() => Object.values(this.state().projects));
+
+  /** Currently selected project ID */
+  readonly selectedProjectId = computed(() => this.state().selectedProjectId);
+
+  /** Currently selected project entity (or null) */
+  readonly selectedProject = computed(() => {
+    const id = this.state().selectedProjectId;
+    return id ? (this.state().projects[id] ?? null) : null;
   });
 
-  readonly projects = computed(() => this.state().projects);
+  /** Loading flag */
+  readonly loading = computed(() => this.state().loading);
 
+  /** Last error */
+  readonly error = computed(() => this.state().error);
+
+  // ===================================================================
+  // SELECTORS — denormalized view-model for the UI
+  // ===================================================================
+
+  /**
+   * Denormalized view of the selected project.
+   * Reads from ProjectStore, SectionStore, and TaskStore to build
+   * the full `ProjectViewModel` tree (including subtasks).
+   */
+  readonly projectView = computed<ProjectViewModel | null>(() => {
+    const project = this.selectedProject();
+    if (!project) return null;
+
+    const sections = this.sectionStore.sections();
+    const tasks    = this.taskStore.tasks();
+
+    /** Recursively build TaskViewModel tree from a flat tasks dict */
+    const buildTaskTree = (taskIds: readonly string[]): TaskViewModel[] =>
+      taskIds
+        .map(tId => tasks[tId])
+        .filter(Boolean)
+        .map(task => ({
+          id: task.id,
+          name: task.name,
+          completed: task.completed,
+          startDate: task.startDate,
+          subtasks: buildTaskTree(task.subtaskIds),
+        }));
+
+    const sectionViewModels: SectionViewModel[] = project.sectionIds
+      .map(sId => sections[sId])
+      .filter(Boolean)
+      .map(section => ({
+        id: section.id,
+        name: section.name,
+        tasks: buildTaskTree(section.taskIds),
+      }));
+
+    return {
+      id: project.id,
+      name: project.name,
+      sections: sectionViewModels,
+    };
+  });
+
+  // ===================================================================
+  // ACTIONS — Project
+  // ===================================================================
+
+  /** Create a new project and add it to the store */
   createProject(projectDto: ProjectDto): void {
-    this.state.set({
-      projects: [],
-    });
-
     this.createProjectUseCase.execute(projectDto).subscribe({
       next: (project) => {
-        this.state.set({
-          projects: [project],
-        });
+        this.state.update(s => ({
+          ...s,
+          projects: { ...s.projects, [project.id]: project },
+        }));
       },
       error: (error) => {
+        this.state.update(s => ({ ...s, error: error.message }));
         console.error('Failed to create project:', error);
       },
     });
   }
 
+  /**
+   * Load a full project (with sections & tasks) from the API,
+   * then distribute the normalized data to each store.
+   */
   loadProject(projectId: string): void {
-    this.state.set({
-      projects: [],
-    });
+    this.state.update(s => ({
+      ...s,
+      loading: true,
+      error: null,
+      selectedProjectId: projectId,
+    }));
 
     this.loadProjectUseCase.execute(projectId).subscribe({
-      next: (project) => {
-        this.state.set({
-          projects: [project],
-        });
+      next: ({ project, sections, tasks }) => {
+        // Distribute to peer stores
+        this.sectionStore.mergeSections(sections);
+        this.taskStore.mergeTasks(tasks);
+
+        // Update own state
+        this.state.update(s => ({
+          ...s,
+          projects: { ...s.projects, [project.id]: project },
+          loading: false,
+        }));
       },
       error: (error) => {
+        this.state.update(s => ({ ...s, loading: false, error: error.message }));
         console.error('Failed to load project:', error);
       },
     });
   }
 
+  // ===================================================================
+  // ACTIONS — Section (delegated)
+  // ===================================================================
+
+  /** Create a section inside the currently selected project */
+  createSection(sectionName: string): void {
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot create section: no project selected');
+      return;
+    }
+
+    this.sectionStore.createSection(projectId, sectionName, (section) => {
+      // Link the new section to the project
+      this.state.update(s => {
+        const project = s.projects[projectId];
+        if (!project) return s;
+
+        return {
+          ...s,
+          projects: {
+            ...s.projects,
+            [projectId]: project.addSection(section.id),
+          },
+        };
+      });
+    });
+  }
+
+  // ===================================================================
+  // ACTIONS — Task (delegated)
+  // ===================================================================
+
+  /** Create a task inside a given section */
+  createTask(sectionId: string, taskName: string): void {
+    this.taskStore.createTask(sectionId, taskName, (task) => {
+      // Link the new task to the section
+      this.sectionStore.addTaskToSection(sectionId, task.id);
+    });
+  }
+
+  /** Create a subtask under an existing task */
+  createSubtask(parentTaskId: string, sectionId: string, taskName: string): void {
+    this.taskStore.createSubtask(parentTaskId, sectionId, taskName);
+  }
+
+  /** Toggle a task's completed status */
+  toggleTaskCompletion(taskId: string): void {
+    this.taskStore.toggleTaskCompletion(taskId);
+  }
 }

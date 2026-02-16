@@ -9,8 +9,10 @@ import { LoadProjectUseCase } from './application/use-cases/load-project.use-cas
 import { CreateSectionUseCase } from './application/use-cases/create-section.use-case';
 import { CreateTaskUseCase } from './application/use-cases/create-task.use-case';
 import { ToggleTaskCompletionUseCase } from './application/use-cases/toggle-task-completion.use-case';
-import { ProjectStore } from './presentation/store/project.store';
 import { CreateProjectUseCase } from './application/use-cases/create-project.use-case';
+import { ProjectStore } from './presentation/store/project.store';
+import { SectionStore } from './presentation/store/section.store';
+import { TaskStore } from './presentation/store/task.store';
 
 export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   // Repositories
@@ -25,6 +27,8 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   CreateTaskUseCase,
   ToggleTaskCompletionUseCase,
 
-  // Presentation
+  // Presentation — Stores
   ProjectStore,
+  SectionStore,
+  TaskStore,
 ];

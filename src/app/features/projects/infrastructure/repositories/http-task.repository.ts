@@ -18,14 +18,14 @@ export class HttpTaskRepository extends TaskRepository {
     const dto = TaskMapper.toCreateDto(task);
     return this.http
       .post<TaskDto>(`/sections/${task.sectionId}/tasks`, dto)
-      .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId)));
+      .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId, task.parentTaskId)));
   }
 
   update(task: Task): Observable<Task> {
     const dto = TaskMapper.toDto(task);
     return this.http
       .put<TaskDto>(`/tasks/${task.id}`, dto)
-      .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId)));
+      .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId, task.parentTaskId)));
   }
 
   delete(taskId: string): Observable<void> {
