@@ -1,6 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
+import { LoadAllProjectsUseCase } from '../../application/use-cases/load-all-projects.use-case';
 import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
+import { ToggleFavoriteUseCase } from '../../application/use-cases/toggle-favorite.use-case';
 import { initialProjectState, ProjectState } from '../models/project-state';
 import { ProjectDto } from '../../infrastructure/dto/project.dto';
 import {
@@ -11,6 +13,7 @@ import {
 import { SectionStore } from './section.store';
 import { TaskStore } from './task.store';
 import { Task } from '../../domain/entities/task.entity';
+import { Project } from '../../domain/entities/project.entity';
 
 /**
  * Store for **projects** only.
@@ -26,7 +29,9 @@ import { Task } from '../../domain/entities/task.entity';
 export class ProjectStore {
   // --------------- Use-case injection ---------------
   private readonly loadProjectUseCase   = inject(LoadProjectUseCase);
+  private readonly loadAllProjectsUseCase = inject(LoadAllProjectsUseCase);
   private readonly createProjectUseCase = inject(CreateProjectUseCase);
+  private readonly toggleFavoriteUseCase = inject(ToggleFavoriteUseCase);
 
   // --------------- Peer stores ---------------
   private readonly sectionStore = inject(SectionStore);
@@ -56,6 +61,39 @@ export class ProjectStore {
 
   /** Last error */
   readonly error = computed(() => this.state().error);
+
+  // ===================================================================
+  // SELECTORS — derived list views
+  // ===================================================================
+
+  /** Project summaries with pending task counts (for sidebar / project list) */
+  readonly projectSummaries = computed(() => {
+    const sections = this.sectionStore.sections();
+    const tasks    = this.taskStore.tasks();
+
+    return this.projects().map(project => {
+      let pendingTasks = 0;
+
+      for (const sectionId of project.sectionIds) {
+        const section = sections[sectionId];
+        if (!section) continue;
+
+        for (const taskId of section.taskIds) {
+          const task = tasks[taskId];
+          if (task && !task.completed) {
+            pendingTasks++;
+          }
+        }
+      }
+
+      return {
+        id: project.id,
+        name: project.name,
+        favorite: project.favorite,
+        pendingTasks,
+      };
+    });
+  });
 
   // ===================================================================
   // SELECTORS — denormalized view-model for the UI
@@ -106,6 +144,17 @@ export class ProjectStore {
   // ACTIONS — Project
   // ===================================================================
 
+  /**
+   * Clear loading state and errors before starting a new request.
+   */
+  private clearState(): void {
+    this.state.update(s => ({
+      ...s,
+      loading: true,
+      error: null,
+    }));
+  }
+
   /** Create a new project and add it to the store */
   createProject(projectDto: ProjectDto): void {
     this.createProjectUseCase.execute(projectDto).subscribe({
@@ -127,10 +176,9 @@ export class ProjectStore {
    * then distribute the normalized data to each store.
    */
   loadProject(projectId: string): void {
+    this.clearState();
     this.state.update(s => ({
       ...s,
-      loading: true,
-      error: null,
       selectedProjectId: projectId,
     }));
 
@@ -150,6 +198,65 @@ export class ProjectStore {
       error: (error) => {
         this.state.update(s => ({ ...s, loading: false, error: error.message }));
         console.error('Failed to load project:', error);
+      },
+    });
+  }
+
+  /**
+   * Load all projects from the API and populate the store.
+   * This is typically called during app initialization.
+   */
+  loadAllProjects(): void {
+    this.clearState();
+
+    this.loadAllProjectsUseCase.execute().subscribe({
+      next: (projects) => {
+        const projectsDict: Record<string, any> = {};
+        for (const project of projects) {
+          projectsDict[project.id] = project;
+        }
+
+        this.state.update(s => ({
+          ...s,
+          projects: projectsDict,
+          loading: false,
+        }));
+      },
+      error: (error) => {
+        this.state.update(s => ({ ...s, loading: false, error: error.message }));
+        console.error('Failed to load all projects:', error);
+      },
+    });
+  }
+
+  /**
+   * Toggle a project's favorite status and update the store
+   */
+  toggleProjectFavorite(projectId: string): void {
+    const project = this.state().projects[projectId];
+    if (!project) return;
+
+    const newFavoriteState = !project.favorite;
+
+    this.toggleFavoriteUseCase.execute(projectId, newFavoriteState).subscribe({
+      next: () => {
+        // Optimistically update the store
+        this.state.update(s => ({
+          ...s,
+          projects: {
+            ...s.projects,
+            [projectId]: new Project(
+              project.id,
+              project.name,
+              newFavoriteState,
+              project.sectionIds,
+            ),
+          },
+        }));
+      },
+      error: (error) => {
+        this.state.update(s => ({ ...s, error: error.message }));
+        console.error('Failed to toggle favorite:', error);
       },
     });
   }

@@ -1,9 +1,10 @@
 import { NgClass } from '@angular/common';
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, computed, inject } from '@angular/core';
 import { TWDSidebarMenu } from '../../../shared/models/sidebar-menu';
 import { MenuSectionComponent } from './menu-section/menu-section.component';
 import { ModalService } from '../../../services/modal.service';
 import { TWDModalType } from '../../../shared/models/modals-type';
+import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,6 +17,8 @@ export class SidebarComponent {
 
   public sidebarVisibleInput = input.required<boolean>();
   public onSidebarClose = output<boolean>();
+
+  private projectStore = inject(ProjectStore);
 
   constructor(private modalService: ModalService) { }
 
@@ -32,26 +35,10 @@ export class SidebarComponent {
     this.toggleDropdownVal.set(!this.toggleDropdownVal());
   }
 
-  // FIXME: This info should be fetched to the API when backend is available
-  protected projects = signal([
-    {
-      name: 'DAM',
-      favorite: false,
-      pendingTasks: 3,
-    },
-    {
-      name: 'DAW',
-      favorite: false,
-      pendingTasks: 0,
-    },
-    {
-      name: 'IA BigData',
-      favorite: true,
-      pendingTasks: 6,
-    },
-  ]);
+  // Get project summaries with pending task counts from the ProjectStore
+  protected projects = this.projectStore.projectSummaries;
 
-  protected navMenuSectionInfo = signal<TWDSidebarMenu>({
+  protected navMenuSectionInfo = computed<TWDSidebarMenu>(() => ({
     title: 'Navigation',
     items: [
       {
@@ -65,21 +52,21 @@ export class SidebarComponent {
         icon: 'upcoming',
       },
     ],
-  });
+  }));
 
-  protected favoriteMenuSectionInfo = signal<TWDSidebarMenu>({
+  protected favoriteMenuSectionInfo = computed<TWDSidebarMenu>(() => ({
     title: 'Favorite Projects',
     items: this.projects()
       .filter((p) => p.favorite)
       .map((p) => {
-        return { name: p.name, pendingTasks: p.pendingTasks, icon: 'project' };
+        return { id: p.id, name: p.name, pendingTasks: p.pendingTasks, icon: 'project', favorite: p.favorite };
       }),
-  });
+  }));
 
-  protected projectsMenuSectionInfo = signal<TWDSidebarMenu>({
+  protected projectsMenuSectionInfo = computed<TWDSidebarMenu>(() => ({
     title: 'My Projects',
     items: this.projects().map((p) => {
-      return { name: p.name, pendingTasks: p.pendingTasks, icon: 'project' };
+      return { id: p.id, name: p.name, pendingTasks: p.pendingTasks, icon: 'project', favorite: p.favorite };
     }),
-  });
+  }));
 }

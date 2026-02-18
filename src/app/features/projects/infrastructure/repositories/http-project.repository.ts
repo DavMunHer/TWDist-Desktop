@@ -42,4 +42,8 @@ export class HttpProjectRepository extends ProjectRepository {
   delete(projectId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${projectId}/delete`);
   }
+
+  toggleFavorite(projectId: string, favorite: boolean): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${projectId}/favorite`, { favorite });
+  }
 }

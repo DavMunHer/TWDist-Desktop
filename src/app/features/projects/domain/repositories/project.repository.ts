@@ -16,4 +16,5 @@ export abstract class ProjectRepository {
   abstract getAll(): Observable<Project[]>;
   abstract update(project: ProjectDto): Observable<Project>;
   abstract delete(projectId: string): Observable<void>;
+  abstract toggleFavorite(projectId: string, favorite: boolean): Observable<void>;
 }

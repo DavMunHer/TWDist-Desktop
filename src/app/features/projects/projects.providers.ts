@@ -6,9 +6,11 @@ import { HttpProjectRepository } from './infrastructure/repositories/http-projec
 import { HttpSectionRepository } from './infrastructure/repositories/http-section.repository';
 import { HttpTaskRepository } from './infrastructure/repositories/http-task.repository';
 import { LoadProjectUseCase } from './application/use-cases/load-project.use-case';
+import { LoadAllProjectsUseCase } from './application/use-cases/load-all-projects.use-case';
 import { CreateSectionUseCase } from './application/use-cases/create-section.use-case';
 import { CreateTaskUseCase } from './application/use-cases/create-task.use-case';
 import { ToggleTaskCompletionUseCase } from './application/use-cases/toggle-task-completion.use-case';
+import { ToggleFavoriteUseCase } from './application/use-cases/toggle-favorite.use-case';
 import { CreateProjectUseCase } from './application/use-cases/create-project.use-case';
 import { ProjectStore } from './presentation/store/project.store';
 import { SectionStore } from './presentation/store/section.store';
@@ -22,10 +24,12 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
 
   // Use Cases
   LoadProjectUseCase,
+  LoadAllProjectsUseCase,
   CreateProjectUseCase,
   CreateSectionUseCase,
   CreateTaskUseCase,
   ToggleTaskCompletionUseCase,
+  ToggleFavoriteUseCase,
 
   // Presentation — Stores
   ProjectStore,
