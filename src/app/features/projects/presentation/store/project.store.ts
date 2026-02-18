@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
+import { LoadAllProjectsUseCase } from '../../application/use-cases/load-all-projects.use-case';
 import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
 import { initialProjectState, ProjectState } from '../models/project-state';
 import { ProjectDto } from '../../infrastructure/dto/project.dto';
@@ -26,6 +27,7 @@ import { Task } from '../../domain/entities/task.entity';
 export class ProjectStore {
   // --------------- Use-case injection ---------------
   private readonly loadProjectUseCase   = inject(LoadProjectUseCase);
+  private readonly loadAllProjectsUseCase = inject(LoadAllProjectsUseCase);
   private readonly createProjectUseCase = inject(CreateProjectUseCase);
 
   // --------------- Peer stores ---------------
@@ -150,6 +152,37 @@ export class ProjectStore {
       error: (error) => {
         this.state.update(s => ({ ...s, loading: false, error: error.message }));
         console.error('Failed to load project:', error);
+      },
+    });
+  }
+
+  /**
+   * Load all projects from the API and populate the store.
+   * This is typically called during app initialization.
+   */
+  loadAllProjects(): void {
+    this.state.update(s => ({
+      ...s,
+      loading: true,
+      error: null,
+    }));
+
+    this.loadAllProjectsUseCase.execute().subscribe({
+      next: (projects) => {
+        const projectsDict: Record<string, any> = {};
+        for (const project of projects) {
+          projectsDict[project.id] = project;
+        }
+
+        this.state.update(s => ({
+          ...s,
+          projects: projectsDict,
+          loading: false,
+        }));
+      },
+      error: (error) => {
+        this.state.update(s => ({ ...s, loading: false, error: error.message }));
+        console.error('Failed to load all projects:', error);
       },
     });
   }

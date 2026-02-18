@@ -28,6 +28,8 @@ export class ProjectViewComponent implements OnInit {
   ngOnInit(): void {
     // Load project - in real app, get ID from route params
     this.projectStore.loadProject('1');
+    // Load all projects on component initialization
+    this.projectStore.loadAllProjects();
   }
 
   protected updateTaskToCompleted(section: SectionViewModel, task: TaskViewModel) {
