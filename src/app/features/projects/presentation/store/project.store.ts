@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
 import { LoadAllProjectsUseCase } from '../../application/use-cases/load-all-projects.use-case';
 import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
+import { ToggleFavoriteUseCase } from '../../application/use-cases/toggle-favorite.use-case';
 import { initialProjectState, ProjectState } from '../models/project-state';
 import { ProjectDto } from '../../infrastructure/dto/project.dto';
 import {
@@ -12,6 +13,7 @@ import {
 import { SectionStore } from './section.store';
 import { TaskStore } from './task.store';
 import { Task } from '../../domain/entities/task.entity';
+import { Project } from '../../domain/entities/project.entity';
 
 /**
  * Store for **projects** only.
@@ -29,6 +31,7 @@ export class ProjectStore {
   private readonly loadProjectUseCase   = inject(LoadProjectUseCase);
   private readonly loadAllProjectsUseCase = inject(LoadAllProjectsUseCase);
   private readonly createProjectUseCase = inject(CreateProjectUseCase);
+  private readonly toggleFavoriteUseCase = inject(ToggleFavoriteUseCase);
 
   // --------------- Peer stores ---------------
   private readonly sectionStore = inject(SectionStore);
@@ -183,6 +186,38 @@ export class ProjectStore {
       error: (error) => {
         this.state.update(s => ({ ...s, loading: false, error: error.message }));
         console.error('Failed to load all projects:', error);
+      },
+    });
+  }
+
+  /**
+   * Toggle a project's favorite status and update the store
+   */
+  toggleProjectFavorite(projectId: string): void {
+    const project = this.state().projects[projectId];
+    if (!project) return;
+
+    const newFavoriteState = !project.favorite;
+
+    this.toggleFavoriteUseCase.execute(projectId, newFavoriteState).subscribe({
+      next: () => {
+        // Optimistically update the store
+        this.state.update(s => ({
+          ...s,
+          projects: {
+            ...s.projects,
+            [projectId]: new Project(
+              project.id,
+              project.name,
+              newFavoriteState,
+              project.sectionIds,
+            ),
+          },
+        }));
+      },
+      error: (error) => {
+        this.state.update(s => ({ ...s, error: error.message }));
+        console.error('Failed to toggle favorite:', error);
       },
     });
   }

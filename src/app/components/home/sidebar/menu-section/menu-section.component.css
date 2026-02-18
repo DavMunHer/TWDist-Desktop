@@ -53,6 +53,32 @@
                 gap: 10px;
             }
 
+            & .project-actions {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                & .favorite-btn {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 2px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #ccc;
+                    transition: color 0.2s ease;
+
+                    &:hover {
+                        color: #ffc04a;
+                    }
+
+                    &.active {
+                        color: #ffc04a;
+                    }
+                }
+            }
+
             & .pending-tasks {
                 color: #5559;
                 font-size: 13px;
