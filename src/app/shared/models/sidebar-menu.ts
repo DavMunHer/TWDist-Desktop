@@ -1,4 +1,5 @@
 export interface TWDSidebarMenuItem {
+  id?: string;
   name: string;
   pendingTasks: number;
   icon?: string;

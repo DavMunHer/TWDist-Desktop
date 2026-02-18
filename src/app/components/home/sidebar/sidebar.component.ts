@@ -67,14 +67,14 @@ export class SidebarComponent {
     items: this.projects()
       .filter((p) => p.favorite)
       .map((p) => {
-        return { name: p.name, pendingTasks: p.pendingTasks, icon: 'project' };
+        return { id: p.id, name: p.name, pendingTasks: p.pendingTasks, icon: 'project', favorite: p.favorite };
       }),
   }));
 
   protected projectsMenuSectionInfo = computed<TWDSidebarMenu>(() => ({
     title: 'My Projects',
     items: this.projects().map((p) => {
-      return { name: p.name, pendingTasks: p.pendingTasks, icon: 'project' };
+      return { id: p.id, name: p.name, pendingTasks: p.pendingTasks, icon: 'project', favorite: p.favorite };
     }),
   }));
 }

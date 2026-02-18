@@ -1,8 +1,9 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, signal, inject } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { TWDSidebarMenu } from '../../../../shared/models/sidebar-menu';
 import { ModalService } from '../../../../services/modal.service';
 import { TWDModalType } from '../../../../shared/models/modals-type';
+import { ProjectStore } from '../../../../features/projects/presentation/store/project.store';
 
 @Component({
   selector: 'sidebar-menu-section',
@@ -13,6 +14,8 @@ import { TWDModalType } from '../../../../shared/models/modals-type';
 export class MenuSectionComponent {
   public menuSectionInfo = input.required<TWDSidebarMenu>()
   public showPlusIcon = input<boolean>(false)
+
+  private projectStore = inject(ProjectStore);
 
   constructor(private modalService: ModalService) { }
 
@@ -31,5 +34,12 @@ export class MenuSectionComponent {
   openModal(type: TWDModalType, title: string) {
     console.log('click');
     this.modalService.open(type, { title });
+  }
+
+  toggleFavorite(projectId: string | undefined, event: Event): void {
+    event.stopPropagation();
+    if (!projectId) return;
+
+    this.projectStore.toggleProjectFavorite(projectId);
   }
 }
