@@ -5,6 +5,8 @@ import { MenuSectionComponent } from './menu-section/menu-section.component';
 import { ModalService } from '../../../services/modal.service';
 import { TWDModalType } from '../../../shared/models/modals-type';
 import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
+import { SectionStore } from '../../../features/projects/presentation/store/section.store';
+import { TaskStore } from '../../../features/projects/presentation/store/task.store';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,6 +21,8 @@ export class SidebarComponent {
   public onSidebarClose = output<boolean>();
 
   private projectStore = inject(ProjectStore);
+  private sectionStore = inject(SectionStore);
+  private taskStore = inject(TaskStore);
 
   constructor(private modalService: ModalService) { }
 
@@ -37,12 +41,37 @@ export class SidebarComponent {
 
   // Get real projects from the ProjectStore
   protected projects = computed(() =>
-    this.projectStore.projects().map((project) => ({
-      id: project.id,
-      name: project.name,
-      favorite: project.favorite,
-      pendingTasks: 0, // TODO: compute from SectionStore and TaskStore when available
-    }))
+    this.projectStore.projects().map((project) => {
+      // Compute pending tasks by traversing sections → tasks
+      const sections = this.sectionStore.sections();
+      const tasks = this.taskStore.tasks();
+
+      let pendingCount = 0;
+
+      // For each section in this project
+      for (const sectionId of project.sectionIds) {
+        const section = sections[sectionId];
+        if (!section) continue;
+
+        // For each task in this section
+        for (const taskId of section.taskIds) {
+          const task = tasks[taskId];
+          if (!task) continue;
+
+          // Count incomplete tasks
+          if (!task.completed) {
+            pendingCount++;
+          }
+        }
+      }
+
+      return {
+        id: project.id,
+        name: project.name,
+        favorite: project.favorite,
+        pendingTasks: pendingCount,
+      };
+    })
   );
 
   protected navMenuSectionInfo = computed<TWDSidebarMenu>(() => ({
@@ -61,7 +90,6 @@ export class SidebarComponent {
     ],
   }));
 
-  // FIXME: This should be fix to display only the favorite projects
   protected favoriteMenuSectionInfo = computed<TWDSidebarMenu>(() => ({
     title: 'Favorite Projects',
     items: this.projects()
