@@ -63,6 +63,39 @@ export class ProjectStore {
   readonly error = computed(() => this.state().error);
 
   // ===================================================================
+  // SELECTORS — derived list views
+  // ===================================================================
+
+  /** Project summaries with pending task counts (for sidebar / project list) */
+  readonly projectSummaries = computed(() => {
+    const sections = this.sectionStore.sections();
+    const tasks    = this.taskStore.tasks();
+
+    return this.projects().map(project => {
+      let pendingTasks = 0;
+
+      for (const sectionId of project.sectionIds) {
+        const section = sections[sectionId];
+        if (!section) continue;
+
+        for (const taskId of section.taskIds) {
+          const task = tasks[taskId];
+          if (task && !task.completed) {
+            pendingTasks++;
+          }
+        }
+      }
+
+      return {
+        id: project.id,
+        name: project.name,
+        favorite: project.favorite,
+        pendingTasks,
+      };
+    });
+  });
+
+  // ===================================================================
   // SELECTORS — denormalized view-model for the UI
   // ===================================================================
 
@@ -111,6 +144,17 @@ export class ProjectStore {
   // ACTIONS — Project
   // ===================================================================
 
+  /**
+   * Clear loading state and errors before starting a new request.
+   */
+  private clearState(): void {
+    this.state.update(s => ({
+      ...s,
+      loading: true,
+      error: null,
+    }));
+  }
+
   /** Create a new project and add it to the store */
   createProject(projectDto: ProjectDto): void {
     this.createProjectUseCase.execute(projectDto).subscribe({
@@ -132,10 +176,9 @@ export class ProjectStore {
    * then distribute the normalized data to each store.
    */
   loadProject(projectId: string): void {
+    this.clearState();
     this.state.update(s => ({
       ...s,
-      loading: true,
-      error: null,
       selectedProjectId: projectId,
     }));
 
@@ -164,11 +207,7 @@ export class ProjectStore {
    * This is typically called during app initialization.
    */
   loadAllProjects(): void {
-    this.state.update(s => ({
-      ...s,
-      loading: true,
-      error: null,
-    }));
+    this.clearState();
 
     this.loadAllProjectsUseCase.execute().subscribe({
       next: (projects) => {
