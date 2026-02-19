@@ -13,6 +13,7 @@ import { ToggleTaskCompletionUseCase } from './application/use-cases/toggle-task
 import { ToggleFavoriteUseCase } from './application/use-cases/toggle-favorite.use-case';
 import { CreateProjectUseCase } from './application/use-cases/create-project.use-case';
 import { ProjectStore } from './presentation/store/project.store';
+import { ProjectSummaryStore } from './presentation/store/project-summary.store';
 import { SectionStore } from './presentation/store/section.store';
 import { TaskStore } from './presentation/store/task.store';
 
@@ -33,6 +34,7 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
 
   // Presentation — Stores
   ProjectStore,
+  ProjectSummaryStore,
   SectionStore,
   TaskStore,
 ];

@@ -5,6 +5,7 @@ import { MenuSectionComponent } from './menu-section/menu-section.component';
 import { ModalService } from '../../../services/modal.service';
 import { TWDModalType } from '../../../shared/models/modals-type';
 import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
+import { ProjectSummaryStore } from '../../../features/projects/presentation/store/project-summary.store';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,7 +19,8 @@ export class SidebarComponent {
   public sidebarVisibleInput = input.required<boolean>();
   public onSidebarClose = output<boolean>();
 
-  private projectStore = inject(ProjectStore);
+  private readonly projectStore = inject(ProjectStore);
+  private readonly summaryStore = inject(ProjectSummaryStore);
 
   constructor(private modalService: ModalService) { }
 
@@ -27,7 +29,6 @@ export class SidebarComponent {
   }
 
   toggleSidebar() {
-    // When the action of clicking the icon is triggered, we will send an output to update the value of the sidebarVisible
     this.onSidebarClose.emit(false)
   }
 
@@ -35,8 +36,14 @@ export class SidebarComponent {
     this.toggleDropdownVal.set(!this.toggleDropdownVal());
   }
 
-  // Get project summaries with pending task counts from the ProjectStore
-  protected projects = this.projectStore.projectSummaries;
+  protected projects = computed(() =>
+    this.projectStore.projects().map(p => ({
+      id: p.id,
+      name: p.name,
+      favorite: p.favorite,
+      pendingTasks: this.summaryStore.pendingCountFor(p.id, p.sectionIds),
+    })),
+  );
 
   protected navMenuSectionInfo = computed<TWDSidebarMenu>(() => ({
     title: 'Navigation',

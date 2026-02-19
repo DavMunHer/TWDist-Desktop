@@ -6,13 +6,14 @@ import { Project } from '../../domain/entities/project.entity';
  * Each project holds `sectionIds` pointing into the SectionStore's dictionary.
  * Sections and tasks live in their own dedicated stores.
  *
+ * Sidebar-specific data (pending task counts) lives in
+ * {@link ProjectSummaryState} to keep this state focused on core project data.
+ *
  * @see README.md — "State Handling" section for a full explanation.
  */
 export interface ProjectState {
   /** All loaded projects indexed by ID */
   projects: Record<string, Project>;
-  /** Pending task counts indexed by project ID (summary list) */
-  pendingCounts: Record<string, number>;
   /** Currently selected / active project ID */
   selectedProjectId: string | null;
   /** Whether a data operation is in progress */
@@ -24,7 +25,6 @@ export interface ProjectState {
 /** Convenience factory for producing the initial (empty) state */
 export const initialProjectState: ProjectState = {
   projects: {},
-  pendingCounts: {},
   selectedProjectId: null,
   loading: false,
   error: null,

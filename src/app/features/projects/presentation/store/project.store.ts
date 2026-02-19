@@ -12,6 +12,7 @@ import {
 } from '../models/project.view-model';
 import { SectionStore } from './section.store';
 import { TaskStore } from './task.store';
+import { ProjectSummaryStore } from './project-summary.store';
 import { Task } from '../../domain/entities/task.entity';
 import { Project } from '../../domain/entities/project.entity';
 
@@ -34,8 +35,9 @@ export class ProjectStore {
   private readonly toggleFavoriteUseCase = inject(ToggleFavoriteUseCase);
 
   // --------------- Peer stores ---------------
-  private readonly sectionStore = inject(SectionStore);
-  private readonly taskStore    = inject(TaskStore);
+  private readonly sectionStore         = inject(SectionStore);
+  private readonly taskStore            = inject(TaskStore);
+  private readonly projectSummaryStore  = inject(ProjectSummaryStore);
 
   // --------------- State signal ---------------
   private readonly state = signal<ProjectState>(initialProjectState);
@@ -61,42 +63,6 @@ export class ProjectStore {
 
   /** Last error */
   readonly error = computed(() => this.state().error);
-
-  // ===================================================================
-  // SELECTORS — derived list views
-  // ===================================================================
-
-  /** Project summaries with pending task counts (for sidebar / project list) */
-  readonly projectSummaries = computed(() => {
-    const pendingCounts = this.state().pendingCounts;
-    const sections = this.sectionStore.sections();
-    const tasks    = this.taskStore.tasks();
-
-    return this.projects().map(project => {
-      let pendingTasks = pendingCounts[project.id] ?? 0;
-
-      if (pendingCounts[project.id] === undefined) {
-        for (const sectionId of project.sectionIds) {
-          const section = sections[sectionId];
-          if (!section) continue;
-
-          for (const taskId of section.taskIds) {
-            const task = tasks[taskId];
-            if (task && !task.completed) {
-              pendingTasks++;
-            }
-          }
-        }
-      }
-
-      return {
-        id: project.id,
-        name: project.name,
-        favorite: project.favorite,
-        pendingTasks,
-      };
-    });
-  });
 
   // ===================================================================
   // SELECTORS — denormalized view-model for the UI
@@ -214,7 +180,7 @@ export class ProjectStore {
 
     this.loadAllProjectsUseCase.execute().subscribe({
       next: (summaries) => {
-        const projectsDict: Record<string, any> = {};
+        const projectsDict: Record<string, Project> = {};
         const pendingCounts: Record<string, number> = {};
 
         for (const { project, pendingCount } of summaries) {
@@ -222,11 +188,11 @@ export class ProjectStore {
           pendingCounts[project.id] = pendingCount;
         }
 
-        // Update own state
+        this.projectSummaryStore.mergePendingCounts(pendingCounts);
+
         this.state.update(s => ({
           ...s,
           projects: projectsDict,
-          pendingCounts,
           loading: false,
         }));
       },
