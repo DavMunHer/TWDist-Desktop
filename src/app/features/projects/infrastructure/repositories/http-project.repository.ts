@@ -28,10 +28,10 @@ export class HttpProjectRepository extends ProjectRepository {
       .pipe(map(dto => ProjectMapper.toAggregate(dto)));
   }
 
-  getAll(): Observable<Project[]> {
+  getAll(): Observable<ProjectAggregate[]> {
     return this.http
       .get<ProjectResponeDto[]>(`${this.baseUrl}/get`)
-      .pipe(map(dtos => dtos.map(dto => ProjectMapper.toDomain(dto))));
+      .pipe(map(dtos => dtos.map(dto => ProjectMapper.toAggregate(dto))));
   }
 
   update(project: Project): Observable<Project> {

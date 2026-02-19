@@ -210,12 +210,23 @@ export class ProjectStore {
     this.clearState();
 
     this.loadAllProjectsUseCase.execute().subscribe({
-      next: (projects) => {
+      next: (aggregates) => {
         const projectsDict: Record<string, any> = {};
-        for (const project of projects) {
+        const allSections: any[] = [];
+        const allTasks: any[] = [];
+
+        // Collect all projects, sections, and tasks from all aggregates
+        for (const { project, sections, tasks } of aggregates) {
           projectsDict[project.id] = project;
+          allSections.push(...sections);
+          allTasks.push(...tasks);
         }
 
+        // Distribute to peer stores
+        this.sectionStore.mergeSections(allSections);
+        this.taskStore.mergeTasks(allTasks);
+
+        // Update own state
         this.state.update(s => ({
           ...s,
           projects: projectsDict,
