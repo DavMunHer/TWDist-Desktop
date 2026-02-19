@@ -10,10 +10,10 @@ import { CreateUserUseCase } from "../../application/use-cases/createUser.use-ca
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
-  private loginUseCase = inject(LoginUseCase);
-  private logoutUseCase = inject(LogoutUseCase);
-  private createUserUseCase = inject(CreateUserUseCase);
-  private getCurrentUserUseCase = inject(GetCurrentUserUseCase);
+  private readonly loginUseCase = inject(LoginUseCase);
+  private readonly logoutUseCase = inject(LogoutUseCase);
+  private readonly createUserUseCase = inject(CreateUserUseCase);
+  private readonly getCurrentUserUseCase = inject(GetCurrentUserUseCase);
 
   private readonly state = signal<AuthState>({
     user: null,
