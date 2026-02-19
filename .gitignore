@@ -3,6 +3,9 @@
 # Compiled output
 /dist
 /tmp
+
+# npm lock file (project uses bun.lock)
+package-lock.json
 /out-tsc
 /bazel-out
 
