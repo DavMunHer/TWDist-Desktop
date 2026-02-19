@@ -1,9 +1,10 @@
 import { Project } from '../../domain/entities/project.entity';
 import { Section } from '../../domain/entities/section.entity';
 import { Task } from '../../domain/entities/task.entity';
-import { ProjectAggregate } from '../../domain/repositories/project.repository';
+import { ProjectAggregate, ProjectSummary } from '../../domain/repositories/project.repository';
 import { ProjectDto } from '../dto/project.dto';
 import { ProjectResponeDto } from '../dto/response/project.dto';
+import { ProjectSummaryDto } from '../dto/response/project-summary.dto';
 import { SectionMapper } from './section.mapper';
 import { TaskMapper } from './task.mapper';
 
@@ -38,6 +39,20 @@ export class ProjectMapper {
       project: ProjectMapper.toDomain(dto),
       sections,
       tasks,
+    };
+  }
+
+  static toSummary(dto: ProjectSummaryDto): ProjectSummary {
+    const project = new Project(
+      String(dto.id),
+      dto.name,
+      dto.favorite,
+      []
+    );
+
+    return {
+      project,
+      pendingCount: dto.pendingCount,
     };
   }
 

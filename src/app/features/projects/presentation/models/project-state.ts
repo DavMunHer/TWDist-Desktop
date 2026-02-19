@@ -11,6 +11,8 @@ import { Project } from '../../domain/entities/project.entity';
 export interface ProjectState {
   /** All loaded projects indexed by ID */
   projects: Record<string, Project>;
+  /** Pending task counts indexed by project ID (summary list) */
+  pendingCounts: Record<string, number>;
   /** Currently selected / active project ID */
   selectedProjectId: string | null;
   /** Whether a data operation is in progress */
@@ -22,6 +24,7 @@ export interface ProjectState {
 /** Convenience factory for producing the initial (empty) state */
 export const initialProjectState: ProjectState = {
   projects: {},
+  pendingCounts: {},
   selectedProjectId: null,
   loading: false,
   error: null,

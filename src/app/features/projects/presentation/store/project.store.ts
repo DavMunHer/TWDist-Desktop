@@ -68,20 +68,23 @@ export class ProjectStore {
 
   /** Project summaries with pending task counts (for sidebar / project list) */
   readonly projectSummaries = computed(() => {
+    const pendingCounts = this.state().pendingCounts;
     const sections = this.sectionStore.sections();
     const tasks    = this.taskStore.tasks();
 
     return this.projects().map(project => {
-      let pendingTasks = 0;
+      let pendingTasks = pendingCounts[project.id] ?? 0;
 
-      for (const sectionId of project.sectionIds) {
-        const section = sections[sectionId];
-        if (!section) continue;
+      if (pendingCounts[project.id] === undefined) {
+        for (const sectionId of project.sectionIds) {
+          const section = sections[sectionId];
+          if (!section) continue;
 
-        for (const taskId of section.taskIds) {
-          const task = tasks[taskId];
-          if (task && !task.completed) {
-            pendingTasks++;
+          for (const taskId of section.taskIds) {
+            const task = tasks[taskId];
+            if (task && !task.completed) {
+              pendingTasks++;
+            }
           }
         }
       }
@@ -204,32 +207,26 @@ export class ProjectStore {
 
   /**
    * Load all projects from the API and populate the store.
-   * This is typically called during app initialization.
+   * This is called after making a successful login.
    */
   loadAllProjects(): void {
     this.clearState();
 
     this.loadAllProjectsUseCase.execute().subscribe({
-      next: (aggregates) => {
+      next: (summaries) => {
         const projectsDict: Record<string, any> = {};
-        const allSections: any[] = [];
-        const allTasks: any[] = [];
+        const pendingCounts: Record<string, number> = {};
 
-        // Collect all projects, sections, and tasks from all aggregates
-        for (const { project, sections, tasks } of aggregates) {
+        for (const { project, pendingCount } of summaries) {
           projectsDict[project.id] = project;
-          allSections.push(...sections);
-          allTasks.push(...tasks);
+          pendingCounts[project.id] = pendingCount;
         }
-
-        // Distribute to peer stores
-        this.sectionStore.mergeSections(allSections);
-        this.taskStore.mergeTasks(allTasks);
 
         // Update own state
         this.state.update(s => ({
           ...s,
           projects: projectsDict,
+          pendingCounts,
           loading: false,
         }));
       },
