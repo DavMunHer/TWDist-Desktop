@@ -7,6 +7,6 @@ export class LoadAllProjectsUseCase {
   constructor(private projectRepository: ProjectRepository) {}
 
   execute(): Observable<ProjectAggregate[]> {
-    return this.projectRepository.getAll();
+    return this.projectRepository.getAllWithAggregates();
   }
 }
