@@ -124,6 +124,28 @@ export class ProjectStore {
     }));
   }
 
+  /** Insert or replace a project in the dictionary. */
+  private upsertProject(id: string, project: Project): void {
+    this.state.update(s => ({
+      ...s,
+      projects: { ...s.projects, [id]: project },
+    }));
+  }
+
+  /** Remove a project from the dictionary by id. */
+  private removeProject(id: string): void {
+    this.state.update(s => {
+      const { [id]: _, ...rest } = s.projects;
+      return { ...s, projects: rest };
+    });
+  }
+
+  /** Record an error in the store and log it to the console. */
+  private setError(message: string, context: string, error: unknown): void {
+    this.state.update(s => ({ ...s, error: message }));
+    console.error(`Failed to ${context}:`, error);
+  }
+
   /**
    * Create a new project with **optimistic UI**.
    *
@@ -142,34 +164,23 @@ export class ProjectStore {
     );
 
     // Show the project in the UI right away
-    this.state.update(s => ({
-      ...s,
-      projects: { ...s.projects, [tempId]: optimisticProject },
-    }));
+    this.upsertProject(tempId, optimisticProject);
     this.projectSummaryStore.mergePendingCounts({ [tempId]: 0 });
 
     // Fire the backend request in parallel
     this.createProjectUseCase.execute(projectDto).subscribe({
       next: (project) => {
         // Replace the temp project with the real one from the backend
-        this.state.update(s => {
-          const { [tempId]: _, ...rest } = s.projects;
-          return {
-            ...s,
-            projects: { ...rest, [project.id]: project },
-          };
-        });
+        this.removeProject(tempId);
+        this.upsertProject(project.id, project);
         this.projectSummaryStore.removePendingCount(tempId);
         this.projectSummaryStore.mergePendingCounts({ [project.id]: 0 });
       },
       error: (error) => {
         // Revert the optimistic update
-        this.state.update(s => {
-          const { [tempId]: _, ...rest } = s.projects;
-          return { ...s, projects: rest, error: error.message };
-        });
+        this.removeProject(tempId);
         this.projectSummaryStore.removePendingCount(tempId);
-        console.error('Failed to create project:', error);
+        this.setError(error.message, 'create project', error);
       },
     });
   }
@@ -192,15 +203,12 @@ export class ProjectStore {
         this.taskStore.mergeTasks(tasks);
 
         // Update own state
-        this.state.update(s => ({
-          ...s,
-          projects: { ...s.projects, [project.id]: project },
-          loading: false,
-        }));
+        this.upsertProject(project.id, project);
+        this.state.update(s => ({ ...s, loading: false }));
       },
       error: (error) => {
-        this.state.update(s => ({ ...s, loading: false, error: error.message }));
-        console.error('Failed to load project:', error);
+        this.state.update(s => ({ ...s, loading: false }));
+        this.setError(error.message, 'load project', error);
       },
     });
   }
@@ -231,8 +239,8 @@ export class ProjectStore {
         }));
       },
       error: (error) => {
-        this.state.update(s => ({ ...s, loading: false, error: error.message }));
-        console.error('Failed to load all projects:', error);
+        this.state.update(s => ({ ...s, loading: false }));
+        this.setError(error.message, 'load all projects', error);
       },
     });
   }
@@ -251,21 +259,14 @@ export class ProjectStore {
     const toggled = project.toggleFavorite();
 
     // Update the UI immediately
-    this.state.update(s => ({
-      ...s,
-      projects: { ...s.projects, [projectId]: toggled },
-    }));
+    this.upsertProject(projectId, toggled);
 
     // Then call the backend
     this.toggleFavoriteUseCase.execute(projectId, toggled.favorite).subscribe({
       error: (error) => {
         // Revert to the original project on failure
-        this.state.update(s => ({
-          ...s,
-          projects: { ...s.projects, [projectId]: project },
-          error: error.message,
-        }));
-        console.error('Failed to toggle favorite:', error);
+        this.upsertProject(projectId, project);
+        this.setError(error.message, 'toggle favorite', error);
       },
     });
   }
@@ -284,18 +285,9 @@ export class ProjectStore {
 
     this.sectionStore.createSection(projectId, sectionName, (section) => {
       // Link the new section to the project
-      this.state.update(s => {
-        const project = s.projects[projectId];
-        if (!project) return s;
-
-        return {
-          ...s,
-          projects: {
-            ...s.projects,
-            [projectId]: project.addSection(section.id),
-          },
-        };
-      });
+      const project = this.state().projects[projectId];
+      if (!project) return;
+      this.upsertProject(projectId, project.addSection(section.id));
     });
   }
 
