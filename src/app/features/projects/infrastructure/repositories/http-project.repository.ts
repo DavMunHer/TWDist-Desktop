@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ProjectRepository, ProjectAggregate } from '../../domain/repositories/project.repository';
+import { ProjectRepository, ProjectAggregate, ProjectSummary } from '../../domain/repositories/project.repository';
 import { ProjectDto } from '../dto/project.dto';
 import { ProjectMapper } from '../mappers/project.mapper';
 import { Project } from '../../domain/entities/project.entity';
 import { ProjectResponeDto } from '../dto/response/project.dto';
+import { ProjectSummaryDto } from '../dto/response/project-summary.dto';
 
 @Injectable()
 export class HttpProjectRepository extends ProjectRepository {
@@ -28,10 +29,10 @@ export class HttpProjectRepository extends ProjectRepository {
       .pipe(map(dto => ProjectMapper.toAggregate(dto)));
   }
 
-  getAll(): Observable<Project[]> {
+  getAll(): Observable<ProjectSummary[]> {
     return this.http
-      .get<ProjectResponeDto[]>(`${this.baseUrl}/get`)
-      .pipe(map(dtos => dtos.map(dto => ProjectMapper.toDomain(dto))));
+      .get<ProjectSummaryDto[]>(`${this.baseUrl}/get`)
+      .pipe(map(dtos => dtos.map(dto => ProjectMapper.toSummary(dto))));
   }
 
   update(project: Project): Observable<Project> {

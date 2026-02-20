@@ -12,14 +12,14 @@ import { ProjectStore } from '../../../features/projects/presentation/store/proj
   styleUrl: './project-view.component.css',
 })
 export class ProjectViewComponent implements OnInit {
-  private projectStore = inject(ProjectStore);
+  private readonly projectStore = inject(ProjectStore);
 
   // Tunnel for hidding icon when sidebar is visible
-  public onShowIconChange = output<boolean>();
+  public showIconChange = output<boolean>();
   public showIcon = input.required<boolean>();
 
   handleIconChange() {
-    this.onShowIconChange.emit(true)
+    this.showIconChange.emit(true)
   }
 
   /** Denormalized project view-model, ready for the template */
