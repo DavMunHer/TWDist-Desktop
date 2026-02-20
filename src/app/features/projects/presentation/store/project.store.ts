@@ -124,17 +124,51 @@ export class ProjectStore {
     }));
   }
 
-  /** Create a new project and add it to the store */
+  /**
+   * Create a new project with **optimistic UI**.
+   *
+   * A temporary project is added to the store immediately so the user
+   * sees it without waiting for the backend round-trip.  Once the
+   * server responds the temporary entry is swapped for the real one;
+   * on failure the optimistic entry is rolled back.
+   */
   createProject(projectDto: ProjectDto): void {
+    const tempId = `temp-${Date.now()}`;
+    const optimisticProject = new Project(
+      tempId,
+      projectDto.name,
+      projectDto.favorite,
+      [],
+    );
+
+    // Show the project in the UI right away
+    this.state.update(s => ({
+      ...s,
+      projects: { ...s.projects, [tempId]: optimisticProject },
+    }));
+    this.projectSummaryStore.mergePendingCounts({ [tempId]: 0 });
+
+    // Fire the backend request in parallel
     this.createProjectUseCase.execute(projectDto).subscribe({
       next: (project) => {
-        this.state.update(s => ({
-          ...s,
-          projects: { ...s.projects, [project.id]: project },
-        }));
+        // Replace the temp project with the real one from the backend
+        this.state.update(s => {
+          const { [tempId]: _, ...rest } = s.projects;
+          return {
+            ...s,
+            projects: { ...rest, [project.id]: project },
+          };
+        });
+        this.projectSummaryStore.removePendingCount(tempId);
+        this.projectSummaryStore.mergePendingCounts({ [project.id]: 0 });
       },
       error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
+        // Revert the optimistic update
+        this.state.update(s => {
+          const { [tempId]: _, ...rest } = s.projects;
+          return { ...s, projects: rest, error: error.message };
+        });
+        this.projectSummaryStore.removePendingCount(tempId);
         console.error('Failed to create project:', error);
       },
     });
@@ -204,32 +238,33 @@ export class ProjectStore {
   }
 
   /**
-   * Toggle a project's favorite status and update the store
+   * Toggle a project's favorite status with **optimistic UI**.
+   *
+   * The store is updated immediately so the user sees the change
+   * without delay.  If the backend call fails the original state
+   * is restored.
    */
   toggleProjectFavorite(projectId: string): void {
     const project = this.state().projects[projectId];
     if (!project) return;
 
-    const newFavoriteState = !project.favorite;
+    const toggled = project.toggleFavorite();
 
-    this.toggleFavoriteUseCase.execute(projectId, newFavoriteState).subscribe({
-      next: () => {
-        // Optimistically update the store
+    // Update the UI immediately
+    this.state.update(s => ({
+      ...s,
+      projects: { ...s.projects, [projectId]: toggled },
+    }));
+
+    // Then call the backend
+    this.toggleFavoriteUseCase.execute(projectId, toggled.favorite).subscribe({
+      error: (error) => {
+        // Revert to the original project on failure
         this.state.update(s => ({
           ...s,
-          projects: {
-            ...s.projects,
-            [projectId]: new Project(
-              project.id,
-              project.name,
-              newFavoriteState,
-              project.sectionIds,
-            ),
-          },
+          projects: { ...s.projects, [projectId]: project },
+          error: error.message,
         }));
-      },
-      error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
         console.error('Failed to toggle favorite:', error);
       },
     });
