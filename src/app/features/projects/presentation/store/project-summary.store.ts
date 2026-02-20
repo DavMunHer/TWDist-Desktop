@@ -73,4 +73,12 @@ export class ProjectSummaryStore {
       pendingCounts: { ...s.pendingCounts, ...counts },
     }));
   }
+
+  /** Remove the pending count entry for a given project (e.g. temp ID cleanup) */
+  removePendingCount(projectId: string): void {
+    this.state.update(s => {
+      const { [projectId]: _, ...rest } = s.pendingCounts;
+      return { ...s, pendingCounts: rest };
+    });
+  }
 }
