@@ -1,11 +1,11 @@
 import { NgClass } from '@angular/common';
 import { Component, input, output, signal, computed, inject } from '@angular/core';
-import { TWDSidebarMenu } from '../../../shared/models/sidebar-menu';
+import { TWDSidebarMenu } from '@shared/models/sidebar-menu';
 import { MenuSectionComponent } from './menu-section/menu-section.component';
-import { ModalService } from '../../../services/modal.service';
-import { TWDModalType } from '../../../shared/models/modals-type';
-import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
-import { ProjectSummaryStore } from '../../../features/projects/presentation/store/project-summary.store';
+import { ModalService } from '@services/modal.service';
+import { TWDModalType } from '@shared/models/modals-type';
+import { ProjectStore } from '@features/projects/presentation/store/project.store';
+import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
 
 @Component({
   selector: 'app-sidebar',

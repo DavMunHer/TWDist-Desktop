@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ProjectStore } from '../../../features/projects/presentation/store/project.store';
+import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
 @Component({
   selector: 'create-project-modal',
