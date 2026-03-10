@@ -1,8 +1,8 @@
 import { Component, computed } from '@angular/core';
-import { ModalService } from '../../../services/modal.service';
+import { ModalService } from '@services/modal.service';
 import { ConfigurationComponent } from "./configuration/configuration.component";
 import { ProfileComponent } from './profile/profile.component';
-import { CreateProjectComponent } from "../../../features/projects/presentation/components/create-project/create-project.component";
+import { CreateProjectComponent } from "@features/projects/presentation/components/create-project/create-project.component";
 
 @Component({
   selector: 'app-modal',
