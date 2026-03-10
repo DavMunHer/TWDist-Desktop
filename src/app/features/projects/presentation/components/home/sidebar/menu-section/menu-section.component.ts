@@ -36,6 +36,11 @@ export class MenuSectionComponent {
     this.modalService.open(type, { title });
   }
 
+  selectProject(projectId: string | undefined): void {
+    if (!projectId) return;
+    this.projectStore.loadProject(projectId);
+  }
+
   toggleFavorite(projectId: string | undefined, event: Event): void {
     event.stopPropagation();
     if (!projectId) return;

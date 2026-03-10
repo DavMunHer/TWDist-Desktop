@@ -26,9 +26,6 @@ export class ProjectViewComponent implements OnInit {
   protected projectInfo = computed(() => this.projectStore.projectView());
 
   ngOnInit(): void {
-    // Load project - in real app, get ID from route params
-    this.projectStore.loadProject('1');
-    // Load all projects on component initialization
     this.projectStore.loadAllProjects();
   }
 

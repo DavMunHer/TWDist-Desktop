@@ -19,7 +19,7 @@
     </div>
     <ul>
         @for (item of menuSectionInfo().items; track $index) {
-        <li class="sidebar-hover">
+        <li class="sidebar-hover" (click)="selectProject(item.id)">
             <div class="project-start">
                 @switch (item.icon){
                 @case ('project') {

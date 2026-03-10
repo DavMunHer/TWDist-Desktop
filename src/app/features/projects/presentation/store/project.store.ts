@@ -237,6 +237,12 @@ export class ProjectStore {
           projects: projectsDict,
           loading: false,
         }));
+
+        // Auto-select the first project if none is selected yet
+        const ids = Object.keys(projectsDict);
+        if (!this.state().selectedProjectId && ids.length > 0) {
+          this.loadProject(ids[0]);
+        }
       },
       error: (error) => {
         this.state.update(s => ({ ...s, loading: false }));
