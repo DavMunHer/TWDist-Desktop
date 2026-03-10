@@ -128,6 +128,14 @@ export class TaskStore {
     });
   }
 
+  /** Remove a task entirely from the store */
+  removeTask(taskId: string): void {
+    this.state.update(s => {
+      const { [taskId]: _, ...rest } = s.tasks;
+      return { ...s, tasks: rest };
+    });
+  }
+
   /** Toggle a task's completed status */
   toggleTaskCompletion(taskId: string): void {
     this.toggleTaskUseCase.execute(taskId).subscribe({
