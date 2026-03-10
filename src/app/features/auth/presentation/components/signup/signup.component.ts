@@ -1,7 +1,7 @@
 import { Component, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthStore } from '../../../features/auth/presentation/store/auth.store';
+import { AuthStore } from '../../store/auth.store';
 
 @Component({
   selector: 'signup',

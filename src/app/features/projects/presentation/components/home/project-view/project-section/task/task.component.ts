@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { TaskViewModel } from '../../../../../features/projects/presentation/models/project.view-model';
+import { TaskViewModel } from '../../../../../models/project.view-model';
 
 @Component({
   selector: 'task',
