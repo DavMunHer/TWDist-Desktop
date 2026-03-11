@@ -1,20 +1,29 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
-import { LoadAllProjectsUseCase } from '../../application/use-cases/load-all-projects.use-case';
-import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
-import { ToggleFavoriteUseCase } from '../../application/use-cases/toggle-favorite.use-case';
-import { initialProjectState, ProjectState } from '../models/project-state';
-import { ProjectDto } from '../../infrastructure/dto/project.dto';
+import { Subscription } from 'rxjs';
+import { LoadProjectUseCase } from '@features/projects/application/use-cases/load-project.use-case';
+import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects.use-case';
+import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project.use-case';
+import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite.use-case';
+import { initialProjectState, ProjectState } from '@features/projects/presentation/models/project-state';
+import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 import {
   ProjectViewModel,
   SectionViewModel,
   TaskViewModel,
-} from '../models/project.view-model';
-import { SectionStore } from './section.store';
-import { TaskStore } from './task.store';
-import { ProjectSummaryStore } from './project-summary.store';
-import { Task } from '../../domain/entities/task.entity';
-import { Project } from '../../domain/entities/project.entity';
+} from '@features/projects/presentation/models/project.view-model';
+import { SectionStore } from '@features/projects/presentation/store/section.store';
+import { TaskStore } from '@features/projects/presentation/store/task.store';
+import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
+import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectEventsService } from '@features/projects/infrastructure/services/project-events.service';
+import { UserEventsService } from '@features/projects/infrastructure/services/user-events.service';
+import { ProjectEvent, DeletePayload } from '@features/projects/infrastructure/dto/sse/project-event';
+import { UserEvent, ProjectDeletePayload } from '@features/projects/infrastructure/dto/sse/user-event';
+import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
+import { SectionMapper } from '@features/projects/infrastructure/mappers/section.mapper';
+import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
+import { SectionDto } from '@features/projects/infrastructure/dto/section.dto';
+import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
 
 /**
  * Store for **projects** only.
@@ -38,6 +47,12 @@ export class ProjectStore {
   private readonly sectionStore         = inject(SectionStore);
   private readonly taskStore            = inject(TaskStore);
   private readonly projectSummaryStore  = inject(ProjectSummaryStore);
+
+  // --------------- SSE ---------------
+  private readonly projectEventsService = inject(ProjectEventsService);
+  private readonly userEventsService = inject(UserEventsService);
+  private projectEventsSubscription?: Subscription;
+  private userEventsSubscription?: Subscription;
 
   // --------------- State signal ---------------
   private readonly state = signal<ProjectState>(initialProjectState);
@@ -188,8 +203,10 @@ export class ProjectStore {
   /**
    * Load a full project (with sections & tasks) from the API,
    * then distribute the normalized data to each store.
+   * Opens an SSE connection for live updates from other users.
    */
   loadProject(projectId: string): void {
+    this.disconnectFromProjectEvents();
     this.clearState();
     this.state.update(s => ({
       ...s,
@@ -198,13 +215,13 @@ export class ProjectStore {
 
     this.loadProjectUseCase.execute(projectId).subscribe({
       next: ({ project, sections, tasks }) => {
-        // Distribute to peer stores
         this.sectionStore.mergeSections(sections);
         this.taskStore.mergeTasks(tasks);
 
-        // Update own state
         this.upsertProject(project.id, project);
         this.state.update(s => ({ ...s, loading: false }));
+
+        this.connectToProjectEvents(projectId);
       },
       error: (error) => {
         this.state.update(s => ({ ...s, loading: false }));
@@ -219,6 +236,7 @@ export class ProjectStore {
    */
   loadAllProjects(): void {
     this.clearState();
+    this.connectToUserEvents();
 
     this.loadAllProjectsUseCase.execute().subscribe({
       next: (summaries) => {
@@ -317,5 +335,149 @@ export class ProjectStore {
   /** Toggle a task's completed status */
   toggleTaskCompletion(taskId: string): void {
     this.taskStore.toggleTaskCompletion(taskId);
+  }
+
+  // ===================================================================
+  // SSE — real-time updates from other users
+  // ===================================================================
+
+  // --- Project channel (per-project, rotates on project change) ---
+
+  private connectToProjectEvents(projectId: string): void {
+    this.projectEventsSubscription = this.projectEventsService
+      .connect(projectId)
+      .subscribe(event => this.handleProjectEvent(event, projectId));
+  }
+
+  private disconnectFromProjectEvents(): void {
+    this.projectEventsSubscription?.unsubscribe();
+    this.projectEventsSubscription = undefined;
+  }
+
+  // --- User channel (session-wide, open from login to logout) ---
+
+  private connectToUserEvents(): void {
+    this.userEventsSubscription?.unsubscribe();
+    this.userEventsSubscription = this.userEventsService
+      .connect()
+      .subscribe(event => this.handleUserEvent(event));
+  }
+
+  private disconnectFromUserEvents(): void {
+    this.userEventsSubscription?.unsubscribe();
+    this.userEventsSubscription = undefined;
+  }
+
+  /** Close all SSE connections. Call on logout / navigation away. */
+  disconnectFromEvents(): void {
+    this.disconnectFromProjectEvents();
+    this.disconnectFromUserEvents();
+  }
+
+  // --- Event handlers ---
+
+  private handleUserEvent(event: UserEvent): void {
+    switch (event.type) {
+      case 'project_created': {
+        const dto = event.data as ProjectSummaryDto;
+        const projectId = String(dto.id);
+        if (!this.state().projects[projectId]) {
+          const project = new Project(projectId, dto.name, dto.favorite, []);
+          this.upsertProject(projectId, project);
+          this.projectSummaryStore.mergePendingCounts({ [projectId]: dto.pendingCount });
+        }
+        break;
+      }
+
+      case 'project_updated': {
+        const dto = event.data as ProjectSummaryDto;
+        const projectId = String(dto.id);
+        const existing = this.state().projects[projectId];
+        if (existing) {
+          const updated = new Project(projectId, dto.name, dto.favorite, existing.sectionIds);
+          this.upsertProject(projectId, updated);
+          this.projectSummaryStore.mergePendingCounts({ [projectId]: dto.pendingCount });
+        }
+        break;
+      }
+
+      case 'project_deleted': {
+        const { id } = event.data as ProjectDeletePayload;
+        const projectId = String(id);
+        this.removeProject(projectId);
+        this.projectSummaryStore.removePendingCount(projectId);
+        if (this.state().selectedProjectId === projectId) {
+          const ids = Object.keys(this.state().projects);
+          if (ids.length > 0) {
+            this.loadProject(ids[0]);
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  private handleProjectEvent(event: ProjectEvent, projectId: string): void {
+    switch (event.type) {
+      case 'section_created': {
+        const dto = event.data as SectionDto;
+        const section = SectionMapper.toDomain(dto, projectId);
+        this.sectionStore.mergeSections([section]);
+        const project = this.state().projects[projectId];
+        if (project && !project.sectionIds.includes(section.id)) {
+          this.upsertProject(projectId, project.addSection(section.id));
+        }
+        break;
+      }
+
+      case 'section_updated': {
+        const dto = event.data as SectionDto;
+        const section = SectionMapper.toDomain(dto, projectId);
+        this.sectionStore.mergeSections([section]);
+        break;
+      }
+
+      case 'section_deleted': {
+        const { id } = event.data as DeletePayload;
+        const sectionId = String(id);
+        const project = this.state().projects[projectId];
+        if (project) {
+          this.upsertProject(projectId, project.removeSection(sectionId));
+        }
+        this.sectionStore.removeSection(sectionId);
+        break;
+      }
+
+      case 'task_created': {
+        const dto = event.data as TaskDto;
+        const sectionId = String((event.data as any).sectionId ?? dto.id);
+        const taskId = String(dto.id);
+        const tasks = TaskMapper.flattenToDomain(dto, sectionId);
+        this.taskStore.mergeTasks(tasks);
+        const section = this.sectionStore.getSection(sectionId);
+        if (section && !section.taskIds.includes(taskId)) {
+          this.sectionStore.addTaskToSection(sectionId, taskId);
+        }
+        break;
+      }
+
+      case 'task_updated': {
+        const dto = event.data as TaskDto;
+        const sectionId = String((event.data as any).sectionId);
+        const tasks = TaskMapper.flattenToDomain(dto, sectionId);
+        this.taskStore.mergeTasks(tasks);
+        break;
+      }
+
+      case 'task_deleted': {
+        const { id, sectionId } = event.data as DeletePayload;
+        const taskId = String(id);
+        if (sectionId) {
+          this.sectionStore.removeTaskFromSection(String(sectionId), taskId);
+        }
+        this.taskStore.removeTask(taskId);
+        break;
+      }
+    }
   }
 }
