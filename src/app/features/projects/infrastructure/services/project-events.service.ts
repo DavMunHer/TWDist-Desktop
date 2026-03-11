@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../shared/config/environment';
-import { ProjectEvent, ProjectEventType } from '../dto/sse/project-event';
+import { environment } from '@shared/config/environment';
+import { ProjectEvent, ProjectEventType } from '@features/projects/infrastructure/dto/sse/project-event';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectEventsService {
@@ -24,7 +24,10 @@ export class ProjectEventsService {
         source.addEventListener(type, ((e: MessageEvent) => {
           try {
             subscriber.next({ type, data: JSON.parse(e.data) });
-          } catch { /* malformed event data */ }
+          } catch (error) {
+            console.error(`[SSE:Project] Failed to parse "${type}" event:`, error, e.data);
+            subscriber.error(error);
+          }
         }) as EventListener);
       }
 

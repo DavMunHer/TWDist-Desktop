@@ -1,29 +1,29 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
-import { LoadAllProjectsUseCase } from '../../application/use-cases/load-all-projects.use-case';
-import { CreateProjectUseCase } from '../../application/use-cases/create-project.use-case';
-import { ToggleFavoriteUseCase } from '../../application/use-cases/toggle-favorite.use-case';
-import { initialProjectState, ProjectState } from '../models/project-state';
-import { ProjectDto } from '../../infrastructure/dto/project.dto';
+import { LoadProjectUseCase } from '@features/projects/application/use-cases/load-project.use-case';
+import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects.use-case';
+import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project.use-case';
+import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite.use-case';
+import { initialProjectState, ProjectState } from '@features/projects/presentation/models/project-state';
+import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 import {
   ProjectViewModel,
   SectionViewModel,
   TaskViewModel,
-} from '../models/project.view-model';
-import { SectionStore } from './section.store';
-import { TaskStore } from './task.store';
-import { ProjectSummaryStore } from './project-summary.store';
-import { Project } from '../../domain/entities/project.entity';
-import { ProjectEventsService } from '../../infrastructure/services/project-events.service';
-import { UserEventsService } from '../../infrastructure/services/user-events.service';
-import { ProjectEvent, DeletePayload } from '../../infrastructure/dto/sse/project-event';
-import { UserEvent, ProjectDeletePayload } from '../../infrastructure/dto/sse/user-event';
-import { ProjectSummaryDto } from '../../infrastructure/dto/response/project-summary.dto';
-import { SectionMapper } from '../../infrastructure/mappers/section.mapper';
-import { TaskMapper } from '../../infrastructure/mappers/task.mapper';
-import { SectionDto } from '../../infrastructure/dto/section.dto';
-import { TaskDto } from '../../infrastructure/dto/task.dto';
+} from '@features/projects/presentation/models/project.view-model';
+import { SectionStore } from '@features/projects/presentation/store/section.store';
+import { TaskStore } from '@features/projects/presentation/store/task.store';
+import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
+import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectEventsService } from '@features/projects/infrastructure/services/project-events.service';
+import { UserEventsService } from '@features/projects/infrastructure/services/user-events.service';
+import { ProjectEvent, DeletePayload } from '@features/projects/infrastructure/dto/sse/project-event';
+import { UserEvent, ProjectDeletePayload } from '@features/projects/infrastructure/dto/sse/user-event';
+import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
+import { SectionMapper } from '@features/projects/infrastructure/mappers/section.mapper';
+import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
+import { SectionDto } from '@features/projects/infrastructure/dto/section.dto';
+import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
 
 /**
  * Store for **projects** only.

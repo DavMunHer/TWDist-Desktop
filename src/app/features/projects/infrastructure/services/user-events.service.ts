@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../shared/config/environment';
-import { UserEvent, UserEventType } from '../dto/sse/user-event';
+import { environment } from '@shared/config/environment';
+import { UserEvent, UserEventType } from '@features/projects/infrastructure/dto/sse/user-event';
 
 @Injectable({ providedIn: 'root' })
 export class UserEventsService {
@@ -21,7 +21,10 @@ export class UserEventsService {
         source.addEventListener(type, ((e: MessageEvent) => {
           try {
             subscriber.next({ type, data: JSON.parse(e.data) });
-          } catch { /* malformed event data */ }
+          } catch (error) {
+            console.error(`[SSE:User] Failed to parse "${type}" event:`, error, e.data);
+            subscriber.error(error);
+          }
         }) as EventListener);
       }
 
