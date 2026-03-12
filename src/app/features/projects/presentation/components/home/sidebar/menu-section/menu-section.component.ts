@@ -21,17 +21,27 @@ export class MenuSectionComponent {
 
   constructor(private modalService: ModalService) { }
 
-  protected projectIconColors = signal([
-    '#7AD2D2',
+  private readonly projectIconColors = [
+    '#008B8B',
     '#3A6FAF',
-    '#EC7580',
-    '#9BE8D8',
-    '#FFC04A',
-    '#6DAA9F',
-    '#FFF3D9',
-    '#F56A62',
-    '#C4D291',
-  ]);
+    '#D32F2F',
+    '#00897B',
+    '#E65100',
+    '#455A64',
+    '#FBC02D',
+    '#C62828',
+    '#689F38',
+  ];
+
+  getProjectColor(projectId: string | undefined): string {
+    if (!projectId) return '#222';
+    let hash = 0;
+    for (let i = 0; i < projectId.length; i++) {
+      hash = (hash * 31 + projectId.charCodeAt(i)) | 0;
+    }
+    const index = Math.abs(hash) % this.projectIconColors.length;
+    return this.projectIconColors[index];
+  }
 
   openModal(type: TWDModalType, title: string) {
     console.log('click');

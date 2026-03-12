@@ -24,7 +24,7 @@
                 @switch (item.icon){
                 @case ('project') {
                 <ng-container [ngTemplateOutlet]="projectIcon"
-                    [ngTemplateOutletContext]="{ index: $index }"></ng-container>
+                    [ngTemplateOutletContext]="{ id: item.id }"></ng-container>
                 }
                 @case ('today') {
                 <ng-container [ngTemplateOutlet]="todayIcon"></ng-container>
@@ -137,9 +137,9 @@
 </ng-template>
 
 
-<ng-template #projectIcon let-i="index">
+<ng-template #projectIcon let-id="id">
     <svg width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
-        [attr.stroke]="projectIconColors().at(i) ?? '#222'" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        [attr.stroke]="getProjectColor(id)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5 9H20" />
         <path d="M4 15H19" />
         <path d="M17.52 3L12.69 21" />
