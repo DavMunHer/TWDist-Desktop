@@ -308,9 +308,12 @@ export class ProjectStore {
     }
 
     this.sectionStore.createSection(projectId, sectionName, (section) => {
-      // Link the new section to the project
       const project = this.state().projects[projectId];
       if (!project) return;
+      // The same section can arrive both through this callback (HTTP response)
+      // and via the SSE `section_created` event. Guarding here keeps
+      // `project.sectionIds` unique even if both paths fire for the same ID.
+      if (project.sectionIds.includes(section.id)) return;
       this.upsertProject(projectId, project.addSection(section.id));
     });
   }

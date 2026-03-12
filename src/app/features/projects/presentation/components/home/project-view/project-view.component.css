@@ -3,8 +3,10 @@
 }
 
 .project-section {
-    margin-top: 20px;
-    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px 5px 5px 5px;
 
     & .project-header {
         font-size: var(--section-title-size);
@@ -15,5 +17,9 @@
 
     & .project-main-container {
         display: flex;
+        flex: 1;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 8px;
     }
 }
