@@ -315,6 +315,7 @@ export class ProjectStore {
     if (this.state().selectedProjectId === projectId) {
       const ids = Object.keys(this.state().projects);
       if (ids.length > 0) {
+        // RELOAD: First project in list when we delete a project  
         this.loadProject(ids[0]);
       } else {
         this.state.update(s => ({ ...s, selectedProjectId: null }));
