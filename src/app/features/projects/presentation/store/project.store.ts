@@ -4,6 +4,7 @@ import { LoadProjectUseCase } from '@features/projects/application/use-cases/loa
 import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects.use-case';
 import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project.use-case';
 import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite.use-case';
+import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project.use-case';
 import { initialProjectState, ProjectState } from '@features/projects/presentation/models/project-state';
 import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 import {
@@ -42,6 +43,7 @@ export class ProjectStore {
   private readonly loadAllProjectsUseCase = inject(LoadAllProjectsUseCase);
   private readonly createProjectUseCase = inject(CreateProjectUseCase);
   private readonly toggleFavoriteUseCase = inject(ToggleFavoriteUseCase);
+  private readonly deleteProjectUseCase = inject(DeleteProjectUseCase);
 
   // --------------- Peer stores ---------------
   private readonly sectionStore         = inject(SectionStore);
@@ -291,6 +293,39 @@ export class ProjectStore {
         // Revert to the original project on failure
         this.upsertProject(projectId, project);
         this.setError(error.message, 'toggle favorite', error);
+      },
+    });
+  }
+
+  /**
+   * Delete a project with **optimistic UI**.
+   *
+   * The project is removed from the store immediately.
+   * If the backend call fails the project is restored.
+   * When the deleted project was the selected one, the first
+   * remaining project is auto-selected.
+   */
+  deleteProject(projectId: string): void {
+    const project = this.state().projects[projectId];
+    if (!project) return;
+
+    this.removeProject(projectId);
+    this.projectSummaryStore.removePendingCount(projectId);
+
+    if (this.state().selectedProjectId === projectId) {
+      const ids = Object.keys(this.state().projects);
+      if (ids.length > 0) {
+        // RELOAD: First project in list when we delete a project  
+        this.loadProject(ids[0]);
+      } else {
+        this.state.update(s => ({ ...s, selectedProjectId: null }));
+      }
+    }
+
+    this.deleteProjectUseCase.execute(projectId).subscribe({
+      error: (error) => {
+        this.upsertProject(projectId, project);
+        this.setError(error.message, 'delete project', error);
       },
     });
   }

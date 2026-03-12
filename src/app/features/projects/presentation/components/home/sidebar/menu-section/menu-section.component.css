@@ -54,34 +54,101 @@
             }
 
             & .project-actions {
-                display: flex;
-                align-items: center;
-                gap: 8px;
+                position: relative;
+                display: grid;
+                place-items: center end;
 
-                & .favorite-btn {
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    padding: 2px;
-                    display: flex;
+                & > * {
+                    grid-area: 1 / 1;
+                }
+
+                & .pending-tasks {
+                    color: #5559;
+                    font-size: 13px;
+                    transition: opacity 0.15s ease;
+                }
+
+                & .project-menu-wrapper {
+                    position: relative;
+                }
+
+                & .project-menu-trigger {
+                    display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    color: #ccc;
-                    transition: color 0.2s ease;
+                    padding: 2px;
+                    border-radius: 5px;
+                    opacity: 0;
+                    visibility: hidden;
+                    cursor: pointer;
+                    transition: opacity 0.15s ease, background-color 0.15s ease;
+                }
 
-                    &:hover {
-                        color: #ffc04a;
-                    }
+                & .project-menu-trigger:hover {
+                    background-color: #dadada;
+                }
 
-                    &.active {
-                        color: #ffc04a;
-                    }
+                & .project-menu-backdrop {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    z-index: 99;
+                }
+
+                & .project-menu-dropdown {
+                    position: absolute;
+                    left: 0;
+                    top: 100%;
+                    min-width: 200px;
+                    background: #fff;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+                    padding: 4px 0;
+                    z-index: 100;
+                }
+
+                & .project-menu-item {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 7px 12px;
+                    border: none;
+                    background: none;
+                    font-size: 13px;
+                    color: #333;
+                    cursor: pointer;
+                    text-align: left;
+                }
+
+                & .project-menu-item:hover {
+                    background-color: #f3f3f3;
+                }
+
+                & .project-menu-item--danger {
+                    color: #d33;
+                }
+
+                & .project-menu-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 18px;
+                    height: 18px;
                 }
             }
 
-            & .pending-tasks {
-                color: #5559;
-                font-size: 13px;
+            &:hover {
+                & .project-actions .project-menu-trigger {
+                    opacity: 1;
+                    visibility: visible;
+                }
+
+                & .project-actions .pending-tasks {
+                    opacity: 0;
+                }
             }
         }
     }
