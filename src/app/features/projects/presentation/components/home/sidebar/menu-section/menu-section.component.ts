@@ -60,6 +60,11 @@ export class MenuSectionComponent {
     this.openMenuProjectId.set(current === projectId ? null : projectId);
   }
 
+  closeMenu(event: Event): void {
+    event.stopPropagation();
+    this.openMenuProjectId.set(null);
+  }
+
   onFavoriteClick(projectId: string | undefined, event: Event): void {
     event.stopPropagation();
     if (!projectId) return;

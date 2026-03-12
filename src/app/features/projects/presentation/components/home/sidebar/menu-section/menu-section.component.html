@@ -61,10 +61,23 @@
                         </svg>
                     </div>
                     @if (openMenuProjectId() === item.id) {
-                    <div class="project-menu-dropdown" (click)="$event.stopPropagation()">
+                    <div class="project-menu-backdrop" (click)="closeMenu($event)"></div>
+                    <div class="project-menu-dropdown">
                         <button type="button" class="project-menu-item"
                             (click)="onFavoriteClick(item.id, $event)">
                             <span class="project-menu-icon">
+                                @if (item.favorite) {
+                                <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                    <g id="SVGRepo_iconCarrier">
+                                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <line x1="3" y1="21" x2="21" y2="3"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+                                    </g>
+                                </svg>
+                                } @else {
                                 <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -73,6 +86,7 @@
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                     </g>
                                 </svg>
+                                }
                             </span>
                             <span>{{ item.favorite ? 'Quitar de Favoritos' : 'Añadir a Favoritos' }}</span>
                         </button>
