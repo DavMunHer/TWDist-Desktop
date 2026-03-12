@@ -12,6 +12,7 @@ import { CreateTaskUseCase } from './application/use-cases/create-task.use-case'
 import { ToggleTaskCompletionUseCase } from './application/use-cases/toggle-task-completion.use-case';
 import { ToggleFavoriteUseCase } from './application/use-cases/toggle-favorite.use-case';
 import { CreateProjectUseCase } from './application/use-cases/create-project.use-case';
+import { DeleteProjectUseCase } from './application/use-cases/delete-project.use-case';
 import { ProjectStore } from './presentation/store/project.store';
 import { ProjectSummaryStore } from './presentation/store/project-summary.store';
 import { SectionStore } from './presentation/store/section.store';
@@ -27,6 +28,7 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   LoadProjectUseCase,
   LoadAllProjectsUseCase,
   CreateProjectUseCase,
+  DeleteProjectUseCase,
   CreateSectionUseCase,
   CreateTaskUseCase,
   ToggleTaskCompletionUseCase,

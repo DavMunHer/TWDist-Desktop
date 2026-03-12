@@ -17,6 +17,8 @@ export class MenuSectionComponent {
 
   private projectStore = inject(ProjectStore);
 
+  protected openMenuProjectId = signal<string | null>(null);
+
   constructor(private modalService: ModalService) { }
 
   protected projectIconColors = signal([
@@ -41,10 +43,24 @@ export class MenuSectionComponent {
     this.projectStore.loadProject(projectId);
   }
 
-  toggleFavorite(projectId: string | undefined, event: Event): void {
+  toggleProjectMenu(projectId: string | undefined, event: Event): void {
     event.stopPropagation();
     if (!projectId) return;
+    const current = this.openMenuProjectId();
+    this.openMenuProjectId.set(current === projectId ? null : projectId);
+  }
 
+  onFavoriteClick(projectId: string | undefined, event: Event): void {
+    event.stopPropagation();
+    if (!projectId) return;
     this.projectStore.toggleProjectFavorite(projectId);
+    this.openMenuProjectId.set(null);
+  }
+
+  onDeleteClick(projectId: string | undefined, event: Event): void {
+    event.stopPropagation();
+    if (!projectId) return;
+    this.openMenuProjectId.set(null);
+    this.projectStore.deleteProject(projectId);
   }
 }
