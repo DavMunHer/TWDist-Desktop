@@ -17,7 +17,7 @@ export class HttpSectionRepository extends SectionRepository {
   create(section: Section): Observable<Section> {
     const dto = SectionMapper.toCreateDto(section);
     return this.http
-      .post<SectionDto>(`/projects/${section.projectId}/sections`, dto)
+      .post<SectionDto>(`/projects/${section.projectId}/section/create`, dto)
       .pipe(map(responseDto => SectionMapper.toDomain(responseDto, section.projectId)));
   }
 

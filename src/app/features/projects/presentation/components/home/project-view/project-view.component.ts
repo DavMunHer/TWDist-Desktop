@@ -32,8 +32,4 @@ export class ProjectViewComponent implements OnInit {
   protected updateTaskToCompleted(section: SectionViewModel, task: TaskViewModel) {
     this.projectStore.toggleTaskCompletion(task.id);
   }
-
-  protected handleSectionAddition(newSection: SectionViewModel) {
-    this.projectStore.createSection(newSection.name);
-  }
 }

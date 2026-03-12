@@ -308,9 +308,9 @@ export class ProjectStore {
     }
 
     this.sectionStore.createSection(projectId, sectionName, (section) => {
-      // Link the new section to the project
       const project = this.state().projects[projectId];
       if (!project) return;
+      if (project.sectionIds.includes(section.id)) return;
       this.upsertProject(projectId, project.addSection(section.id));
     });
   }
