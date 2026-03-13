@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
 import { catchError, map, Observable, of } from "rxjs";
@@ -47,7 +47,12 @@ export class HttpAuthRepository extends AuthRepository {
     return this.http.get<UserResponseDto>('/auth/me')
       .pipe(
         map(dto => UserMapper.toDomain(dto)),
-        catchError(() => of(null)) // If cookie expired, return null
+        catchError((error: HttpErrorResponse) => {
+          if (error.status !== 401 && error.status !== 403) {
+            console.warn('Unexpected error checking auth status:', error.status);
+          }
+          return of(null);
+        })
       );
   }
 }
