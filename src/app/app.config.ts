@@ -1,7 +1,6 @@
 import { ApplicationConfig, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
 import { PROJECT_FEATURE_PROVIDERS } from './features/projects/projects.providers';
@@ -20,9 +19,13 @@ export const appConfig: ApplicationConfig = {
     ...PROJECT_FEATURE_PROVIDERS,
     ...AUTH_FEATURE_PROVIDERS,
 
-    provideAppInitializer(async () => {
+    
+    // Check authentication status on app startup
+    // This validates the cookie with the backend and updates the auth state
+    // Error handling ensures the app doesn't hang if the cookie is invalid
+    provideAppInitializer(() => {
       const authStore = inject(AuthStore);
-      await firstValueFrom(authStore.checkAuthStatus()).catch(() => {});
+      return authStore.checkAuthStatus();
     }),
   ],
 };

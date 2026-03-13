@@ -104,8 +104,8 @@ export class AuthStore {
           isAuthenticated: !!user,
         }));
       }),
-      catchError(() => {
-        // Handle 403 or any other error - user is not authenticated
+      catchError((error) => {
+        console.warn('Auth status check failed:', error?.message ?? error);
         this.state.update(s => ({
           ...s,
           user: null,

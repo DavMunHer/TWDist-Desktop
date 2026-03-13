@@ -48,8 +48,9 @@ export class HttpAuthRepository extends AuthRepository {
       .pipe(
         map(dto => UserMapper.toDomain(dto)),
         catchError((error: HttpErrorResponse) => {
-          if (error.status !== 401 && error.status !== 403) {
-            console.warn('Unexpected error checking auth status:', error.status);
+          const expectedStatuses = [0, 401, 403];
+          if (!expectedStatuses.includes(error.status)) {
+            console.warn('Unexpected error checking auth status:', error.status, error.message);
           }
           return of(null);
         })
