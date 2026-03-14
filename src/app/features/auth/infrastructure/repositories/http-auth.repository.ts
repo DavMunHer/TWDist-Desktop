@@ -7,10 +7,14 @@ import { User } from "../../domain/entities/user.entity";
 import { UserMapper } from "../mappers/user.mapper";
 import { UserResponseDto } from "../dto/response/user-response.dto";
 import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
+import { SessionHintService } from "../services/session-hint.service";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private sessionHintService: SessionHintService,
+  ) {
     super();
   }
 
@@ -23,7 +27,7 @@ export class HttpAuthRepository extends AuthRepository {
           }
           return UserMapper.toDomain(dto);
         }),
-        tap(() => localStorage.setItem('has_session', 'true'))
+        tap(() => this.sessionHintService.markAuthenticated())
       );
   }
 
@@ -42,17 +46,17 @@ export class HttpAuthRepository extends AuthRepository {
   logout(): Observable<void> {
     // Server clears the cookie
     return this.http.post<void>('/auth/logout', {}).pipe(
-      tap(() => localStorage.removeItem('has_session')),
+      tap(() => this.sessionHintService.clear()),
       catchError(() => {
         // Even if the server fails, clear local session hint
-        localStorage.removeItem('has_session');
+        this.sessionHintService.clear();
         return of(void 0);
       })
     );
   }
 
   getCurrentUser(): Observable<User | null> {
-    if (!localStorage.getItem('has_session')) {
+    if (!this.sessionHintService.hasSessionHint()) {
       return of(null);
     }
 
@@ -61,7 +65,7 @@ export class HttpAuthRepository extends AuthRepository {
         map(dto => UserMapper.toDomain(dto)),
         catchError(() => {
           // If cookie expired or unauthorized, clear the session hint
-          localStorage.removeItem('has_session');
+          this.sessionHintService.clear();
           return of(null)
         })
       );

@@ -1,8 +1,9 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { EMPTY, catchError, throwError } from 'rxjs';
-import { AuthStore } from '../../features/auth/presentation/store/auth.store';
+import { AuthStore } from '@features/auth/presentation/store/auth.store';
 import { Router } from '@angular/router';
+import { SessionHintService } from '@features/auth/infrastructure/services/session-hint.service';
 
 /**
  * Error Interceptor
@@ -12,8 +13,9 @@ import { Router } from '@angular/router';
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
+  const sessionHintService = inject(SessionHintService);
   const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/users/create');
-  const hasSessionHint = !!localStorage.getItem('has_session');
+  const hasSessionHint = sessionHintService.hasSessionHint();
 
   if (!isAuthRequest && !hasSessionHint) {
     if (router.url !== '/auth/login') {
@@ -27,7 +29,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const isUnauthorized = error.status === 401;
 
       if (isUnauthorized && !isAuthRequest) {
-        localStorage.removeItem('has_session');
+        sessionHintService.clear();
         authStore.clearSessionState();
 
         if (router.url !== '/auth/login') {
