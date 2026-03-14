@@ -27,6 +27,8 @@ export class AuthStore {
 
   readonly user = computed(() => this.state().user);
   readonly isAuthenticated = computed(() => this.state().isAuthenticated);
+  readonly isLoading = computed(() => this.state().isLoading);
+  readonly error = computed(() => this.state().error);
   readonly isRegistrationSuccess = computed(() => this.registrationSuccess());
 
   register(credentials: RegisterCredentialsDto): void {
