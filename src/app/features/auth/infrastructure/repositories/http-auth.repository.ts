@@ -1,13 +1,14 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
-import { catchError, map, Observable, of, tap } from "rxjs";
+import { catchError, map, Observable, of, tap, throwError } from "rxjs";
 import { LoginCredentialsDto } from "../dto/request/login-credentials.dto";
 import { User } from "../../domain/entities/user.entity";
 import { UserMapper } from "../mappers/user.mapper";
 import { UserResponseDto } from "../dto/response/user-response.dto";
 import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
 import { SessionHintService } from "../services/session-hint.service";
+import { AuthError } from "../../domain/errors/auth.error";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {
@@ -23,11 +24,24 @@ export class HttpAuthRepository extends AuthRepository {
       .pipe(
         map(dto => {
           if (!dto || !dto.id) {
-            throw new Error('Invalid login response: missing user data');
+            throw new AuthError('INVALID_LOGIN_RESPONSE', 'Invalid login response: missing user data');
           }
           return UserMapper.toDomain(dto);
         }),
-        tap(() => this.sessionHintService.markAuthenticated())
+        tap(() => this.sessionHintService.markAuthenticated()),
+        // `unknown` is intentional here: RxJS error channels can contain any value,
+        // so we narrow explicitly (`instanceof`) before reading error details.
+        catchError((error: unknown) => {
+          if (error instanceof HttpErrorResponse && error.status === 401) {
+            return throwError(() => new AuthError('INVALID_CREDENTIALS', 'Invalid email or password'));
+          }
+
+          if (error instanceof AuthError) {
+            return throwError(() => error);
+          }
+
+          return throwError(() => new AuthError('UNKNOWN_AUTH_ERROR', 'Unexpected authentication error'));
+        })
       );
   }
 
@@ -36,7 +50,7 @@ export class HttpAuthRepository extends AuthRepository {
       .pipe(
         map(userDto => {
           if (!userDto || !userDto.id) {
-            throw new Error('Invalid register response: missing user data');
+            throw new AuthError('INVALID_REGISTER_RESPONSE', 'Invalid register response: missing user data');
           }
           return UserMapper.toDomain(userDto);
         })

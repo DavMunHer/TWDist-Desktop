@@ -1,5 +1,4 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
-import { HttpErrorResponse } from "@angular/common/http";
 import { catchError, of, tap } from "rxjs";
 import { LoginUseCase } from "../../application/use-cases/login.use-case";
 import { LogoutUseCase } from "../../application/use-cases/logout.use-case";
@@ -46,11 +45,13 @@ export class AuthStore {
         }));
         this.registrationSuccess.set(true);
       }),
-      catchError((error) => {
+      catchError((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unable to create your account. Please try again.';
+
         this.state.update(s => ({
           ...s,
           isLoading: false,
-          error: error.message
+          error: message
         }));
         this.registrationSuccess.set(false);
         return of(null);
@@ -72,11 +73,8 @@ export class AuthStore {
           isLoading: false,
         }));
       }),
-      catchError((error) => {
-        const authError = error as HttpErrorResponse;
-        const message = authError.status === 401
-          ? 'Invalid email or password'
-          : error.message;
+      catchError((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unable to login. Please try again.';
 
         this.state.update(s => ({ 
           ...s, 
