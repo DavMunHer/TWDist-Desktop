@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
+import { EMPTY, catchError, throwError } from 'rxjs';
 import { AuthStore } from '../../features/auth/presentation/store/auth.store';
 import { Router } from '@angular/router';
 
@@ -12,12 +12,19 @@ import { Router } from '@angular/router';
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authStore = inject(AuthStore);
   const router = inject(Router);
+  const isAuthRequest = req.url.includes('/auth/login') || req.url.includes('/users/create');
+  const hasSessionHint = !!localStorage.getItem('has_session');
+
+  if (!isAuthRequest && !hasSessionHint) {
+    if (router.url !== '/auth/login') {
+      router.navigate(['/auth/login']);
+    }
+    return EMPTY;
+  }
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const isUnauthorized = error.status === 401;
-      // We might actually want to enable login directly after register
-      const isAuthRequest = req.url.includes('/auth/login');
 
       if (isUnauthorized && !isAuthRequest) {
         localStorage.removeItem('has_session');
@@ -26,6 +33,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         if (router.url !== '/auth/login') {
           router.navigate(['/auth/login']);
         }
+
+        return EMPTY;
       }
       
       return throwError(() => error);
