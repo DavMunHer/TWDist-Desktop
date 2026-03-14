@@ -35,8 +35,7 @@ export class HttpAuthRepository extends AuthRepository {
             throw new Error('Invalid register response: missing user data');
           }
           return UserMapper.toDomain(userDto);
-        }),
-        tap(() => localStorage.setItem('has_session', 'true'))
+        })
     );
   }
 
