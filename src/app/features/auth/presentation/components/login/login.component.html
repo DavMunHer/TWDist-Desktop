@@ -30,7 +30,8 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" formControlName="password" placeholder="********" required>
           </div>
-          <button type="submit">Login</button>
+          <p class="login-error" [style.visibility]="errorMessage() ? 'visible' : 'hidden'">{{ errorMessage() || ' ' }}</p>
+          <button type="submit" [disabled]="isLoading()">{{ isLoading() ? 'Logging in...' : 'Login' }}</button>
         </form>
         <p>By continuing, you agree to TWDist <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
         <hr>

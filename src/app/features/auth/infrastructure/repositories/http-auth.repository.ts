@@ -1,16 +1,22 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
-import { catchError, map, Observable, of } from "rxjs";
+import { catchError, map, Observable, of, tap, throwError } from "rxjs";
 import { LoginCredentialsDto } from "../dto/request/login-credentials.dto";
 import { User } from "../../domain/entities/user.entity";
 import { UserMapper } from "../mappers/user.mapper";
 import { UserResponseDto } from "../dto/response/user-response.dto";
 import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
+import { SessionHintService } from "../services/session-hint.service";
+import { AuthError } from "../../domain/errors/auth.error";
+import { requiresAuthContext } from "@shared/interceptors/auth-context.token";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private sessionHintService: SessionHintService,
+  ) {
     super();
   }
 
@@ -19,9 +25,23 @@ export class HttpAuthRepository extends AuthRepository {
       .pipe(
         map(dto => {
           if (!dto || !dto.id) {
-            throw new Error('Invalid login response: missing user data');
+            throw new AuthError('INVALID_LOGIN_RESPONSE', 'Invalid login response: missing user data');
           }
           return UserMapper.toDomain(dto);
+        }),
+        tap(() => this.sessionHintService.markAuthenticated()),
+        // `unknown` is intentional here: RxJS error channels can contain any value,
+        // so we narrow explicitly (`instanceof`) before reading error details.
+        catchError((error: unknown) => {
+          if (error instanceof HttpErrorResponse && error.status === 401) {
+            return throwError(() => new AuthError('INVALID_CREDENTIALS', 'Invalid email or password'));
+          }
+
+          if (error instanceof AuthError) {
+            return throwError(() => error);
+          }
+
+          return throwError(() => new AuthError('UNKNOWN_AUTH_ERROR', 'Unexpected authentication error'));
         })
       );
   }
@@ -31,7 +51,7 @@ export class HttpAuthRepository extends AuthRepository {
       .pipe(
         map(userDto => {
           if (!userDto || !userDto.id) {
-            throw new Error('Invalid register response: missing user data');
+            throw new AuthError('INVALID_REGISTER_RESPONSE', 'Invalid register response: missing user data');
           }
           return UserMapper.toDomain(userDto);
         })
@@ -40,14 +60,29 @@ export class HttpAuthRepository extends AuthRepository {
 
   logout(): Observable<void> {
     // Server clears the cookie
-    return this.http.post<void>('/auth/logout', {});
+    return this.http.post<void>('/auth/logout', {}, requiresAuthContext()).pipe(
+      tap(() => this.sessionHintService.clear()),
+      catchError(() => {
+        // Even if the server fails, clear local session hint
+        this.sessionHintService.clear();
+        return of(void 0);
+      })
+    );
   }
 
   getCurrentUser(): Observable<User | null> {
-    return this.http.get<UserResponseDto>('/auth/me')
+    if (!this.sessionHintService.hasSessionHint()) {
+      return of(null);
+    }
+
+    return this.http.get<UserResponseDto>('/auth/me', requiresAuthContext())
       .pipe(
         map(dto => UserMapper.toDomain(dto)),
-        catchError(() => of(null)) // If cookie expired, return null
+        catchError(() => {
+          // If cookie expired or unauthorized, clear the session hint
+          this.sessionHintService.clear();
+          return of(null)
+        })
       );
   }
 }

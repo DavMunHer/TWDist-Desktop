@@ -26,6 +26,8 @@ export class AuthStore {
 
   readonly user = computed(() => this.state().user);
   readonly isAuthenticated = computed(() => this.state().isAuthenticated);
+  readonly isLoading = computed(() => this.state().isLoading);
+  readonly error = computed(() => this.state().error);
   readonly isRegistrationSuccess = computed(() => this.registrationSuccess());
 
   register(credentials: RegisterCredentialsDto): void {
@@ -43,11 +45,13 @@ export class AuthStore {
         }));
         this.registrationSuccess.set(true);
       }),
-      catchError((error) => {
+      catchError((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unable to create your account. Please try again.';
+
         this.state.update(s => ({
           ...s,
           isLoading: false,
-          error: error.message
+          error: message
         }));
         this.registrationSuccess.set(false);
         return of(null);
@@ -69,11 +73,13 @@ export class AuthStore {
           isLoading: false,
         }));
       }),
-      catchError((error) => {
+      catchError((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unable to login. Please try again.';
+
         this.state.update(s => ({ 
           ...s, 
           isLoading: false, 
-          error: error.message 
+          error: message 
         }));
         return of(null);
       })
@@ -84,13 +90,17 @@ export class AuthStore {
     this.logoutUseCase.execute().subscribe({
       next: () => {
         // Server cleared the cookie
-        this.state.set({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-        });
+        this.clearSessionState();
       },
+    });
+  }
+
+  clearSessionState(): void {
+    this.state.set({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
     });
   }
 

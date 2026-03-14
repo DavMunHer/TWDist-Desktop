@@ -7,6 +7,7 @@ import { SectionRepository } from '../../domain/repositories/section.repository'
 import { SectionDto } from '../dto/section.dto';
 import { CreateSectionDto } from '../dto/create-section.dto';
 import { SectionMapper } from '../mappers/section.mapper';
+import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
 @Injectable()
 export class HttpSectionRepository extends SectionRepository {
@@ -17,19 +18,19 @@ export class HttpSectionRepository extends SectionRepository {
   create(section: Section): Observable<Section> {
     const dto = SectionMapper.toCreateDto(section);
     return this.http
-      .post<SectionDto>(`/projects/${section.projectId}/section/create`, dto)
+      .post<SectionDto>(`/projects/${section.projectId}/section/create`, dto, requiresAuthContext())
       .pipe(map(responseDto => SectionMapper.toDomain(responseDto, section.projectId)));
   }
 
   update(section: Section): Observable<Section> {
     const dto = SectionMapper.toDto(section);
     return this.http
-      .put<SectionDto>(`/sections/${section.id}`, dto)
+      .put<SectionDto>(`/sections/${section.id}`, dto, requiresAuthContext())
       .pipe(map(responseDto => SectionMapper.toDomain(responseDto, section.projectId)));
   }
 
   delete(sectionId: string): Observable<void> {
-    return this.http.delete<void>(`/sections/${sectionId}`);
+    return this.http.delete<void>(`/sections/${sectionId}`, requiresAuthContext());
   }
 
   findById(sectionId: string): Observable<Section> {

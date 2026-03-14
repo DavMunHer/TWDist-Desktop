@@ -25,6 +25,9 @@ export class LoginComponent {
   private authStore = inject(AuthStore);
   private router = inject(Router);
 
+  protected readonly errorMessage = this.authStore.error;
+  protected readonly isLoading = this.authStore.isLoading;
+
   constructor() {
     // Watch isAuthenticated and redirect when user logs in
     effect(() => {

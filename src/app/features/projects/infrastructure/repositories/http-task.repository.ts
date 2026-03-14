@@ -7,6 +7,7 @@ import { TaskRepository } from '../../domain/repositories/task.repository';
 import { TaskDto } from '../dto/task.dto';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { TaskMapper } from '../mappers/task.mapper';
+import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
 @Injectable()
 export class HttpTaskRepository extends TaskRepository {
@@ -17,19 +18,19 @@ export class HttpTaskRepository extends TaskRepository {
   create(task: Task): Observable<Task> {
     const dto = TaskMapper.toCreateDto(task);
     return this.http
-      .post<TaskDto>(`/sections/${task.sectionId}/tasks`, dto)
+      .post<TaskDto>(`/sections/${task.sectionId}/tasks`, dto, requiresAuthContext())
       .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId, task.parentTaskId)));
   }
 
   update(task: Task): Observable<Task> {
     const dto = TaskMapper.toDto(task);
     return this.http
-      .put<TaskDto>(`/tasks/${task.id}`, dto)
+      .put<TaskDto>(`/tasks/${task.id}`, dto, requiresAuthContext())
       .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId, task.parentTaskId)));
   }
 
   delete(taskId: string): Observable<void> {
-    return this.http.delete<void>(`/tasks/${taskId}`);
+    return this.http.delete<void>(`/tasks/${taskId}`, requiresAuthContext());
   }
 
   findById(taskId: string): Observable<Task> {
