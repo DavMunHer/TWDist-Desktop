@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
-import { catchError, map, Observable, of } from "rxjs";
+import { catchError, map, Observable, of, tap } from "rxjs";
 import { LoginCredentialsDto } from "../dto/request/login-credentials.dto";
 import { User } from "../../domain/entities/user.entity";
 import { UserMapper } from "../mappers/user.mapper";
@@ -22,7 +22,8 @@ export class HttpAuthRepository extends AuthRepository {
             throw new Error('Invalid login response: missing user data');
           }
           return UserMapper.toDomain(dto);
-        })
+        }),
+        tap(() => localStorage.setItem('has_session', 'true'))
       );
   }
 
@@ -34,20 +35,36 @@ export class HttpAuthRepository extends AuthRepository {
             throw new Error('Invalid register response: missing user data');
           }
           return UserMapper.toDomain(userDto);
-        })
+        }),
+        tap(() => localStorage.setItem('has_session', 'true'))
     );
   }
 
   logout(): Observable<void> {
     // Server clears the cookie
-    return this.http.post<void>('/auth/logout', {});
+    return this.http.post<void>('/auth/logout', {}).pipe(
+      tap(() => localStorage.removeItem('has_session')),
+      catchError(() => {
+        // Even if the server fails, clear local session hint
+        localStorage.removeItem('has_session');
+        return of(void 0);
+      })
+    );
   }
 
   getCurrentUser(): Observable<User | null> {
+    if (!localStorage.getItem('has_session')) {
+      return of(null);
+    }
+
     return this.http.get<UserResponseDto>('/auth/me')
       .pipe(
         map(dto => UserMapper.toDomain(dto)),
-        catchError(() => of(null)) // If cookie expired, return null
+        catchError(() => {
+          // If cookie expired or unauthorized, clear the session hint
+          localStorage.removeItem('has_session');
+          return of(null)
+        })
       );
   }
 }
