@@ -15,16 +15,17 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // If the backend responds with a 401, the user's session has expired
-      if (error.status === 401) {
-        // Clear local session hint
-        localStorage.removeItem('has_session');
-        
-        // Reset the frontend state directly
-        authStore.logout();
+      const isUnauthorized = error.status === 401;
+      // We might actually want to enable login directly after register
+      const isAuthRequest = req.url.includes('/auth/login');
 
-        // Redirect user back to the login page (or root)
-        router.navigate(['/auth/login']);
+      if (isUnauthorized && !isAuthRequest) {
+        localStorage.removeItem('has_session');
+        authStore.clearSessionState();
+
+        if (router.url !== '/auth/login') {
+          router.navigate(['/auth/login']);
+        }
       }
       
       return throwError(() => error);

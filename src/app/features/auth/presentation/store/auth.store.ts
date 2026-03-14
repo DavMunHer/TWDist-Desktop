@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
+import { HttpErrorResponse } from "@angular/common/http";
 import { catchError, of, tap } from "rxjs";
 import { LoginUseCase } from "../../application/use-cases/login.use-case";
 import { LogoutUseCase } from "../../application/use-cases/logout.use-case";
@@ -70,10 +71,15 @@ export class AuthStore {
         }));
       }),
       catchError((error) => {
+        const authError = error as HttpErrorResponse;
+        const message = authError.status === 401
+          ? 'Invalid email or password'
+          : error.message;
+
         this.state.update(s => ({ 
           ...s, 
           isLoading: false, 
-          error: error.message 
+          error: message 
         }));
         return of(null);
       })
@@ -84,13 +90,17 @@ export class AuthStore {
     this.logoutUseCase.execute().subscribe({
       next: () => {
         // Server cleared the cookie
-        this.state.set({
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: null,
-        });
+        this.clearSessionState();
       },
+    });
+  }
+
+  clearSessionState(): void {
+    this.state.set({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
     });
   }
 
