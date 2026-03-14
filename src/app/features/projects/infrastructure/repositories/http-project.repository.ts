@@ -8,6 +8,7 @@ import { ProjectMapper } from '../mappers/project.mapper';
 import { Project } from '../../domain/entities/project.entity';
 import { ProjectResponeDto } from '../dto/response/project.dto';
 import { ProjectSummaryDto } from '../dto/response/project-summary.dto';
+import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
 @Injectable()
 export class HttpProjectRepository extends ProjectRepository {
@@ -19,32 +20,32 @@ export class HttpProjectRepository extends ProjectRepository {
   private baseUrl = '/projects';
 
   create(project: ProjectDto): Observable<Project> {
-    return this.http.post<ProjectResponeDto>(`${this.baseUrl}/create`, project)
+    return this.http.post<ProjectResponeDto>(`${this.baseUrl}/create`, project, requiresAuthContext())
       .pipe(map(responseDto => ProjectMapper.toDomain(responseDto)));
   }
 
   findById(projectId: string): Observable<ProjectAggregate> {
     return this.http
-      .get<ProjectResponeDto>(`${this.baseUrl}/${projectId}`)
+      .get<ProjectResponeDto>(`${this.baseUrl}/${projectId}`, requiresAuthContext())
       .pipe(map(dto => ProjectMapper.toAggregate(dto)));
   }
 
   getAll(): Observable<ProjectSummary[]> {
     return this.http
-      .get<ProjectSummaryDto[]>(`${this.baseUrl}/get`)
+      .get<ProjectSummaryDto[]>(`${this.baseUrl}/get`, requiresAuthContext())
       .pipe(map(dtos => dtos.map(dto => ProjectMapper.toSummary(dto))));
   }
 
   update(project: Project): Observable<Project> {
-    return this.http.put<ProjectResponeDto>(`${this.baseUrl}/${project.id}/update`, project)
+    return this.http.put<ProjectResponeDto>(`${this.baseUrl}/${project.id}/update`, project, requiresAuthContext())
       .pipe(map(responseDto => ProjectMapper.toDomain(responseDto)));
   }
 
   delete(projectId: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${projectId}/delete`);
+    return this.http.delete<void>(`${this.baseUrl}/${projectId}/delete`, requiresAuthContext());
   }
 
   toggleFavorite(projectId: string, favorite: boolean): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${projectId}/favorite`, { favorite });
+    return this.http.put<void>(`${this.baseUrl}/${projectId}/favorite`, { favorite }, requiresAuthContext());
   }
 }

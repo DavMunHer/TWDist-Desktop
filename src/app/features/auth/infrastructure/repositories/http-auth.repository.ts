@@ -9,6 +9,7 @@ import { UserResponseDto } from "../dto/response/user-response.dto";
 import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
 import { SessionHintService } from "../services/session-hint.service";
 import { AuthError } from "../../domain/errors/auth.error";
+import { requiresAuthContext } from "@shared/interceptors/auth-context.token";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {
@@ -59,7 +60,7 @@ export class HttpAuthRepository extends AuthRepository {
 
   logout(): Observable<void> {
     // Server clears the cookie
-    return this.http.post<void>('/auth/logout', {}).pipe(
+    return this.http.post<void>('/auth/logout', {}, requiresAuthContext()).pipe(
       tap(() => this.sessionHintService.clear()),
       catchError(() => {
         // Even if the server fails, clear local session hint
@@ -74,7 +75,7 @@ export class HttpAuthRepository extends AuthRepository {
       return of(null);
     }
 
-    return this.http.get<UserResponseDto>('/auth/me')
+    return this.http.get<UserResponseDto>('/auth/me', requiresAuthContext())
       .pipe(
         map(dto => UserMapper.toDomain(dto)),
         catchError(() => {
