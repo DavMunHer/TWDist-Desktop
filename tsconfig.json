@@ -7,8 +7,6 @@
     "paths": {
       "@features/*": ["src/app/features/*"],
       "@shared/*": ["src/app/shared/*"],
-      "@services/*": ["src/app/shared/services/*"],
-      "@directives/*": ["src/app/shared/directives/*"]
     },
     "outDir": "./dist/out-tsc",
     "strict": true,
