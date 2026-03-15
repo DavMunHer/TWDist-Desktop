@@ -1,8 +1,8 @@
 import { Component, input, signal, inject } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { TWDSidebarMenu } from '@shared/models/sidebar-menu';
-import { ModalService } from '@services/modal.service';
-import { TWDModalType } from '@shared/models/modals-type';
+import { TWDSidebarMenu } from '@shared/ui/sidebar/sidebar-menu';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { TWDModalType } from '@shared/ui/modal/modals-type';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
 @Component({
