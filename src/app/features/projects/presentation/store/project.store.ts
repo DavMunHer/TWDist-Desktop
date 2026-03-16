@@ -242,11 +242,22 @@ export class ProjectStore {
 
     this.loadAllProjectsUseCase.execute().subscribe({
       next: (summaries) => {
+        const currentProjects = this.state().projects;
         const projectsDict: Record<string, Project> = {};
         const pendingCounts: Record<string, number> = {};
 
         for (const { project, pendingCount } of summaries) {
-          projectsDict[project.id] = project;
+          const existingProject = currentProjects[project.id];
+          const sectionIds = existingProject?.sectionIds.length
+            ? existingProject.sectionIds
+            : project.sectionIds;
+
+          projectsDict[project.id] = new Project(
+            project.id,
+            project.name,
+            project.favorite,
+            sectionIds,
+          );
           pendingCounts[project.id] = pendingCount;
         }
 

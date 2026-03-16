@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
 import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
@@ -11,7 +11,7 @@ import { ProjectStore } from '@features/projects/presentation/store/project.stor
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.css',
 })
-export class ProjectViewComponent implements OnInit {
+export class ProjectViewComponent {
   private readonly projectStore = inject(ProjectStore);
 
   // Tunnel for hidding icon when sidebar is visible
@@ -24,10 +24,6 @@ export class ProjectViewComponent implements OnInit {
 
   /** Denormalized project view-model, ready for the template */
   protected projectInfo = computed(() => this.projectStore.projectView());
-
-  ngOnInit(): void {
-    this.projectStore.loadAllProjects();
-  }
 
   protected updateTaskToCompleted(section: SectionViewModel, task: TaskViewModel) {
     this.projectStore.toggleTaskCompletion(task.id);
