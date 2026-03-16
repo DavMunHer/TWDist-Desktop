@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
@@ -17,6 +17,8 @@ export class CreateProjectComponent {
     favorite: new FormControl<boolean>(false, { nonNullable: true }),
   });
 
+  public closeModal = output<void>();
+
   private projectStore = inject(ProjectStore);
 
   create() {
@@ -26,7 +28,7 @@ export class CreateProjectComponent {
     });
   }
 
-  cancel(){
-    //TODO Logic for closing the login modal
+  cancel() {
+    this.closeModal.emit();
   }
 }
