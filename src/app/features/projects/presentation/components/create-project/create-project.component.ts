@@ -26,6 +26,7 @@ export class CreateProjectComponent {
       name: this.createProjetForm.controls.projectName.value,
       favorite: this.createProjetForm.controls.favorite.value,
     });
+    this.closeModal.emit();
   }
 
   cancel() {
