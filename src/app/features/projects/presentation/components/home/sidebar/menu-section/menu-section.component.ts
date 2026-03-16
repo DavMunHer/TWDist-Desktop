@@ -1,6 +1,7 @@
 import { Component, input, signal, inject } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { TWDSidebarMenu } from '@shared/ui/sidebar/sidebar-menu';
+import { Router } from '@angular/router';
+import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { TWDModalType } from '@shared/ui/modal/modals-type';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
@@ -16,6 +17,7 @@ export class MenuSectionComponent {
   public showPlusIcon = input<boolean>(false)
 
   private projectStore = inject(ProjectStore);
+  private readonly router = inject(Router);
 
   protected openMenuProjectId = signal<string | null>(null);
 
@@ -51,6 +53,15 @@ export class MenuSectionComponent {
   selectProject(projectId: string | undefined): void {
     if (!projectId) return;
     this.projectStore.loadProject(projectId);
+  }
+
+  onMenuItemClick(item: TWDSidebarMenuItem): void {
+    if (item.route) {
+      this.router.navigateByUrl(item.route);
+      return;
+    }
+
+    this.selectProject(item.id);
   }
 
   toggleProjectMenu(projectId: string | undefined, event: Event): void {

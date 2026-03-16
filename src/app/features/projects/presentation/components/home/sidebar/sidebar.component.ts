@@ -52,11 +52,13 @@ export class SidebarComponent {
         name: 'Hoy',
         pendingTasks: 2,
         icon: 'today',
+        route: '/projects/today',
       },
       {
         name: 'Próximo',
         pendingTasks: 0,
         icon: 'upcoming',
+        route: '/projects/upcoming',
       },
     ],
   }));

@@ -4,6 +4,7 @@ export interface TWDSidebarMenuItem {
   pendingTasks: number;
   icon?: string;
   favorite?: boolean;
+  route?: string;
 }
 
 export interface TWDSidebarMenu {
