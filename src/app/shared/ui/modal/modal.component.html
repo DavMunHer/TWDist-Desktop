@@ -14,7 +14,7 @@
     <profile-modal />
     }
     @case ('create-project') {
-    <create-project-modal />
+    <create-project-modal (closeModal)="close()" />
     }
     }
   </div>
