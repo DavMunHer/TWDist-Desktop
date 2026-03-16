@@ -52,7 +52,7 @@ export class MenuSectionComponent {
 
   selectProject(projectId: string | undefined): void {
     if (!projectId) return;
-    this.projectStore.loadProject(projectId);
+    this.router.navigate(['/projects', projectId]);
   }
 
   onMenuItemClick(item: TWDSidebarMenuItem): void {
