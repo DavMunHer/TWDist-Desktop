@@ -49,13 +49,13 @@ export class SidebarComponent {
     title: 'Navigation',
     items: [
       {
-        name: 'Hoy',
+        name: 'Today',
         pendingTasks: 2,
         icon: 'today',
         route: '/projects/today',
       },
       {
-        name: 'Próximo',
+        name: 'Upcoming',
         pendingTasks: 0,
         icon: 'upcoming',
         route: '/projects/upcoming',
