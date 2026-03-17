@@ -324,6 +324,10 @@ export class ProjectStore {
     this.projectSummaryStore.removePendingCount(projectId);
 
     if (this.state().selectedProjectId === projectId) {
+      // We are deleting the currently-open project; close its SSE stream immediately
+      // so the browser doesn't keep a live connection to a project that no longer exists.
+      this.disconnectFromProjectEvents();
+
       const ids = Object.keys(this.state().projects);
       if (ids.length > 0) {
         // RELOAD: First project in list when we delete a project  
@@ -456,6 +460,8 @@ export class ProjectStore {
         this.removeProject(projectId);
         this.projectSummaryStore.removePendingCount(projectId);
         if (this.state().selectedProjectId === projectId) {
+          // The currently-open project was deleted elsewhere; close the per-project SSE stream.
+          this.disconnectFromProjectEvents();
           const ids = Object.keys(this.state().projects);
           if (ids.length > 0) {
             this.loadProject(ids[0]);
