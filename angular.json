@@ -79,7 +79,7 @@
             "runner": "vitest",
             "tsConfig": "tsconfig.spec.json",
             "include": [
-              "src/vitest/**/*.spec.ts"
+              "src/**/*.spec.ts"
             ],
             "buildTarget": "TWDist-desktop:build:development"
           }

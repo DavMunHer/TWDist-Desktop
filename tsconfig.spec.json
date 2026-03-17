@@ -9,7 +9,7 @@
     ]
   },
   "include": [
-    "src/vitest/**/*.spec.ts",
+    "src/**/*.spec.ts",
     "src/**/*.d.ts"
   ]
 }
