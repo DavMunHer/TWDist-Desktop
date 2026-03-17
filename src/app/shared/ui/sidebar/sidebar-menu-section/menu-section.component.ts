@@ -1,27 +1,26 @@
-import { Component, input, signal, inject } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { Router } from '@angular/router';
-import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
+import { Component, input, output, signal } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { TWDModalType } from '@shared/ui/modal/modals-type';
-import { ProjectStore } from '@features/projects/presentation/store/project.store';
+import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 
 @Component({
   selector: 'sidebar-menu-section',
   imports: [NgTemplateOutlet, NgClass],
   templateUrl: './menu-section.component.html',
-  styleUrl: './menu-section.component.css'
+  styleUrl: './menu-section.component.css',
 })
 export class MenuSectionComponent {
-  public menuSectionInfo = input.required<TWDSidebarMenu>()
-  public showPlusIcon = input<boolean>(false)
+  public menuSectionInfo = input.required<TWDSidebarMenu>();
+  public showPlusIcon = input<boolean>(false);
 
-  private projectStore = inject(ProjectStore);
-  private readonly router = inject(Router);
+  public menuItemClick = output<TWDSidebarMenuItem>();
+  public favoriteClick = output<string>();
+  public deleteClick = output<string>();
 
   protected openMenuProjectId = signal<string | null>(null);
 
-  constructor(private modalService: ModalService) { }
+  constructor(private readonly modalService: ModalService) {}
 
   private readonly projectIconColors = [
     '#008B8B',
@@ -46,22 +45,11 @@ export class MenuSectionComponent {
   }
 
   openModal(type: TWDModalType, title: string) {
-    console.log('click');
     this.modalService.open(type, { title });
   }
 
-  selectProject(projectId: string | undefined): void {
-    if (!projectId) return;
-    this.router.navigate(['/projects', projectId]);
-  }
-
   onMenuItemClick(item: TWDSidebarMenuItem): void {
-    if (item.route) {
-      this.router.navigateByUrl(item.route);
-      return;
-    }
-
-    this.selectProject(item.id);
+    this.menuItemClick.emit(item);
   }
 
   toggleProjectMenu(projectId: string | undefined, event: Event): void {
@@ -79,14 +67,15 @@ export class MenuSectionComponent {
   onFavoriteClick(projectId: string | undefined, event: Event): void {
     event.stopPropagation();
     if (!projectId) return;
-    this.projectStore.toggleProjectFavorite(projectId);
+    this.favoriteClick.emit(projectId);
     this.openMenuProjectId.set(null);
   }
 
   onDeleteClick(projectId: string | undefined, event: Event): void {
     event.stopPropagation();
     if (!projectId) return;
+    this.deleteClick.emit(projectId);
     this.openMenuProjectId.set(null);
-    this.projectStore.deleteProject(projectId);
   }
 }
+
