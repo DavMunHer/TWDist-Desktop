@@ -6,6 +6,8 @@
     "ng": "ng",
     "start": "bun run electron:dev",
     "build": "ng build --base-href ./",
+    "test": "ng test --watch=false",
+    "test:watch": "ng test --watch",
     "electron:tsc": "tsc -p electron/tsconfig.json",
     "electron:serve": "wait-on tcp:4200 && cross-env NODE_ENV=development electron .",
     "electron:dev": "concurrently -k \"ng serve\" \"bun run electron:tsc && bun run electron:serve\"",
@@ -35,14 +37,9 @@
     "@angular-devkit/build-angular": "^20.3.20",
     "@angular/cli": "^20.3.20",
     "@angular/compiler-cli": "^20.3.18",
-    "@types/jasmine": "~5.1.15",
-    "jasmine-core": "~5.5.0",
-    "karma": "~6.4.4",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.1",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.3"
+    "jsdom": "^27.0.0",
+    "typescript": "~5.8.3",
+    "vitest": "^3.2.4"
   },
   "build": {
     "appId": "com.twdist.app",
