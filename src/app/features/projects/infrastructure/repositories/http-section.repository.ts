@@ -25,15 +25,17 @@ export class HttpSectionRepository extends SectionRepository {
   update(section: Section): Observable<Section> {
     const dto = SectionMapper.toDto(section);
     return this.http
-      .put<SectionDto>(`/sections/${section.id}`, dto, requiresAuthContext())
+      .put<SectionDto>(`/projects/${section.projectId}/section/${section.id}/update`, dto, requiresAuthContext())
       .pipe(map(responseDto => SectionMapper.toDomain(responseDto, section.projectId)));
   }
 
-  delete(sectionId: string): Observable<void> {
-    return this.http.delete<void>(`/sections/${sectionId}`, requiresAuthContext());
+  delete(projectId: string, sectionId: string): Observable<void> {
+    return this.http.delete<void>(`/projects/${projectId}/section/${sectionId}/delete`, requiresAuthContext());
   }
 
-  findById(sectionId: string): Observable<Section> {
-    throw new Error('Not implemented yet');
+  findById(projectId: string, sectionId: string): Observable<Section> {
+    return this.http
+      .get<SectionDto>(`/projects/${projectId}/section/${sectionId}/get`, requiresAuthContext())
+      .pipe(map(dto => SectionMapper.toDomain(dto, projectId)));
   }
 }
