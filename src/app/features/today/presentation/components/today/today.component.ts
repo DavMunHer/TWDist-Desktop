@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { BreadcrumbComponent } from '@features/projects/presentation/components/home/project-view/breadcrumb/breadcrumb.component';
+import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 
 @Component({
   selector: 'app-today',
