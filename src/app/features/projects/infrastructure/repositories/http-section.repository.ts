@@ -5,7 +5,6 @@ import { map } from 'rxjs/operators';
 import { Section } from '../../domain/entities/section.entity';
 import { SectionRepository } from '../../domain/repositories/section.repository';
 import { SectionDto } from '../dto/section.dto';
-import { CreateSectionDto } from '../dto/create-section.dto';
 import { SectionMapper } from '../mappers/section.mapper';
 import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
