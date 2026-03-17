@@ -77,11 +77,28 @@
     </div>
 
     <div class="sidebar-menu">
-      <sidebar-menu-section [menuSectionInfo]="navMenuSectionInfo()" />
+      <sidebar-menu-section
+        [menuSectionInfo]="navMenuSectionInfo()"
+        (menuItemClick)="menuItemClick.emit($event)"
+      />
 
-      <sidebar-menu-section [menuSectionInfo]="favoriteMenuSectionInfo()" />
+      @if (favoriteSectionHasItems()) {
+      <sidebar-menu-section
+        [menuSectionInfo]="favoriteMenuSectionInfo()"
+        (menuItemClick)="menuItemClick.emit($event)"
+        (favoriteClick)="favoriteClick.emit($event)"
+        (deleteClick)="deleteClick.emit($event)"
+      />
+      }
 
-      <sidebar-menu-section [showPlusIcon]="true" [menuSectionInfo]="projectsMenuSectionInfo()" />
+      <sidebar-menu-section
+        [showPlusIcon]="true"
+        [menuSectionInfo]="projectsMenuSectionInfo()"
+        (menuItemClick)="menuItemClick.emit($event)"
+        (favoriteClick)="favoriteClick.emit($event)"
+        (deleteClick)="deleteClick.emit($event)"
+      />
     </div>
   </div>
 </div>
+

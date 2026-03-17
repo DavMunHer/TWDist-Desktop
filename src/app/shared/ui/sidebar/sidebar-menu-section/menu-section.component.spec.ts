@@ -8,9 +8,8 @@ describe('MenuSectionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MenuSectionComponent]
-    })
-    .compileComponents();
+      imports: [MenuSectionComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MenuSectionComponent);
     component = fixture.componentInstance;
@@ -21,3 +20,4 @@ describe('MenuSectionComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+

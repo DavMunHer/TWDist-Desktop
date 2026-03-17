@@ -1,7 +1,16 @@
 <main class="main">
   <div class="content">
     <aside class="sidebar-container">
-      <app-sidebar [sidebarVisibleInput]="visibleSidebar()" (onSidebarClose)="toggleSidebar($event)"></app-sidebar>
+      <app-sidebar
+        [sidebarVisibleInput]="visibleSidebar()"
+        [navMenuSectionInfo]="navMenuSectionInfo()"
+        [favoriteMenuSectionInfo]="favoriteMenuSectionInfo()"
+        [projectsMenuSectionInfo]="projectsMenuSectionInfo()"
+        (onSidebarClose)="toggleSidebar($event)"
+        (menuItemClick)="onSidebarMenuItemClick($event)"
+        (favoriteClick)="onSidebarFavoriteClick($event)"
+        (deleteClick)="onSidebarDeleteClick($event)"
+      />
     </aside>
     <section class="view-section">
       @if (rightPanelView() === 'today') {

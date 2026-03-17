@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { ProjectSectionComponent } from './project-section/project-section.component';
 import { SectionAdderComponent } from './section-adder/section-adder.component';
-import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
+import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { SectionViewModel, TaskViewModel } from '@features/projects/presentation/models/project.view-model';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
