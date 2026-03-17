@@ -374,7 +374,13 @@ export class ProjectStore {
 
   /** Create a task inside a given section */
   createTask(sectionId: string, taskName: string): void {
-    this.taskStore.createTask(sectionId, taskName, (task) => {
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot create task: no project selected');
+      return;
+    }
+
+    this.taskStore.createTask(projectId, sectionId, taskName, (task) => {
       // Link the new task to the section
       this.sectionStore.addTaskToSection(sectionId, task.id);
     });
@@ -382,7 +388,13 @@ export class ProjectStore {
 
   /** Create a subtask under an existing task */
   createSubtask(parentTaskId: string, sectionId: string, taskName: string): void {
-    this.taskStore.createSubtask(parentTaskId, sectionId, taskName);
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot create subtask: no project selected');
+      return;
+    }
+
+    this.taskStore.createSubtask(parentTaskId, projectId, sectionId, taskName);
   }
 
   /** Toggle a task's completed status */

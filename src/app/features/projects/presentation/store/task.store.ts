@@ -65,11 +65,12 @@ export class TaskStore {
 
   /** Create a task inside a section. Returns a callback with the created task's info for the SectionStore. */
   createTask(
+    projectId: string,
     sectionId: string,
     taskName: string,
     onCreated?: (task: Task) => void,
   ): void {
-    this.createTaskUseCase.execute(sectionId, taskName).subscribe({
+    this.createTaskUseCase.execute(projectId, sectionId, taskName).subscribe({
       next: (task) => {
         this.state.update(s => ({
           ...s,
@@ -87,6 +88,7 @@ export class TaskStore {
   /** Create a subtask under a parent task */
   createSubtask(
     parentTaskId: string,
+    projectId: string,
     sectionId: string,
     taskName: string,
   ): void {
@@ -96,7 +98,7 @@ export class TaskStore {
       return;
     }
 
-    this.createTaskUseCase.execute(sectionId, taskName).subscribe({
+    this.createTaskUseCase.execute(projectId, sectionId, taskName).subscribe({
       next: (subtask) => {
         // Override the subtask with the correct parentTaskId
         const subtaskWithParent = new Task(
@@ -138,17 +140,14 @@ export class TaskStore {
 
   /** Toggle a task's completed status */
   toggleTaskCompletion(taskId: string): void {
-    this.toggleTaskUseCase.execute(taskId).subscribe({
-      next: (updatedTask) => {
-        this.state.update(s => ({
-          ...s,
-          tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
-        }));
-      },
-      error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
-        console.error('Failed to toggle task:', error);
-      },
+    const existing = this.state().tasks[taskId];
+    if (!existing) return;
+
+    this.toggleTaskUseCase.execute(existing).subscribe((updatedTask) => {
+      this.state.update(s => ({
+        ...s,
+        tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
+      }));
     });
   }
 }

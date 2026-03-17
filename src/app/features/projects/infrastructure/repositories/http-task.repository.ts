@@ -5,7 +5,6 @@ import { map } from 'rxjs/operators';
 import { Task } from '../../domain/entities/task.entity';
 import { TaskRepository } from '../../domain/repositories/task.repository';
 import { TaskDto } from '../dto/task.dto';
-import { CreateTaskDto } from '../dto/create-task.dto';
 import { TaskMapper } from '../mappers/task.mapper';
 import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
@@ -15,25 +14,27 @@ export class HttpTaskRepository extends TaskRepository {
     super();
   }
 
-  create(task: Task): Observable<Task> {
+  create(projectId: string, task: Task): Observable<Task> {
     const dto = TaskMapper.toCreateDto(task);
     return this.http
-      .post<TaskDto>(`/sections/${task.sectionId}/tasks`, dto, requiresAuthContext())
+      .post<TaskDto>(`/projects/${projectId}/section/${task.sectionId}/task/create`, dto, requiresAuthContext())
       .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId, task.parentTaskId)));
   }
 
-  update(task: Task): Observable<Task> {
+  update(projectId: string, task: Task): Observable<Task> {
     const dto = TaskMapper.toDto(task);
     return this.http
-      .put<TaskDto>(`/tasks/${task.id}`, dto, requiresAuthContext())
+      .put<TaskDto>(`/projects/${projectId}/section/${task.sectionId}/task/${task.id}/update`, dto, requiresAuthContext())
       .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId, task.parentTaskId)));
   }
 
-  delete(taskId: string): Observable<void> {
-    return this.http.delete<void>(`/tasks/${taskId}`, requiresAuthContext());
+  delete(projectId: string, sectionId: string, taskId: string): Observable<void> {
+    return this.http.delete<void>(`/projects/${projectId}/section/${sectionId}/task/${taskId}/delete`, requiresAuthContext());
   }
 
-  findById(taskId: string): Observable<Task> {
-    throw new Error('Not implemented yet');
+  findById(projectId: string, sectionId: string, taskId: string): Observable<Task> {
+    return this.http
+      .get<TaskDto>(`/projects/${projectId}/section/${sectionId}/task/${taskId}/get`, requiresAuthContext())
+      .pipe(map(dto => TaskMapper.toDomain(dto, sectionId)));
   }
 }

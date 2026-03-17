@@ -1,20 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { Task } from '../../domain/entities/task.entity';
-import { TaskRepository } from '../../domain/repositories/task.repository';
 
 @Injectable()
 export class ToggleTaskCompletionUseCase {
-  constructor(private taskRepository: TaskRepository) {}
-
-  execute(taskId: string): Observable<Task> {
-    return this.taskRepository.findById(taskId).pipe(
-      map(task => task.completed ? task.uncomplete() : task.complete()),
-      map(updatedTask => {
-        this.taskRepository.update(updatedTask).subscribe();
-        return updatedTask;
-      })
-    );
+  // FIXME: Persist completion toggle in the backend.
+  // The current backend routes only support updating a task's name, so completion toggling is
+  // handled locally in the UI for now.
+  execute(task: Task): Observable<Task> {
+    const updated = task.completed ? task.uncomplete() : task.complete();
+    return of(updated);
   }
 }
