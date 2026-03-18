@@ -20,6 +20,10 @@ bun install
 ## Start developing!
 For starting developing in this project you can just run `bun run start` and it will automatically start a new Electron app with the content of the Angular app.
 
+## Testing templates
+
+Vitest starter templates for component, service, and HTTP service tests are available at [src/vitest/templates/README.md](src/vitest/templates/README.md).
+
 ---
 
 ## State Handling — Normalized Store with Separated Stores
