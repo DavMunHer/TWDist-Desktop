@@ -4,7 +4,7 @@ import { EMPTY, catchError, throwError } from 'rxjs';
 import { AuthStore } from '@features/auth/presentation/store/auth.store';
 import { Router } from '@angular/router';
 import { SessionHintService } from '@features/auth/infrastructure/services/session-hint.service';
-import { REQUIRES_AUTH } from './auth-context.token';
+import { REQUIRES_AUTH } from '@shared/interceptors/auth-context.token';
 
 /**
  * Error Interceptor

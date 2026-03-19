@@ -1,4 +1,4 @@
-import { Section } from '../../domain/entities/section.entity';
+import { Section } from '@features/projects/domain/entities/section.entity';
 
 /**
  * Normalized state for all sections, keyed by ID.

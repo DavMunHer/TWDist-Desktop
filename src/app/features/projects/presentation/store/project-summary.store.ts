@@ -2,9 +2,9 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import {
   initialProjectSummaryState,
   ProjectSummaryState,
-} from '../models/project-summary-state';
-import { SectionStore } from './section.store';
-import { TaskStore } from './task.store';
+} from '@features/projects/presentation/models/project-summary-state';
+import { SectionStore } from '@features/projects/presentation/store/section.store';
+import { TaskStore } from '@features/projects/presentation/store/task.store';
 
 /**
  * Store for sidebar-specific **project summary** data.

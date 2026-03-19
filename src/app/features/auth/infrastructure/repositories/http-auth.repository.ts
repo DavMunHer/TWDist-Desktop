@@ -1,13 +1,13 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { AuthRepository } from "../../domain/repositories/auth.repository";
+import { AuthRepository } from "@features/auth/domain/repositories/auth.repository";
 import { catchError, map, Observable, of, tap, throwError } from "rxjs";
-import { LoginCredentialsDto } from "../dto/request/login-credentials.dto";
-import { User } from "../../domain/entities/user.entity";
-import { UserMapper } from "../mappers/user.mapper";
-import { UserResponseDto } from "../dto/response/user-response.dto";
-import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
-import { SessionHintService } from "../services/session-hint.service";
+import { LoginCredentialsDto } from "@features/auth/infrastructure/dto/request/login-credentials.dto";
+import { User } from "@features/auth/domain/entities/user.entity";
+import { UserMapper } from "@features/auth/infrastructure/mappers/user.mapper";
+import { UserResponseDto } from "@features/auth/infrastructure/dto/response/user-response.dto";
+import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
+import { SessionHintService } from "@features/auth/infrastructure/services/session-hint.service";
 import { requiresAuthContext } from "@shared/interceptors/auth-context.token";
 import { AuthError } from "@features/auth/domain/errors/auth.error";
 

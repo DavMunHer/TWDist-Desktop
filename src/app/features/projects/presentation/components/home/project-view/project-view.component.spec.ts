@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectViewComponent } from './project-view.component';
+import { ProjectViewComponent } from '@features/projects/presentation/components/home/project-view/project-view.component';
 
 describe('ProjectViewComponent', () => {
   let component: ProjectViewComponent;

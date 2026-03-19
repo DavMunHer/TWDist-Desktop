@@ -1,12 +1,12 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { catchError, of, tap } from "rxjs";
-import { LoginUseCase } from "../../application/use-cases/login.use-case";
-import { LogoutUseCase } from "../../application/use-cases/logout.use-case";
-import { GetCurrentUserUseCase } from "../../application/use-cases/getCurrentUser.use-case";
-import { AuthState } from "../models/auth-state";
-import { LoginCredentialsDto } from "../../infrastructure/dto/request/login-credentials.dto";
-import { RegisterCredentialsDto } from "../../infrastructure/dto/request/register-credentials.dto";
-import { CreateUserUseCase } from "../../application/use-cases/createUser.use-case";
+import { LoginUseCase } from "@features/auth/application/use-cases/login.use-case";
+import { LogoutUseCase } from "@features/auth/application/use-cases/logout.use-case";
+import { GetCurrentUserUseCase } from "@features/auth/application/use-cases/getCurrentUser.use-case";
+import { AuthState } from "@features/auth/presentation/models/auth-state";
+import { LoginCredentialsDto } from "@features/auth/infrastructure/dto/request/login-credentials.dto";
+import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
+import { CreateUserUseCase } from "@features/auth/application/use-cases/createUser.use-case";
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore {

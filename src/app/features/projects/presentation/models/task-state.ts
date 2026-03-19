@@ -1,4 +1,4 @@
-import { Task } from '../../domain/entities/task.entity';
+import { Task } from '@features/projects/domain/entities/task.entity';
 
 /**
  * Normalized state for all tasks, keyed by ID.

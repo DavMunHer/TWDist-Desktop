@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ProjectRepository, ProjectAggregate, ProjectSummary } from '../../domain/repositories/project.repository';
-import { ProjectDto } from '../dto/project.dto';
-import { ProjectMapper } from '../mappers/project.mapper';
-import { Project } from '../../domain/entities/project.entity';
-import { ProjectResponeDto } from '../dto/response/project.dto';
-import { ProjectSummaryDto } from '../dto/response/project-summary.dto';
+import { ProjectRepository, ProjectAggregate, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
+import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
+import { ProjectMapper } from '@features/projects/infrastructure/mappers/project.mapper';
+import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
+import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
 import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
 @Injectable()

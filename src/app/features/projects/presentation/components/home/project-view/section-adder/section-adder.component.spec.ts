@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SectionAdderComponent } from './section-adder.component';
+import { SectionAdderComponent } from '@features/projects/presentation/components/home/project-view/section-adder/section-adder.component';
 
 describe('SectionAdderComponent', () => {
   let component: SectionAdderComponent;

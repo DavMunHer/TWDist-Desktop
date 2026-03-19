@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
-import { Project } from '../entities/project.entity';
-import { Section } from '../entities/section.entity';
-import { Task } from '../entities/task.entity';
-import { ProjectDto } from '../../infrastructure/dto/project.dto';
+import { Project } from '@features/projects/domain/entities/project.entity';
+import { Section } from '@features/projects/domain/entities/section.entity';
+import { Task } from '@features/projects/domain/entities/task.entity';
+import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 
 export interface ProjectAggregate {
   project: Project;

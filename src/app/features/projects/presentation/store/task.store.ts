@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { CreateTaskUseCase } from '../../application/use-cases/create-task.use-case';
-import { ToggleTaskCompletionUseCase } from '../../application/use-cases/toggle-task-completion.use-case';
-import { initialTaskState, TaskState } from '../models/task-state';
-import { Task } from '../../domain/entities/task.entity';
+import { CreateTaskUseCase } from '@features/projects/application/use-cases/create-task.use-case';
+import { ToggleTaskCompletionUseCase } from '@features/projects/application/use-cases/toggle-task-completion.use-case';
+import { initialTaskState, TaskState } from '@features/projects/presentation/models/task-state';
+import { Task } from '@features/projects/domain/entities/task.entity';
 
 /**
  * Normalized store for **tasks** (and subtasks).

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { TWDModalType } from './modals-type';
+import { TWDModalType } from '@shared/ui/modal/modals-type';
 
 @Injectable({
   providedIn: 'root'

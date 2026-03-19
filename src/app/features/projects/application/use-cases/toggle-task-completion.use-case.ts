@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { of } from 'rxjs';
-import { Task } from '../../domain/entities/task.entity';
+import { Task } from '@features/projects/domain/entities/task.entity';
 
 @Injectable()
 export class ToggleTaskCompletionUseCase {

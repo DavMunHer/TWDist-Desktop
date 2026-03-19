@@ -1,7 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
-import { ConfigurationComponent } from "./configuration/configuration.component";
-import { ProfileComponent } from './profile/profile.component';
+import { ConfigurationComponent } from "@shared/ui/modal/configuration/configuration.component";
+import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
 import { CreateProjectComponent } from "@features/projects/presentation/components/create-project/create-project.component";
 
 @Component({

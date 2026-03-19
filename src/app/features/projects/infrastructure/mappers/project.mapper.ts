@@ -1,12 +1,12 @@
-import { Project } from '../../domain/entities/project.entity';
-import { Section } from '../../domain/entities/section.entity';
-import { Task } from '../../domain/entities/task.entity';
-import { ProjectAggregate, ProjectSummary } from '../../domain/repositories/project.repository';
-import { ProjectDto } from '../dto/project.dto';
-import { ProjectResponeDto } from '../dto/response/project.dto';
-import { ProjectSummaryDto } from '../dto/response/project-summary.dto';
-import { SectionMapper } from './section.mapper';
-import { TaskMapper } from './task.mapper';
+import { Project } from '@features/projects/domain/entities/project.entity';
+import { Section } from '@features/projects/domain/entities/section.entity';
+import { Task } from '@features/projects/domain/entities/task.entity';
+import { ProjectAggregate, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
+import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
+import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
+import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
+import { SectionMapper } from '@features/projects/infrastructure/mappers/section.mapper';
+import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
 
 export class ProjectMapper {
   static toDomain(dto: ProjectResponeDto): Project {
