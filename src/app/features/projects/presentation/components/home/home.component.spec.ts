@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router, convertToParamMap } from '@angular/router';
 import { Subject } from 'rxjs';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { HomeComponent } from './home.component';
 import { ProjectStore } from '../../store/project.store';

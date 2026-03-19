@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UpcomingComponent } from './upcoming.component';
-import { vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { By } from '@angular/platform-browser';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 
