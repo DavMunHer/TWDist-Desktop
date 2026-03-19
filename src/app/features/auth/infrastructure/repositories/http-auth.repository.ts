@@ -8,8 +8,8 @@ import { UserMapper } from "../mappers/user.mapper";
 import { UserResponseDto } from "../dto/response/user-response.dto";
 import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
 import { SessionHintService } from "../services/session-hint.service";
-import { AuthError } from "../../domain/errors/auth.error";
 import { requiresAuthContext } from "@shared/interceptors/auth-context.token";
+import { AuthError } from "@features/auth/domain/errors/auth.error";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {

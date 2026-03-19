@@ -1,5 +1,3 @@
-import { format } from "path";
-
 export class Credentials {
   constructor(
     public readonly email: string,
