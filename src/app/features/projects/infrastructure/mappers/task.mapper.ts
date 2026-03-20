@@ -1,6 +1,6 @@
-import { Task } from '../../domain/entities/task.entity';
-import { TaskDto } from '../dto/task.dto';
-import { CreateTaskDto } from '../dto/create-task.dto';
+import { Task } from '@features/projects/domain/entities/task.entity';
+import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
+import { CreateTaskDto } from '@features/projects/infrastructure/dto/create-task.dto';
 
 export class TaskMapper {
   /**

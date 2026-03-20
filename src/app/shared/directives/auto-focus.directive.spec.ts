@@ -1,4 +1,4 @@
-import { AutoFocusDirective } from './auto-focus.directive';
+import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import { ElementRef } from '@angular/core';
 
 describe('AutoFocusDirective', () => {

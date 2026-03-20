@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SectionTitleComponent } from './section-title.component';
+import { SectionTitleComponent } from '@features/projects/presentation/components/home/project-view/project-section/section-title/section-title.component';
 
 describe('SectionTitleComponent', () => {
   let component: SectionTitleComponent;

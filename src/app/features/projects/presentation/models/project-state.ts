@@ -1,4 +1,4 @@
-import { Project } from '../../domain/entities/project.entity';
+import { Project } from '@features/projects/domain/entities/project.entity';
 
 /**
  * Normalized state for all projects, keyed by ID.

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalComponent } from './modal.component';
-import { ModalService } from './modal.service';
+import { ModalComponent } from '@shared/ui/modal/modal.component';
+import { ModalService } from '@shared/ui/modal/modal.service';
 import { By } from '@angular/platform-browser';
 import { vi } from 'vitest';
 

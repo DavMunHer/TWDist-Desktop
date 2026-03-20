@@ -5,9 +5,9 @@ import { ActivatedRoute, NavigationEnd, Router, convertToParamMap } from '@angul
 import { Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { HomeComponent } from './home.component';
-import { ProjectStore } from '../../store/project.store';
-import { ProjectSummaryStore } from '../../store/project-summary.store';
+import { HomeComponent } from '@features/projects/presentation/components/home/home.component';
+import { ProjectStore } from '@features/projects/presentation/store/project.store';
+import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { UpcomingComponent } from '@features/upcoming/presentation/components/upcoming/upcoming.component';
 

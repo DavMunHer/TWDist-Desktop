@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
-import { LoginCredentialsDto } from '../../infrastructure/dto/request/login-credentials.dto';
-import { User } from '../entities/user.entity';
-import { RegisterCredentialsDto } from '../../infrastructure/dto/request/register-credentials.dto';
+import { LoginCredentialsDto } from '@features/auth/infrastructure/dto/request/login-credentials.dto';
+import { User } from '@features/auth/domain/entities/user.entity';
+import { RegisterCredentialsDto } from '@features/auth/infrastructure/dto/request/register-credentials.dto';
 
 export abstract class AuthRepository {
   abstract login(credentials: LoginCredentialsDto): Observable<User>;

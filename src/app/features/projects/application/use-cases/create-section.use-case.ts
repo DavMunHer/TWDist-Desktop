@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Section } from '../../domain/entities/section.entity';
-import { SectionRepository } from '../../domain/repositories/section.repository';
-import { ProjectRepository } from '../../domain/repositories/project.repository';
+import { Section } from '@features/projects/domain/entities/section.entity';
+import { SectionRepository } from '@features/projects/domain/repositories/section.repository';
+import { ProjectRepository } from '@features/projects/domain/repositories/project.repository';
 
 @Injectable()
 export class CreateSectionUseCase {

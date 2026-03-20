@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Section } from '../../domain/entities/section.entity';
-import { SectionRepository } from '../../domain/repositories/section.repository';
-import { SectionDto } from '../dto/section.dto';
-import { SectionMapper } from '../mappers/section.mapper';
+import { Section } from '@features/projects/domain/entities/section.entity';
+import { SectionRepository } from '@features/projects/domain/repositories/section.repository';
+import { SectionDto } from '@features/projects/infrastructure/dto/section.dto';
+import { SectionMapper } from '@features/projects/infrastructure/mappers/section.mapper';
 import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
 @Injectable()

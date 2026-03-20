@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { CreateSectionUseCase } from '../../application/use-cases/create-section.use-case';
-import { initialSectionState, SectionState } from '../models/section-state';
-import { Section } from '../../domain/entities/section.entity';
-import { TaskStore } from './task.store';
+import { CreateSectionUseCase } from '@features/projects/application/use-cases/create-section.use-case';
+import { initialSectionState, SectionState } from '@features/projects/presentation/models/section-state';
+import { Section } from '@features/projects/domain/entities/section.entity';
+import { TaskStore } from '@features/projects/presentation/store/task.store';
 
 /**
  * Normalized store for **sections**.

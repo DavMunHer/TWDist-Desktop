@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { AuthRepository } from "../../domain/repositories/auth.repository";
+import { AuthRepository } from "@features/auth/domain/repositories/auth.repository";
 import { Observable } from "rxjs";
-import { User } from "../../domain/entities/user.entity";
-import { RegisterCredentialsDto } from "../../infrastructure/dto/request/register-credentials.dto";
+import { User } from "@features/auth/domain/entities/user.entity";
+import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
 
 @Injectable()
 export class CreateUserUseCase {

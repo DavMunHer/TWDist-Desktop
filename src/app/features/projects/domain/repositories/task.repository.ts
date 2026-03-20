@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Task } from '../entities/task.entity';
+import { Task } from '@features/projects/domain/entities/task.entity';
 
 export abstract class TaskRepository {
   /**

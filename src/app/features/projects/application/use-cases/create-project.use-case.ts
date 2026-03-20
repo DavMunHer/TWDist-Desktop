@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { ProjectRepository } from "../../domain/repositories/project.repository";
-import { ProjectDto } from "../../infrastructure/dto/project.dto";
+import { ProjectRepository } from "@features/projects/domain/repositories/project.repository";
+import { ProjectDto } from "@features/projects/infrastructure/dto/project.dto";
 import { Observable } from "rxjs";
-import { Project } from "../../domain/entities/project.entity";
+import { Project } from "@features/projects/domain/entities/project.entity";
 
 @Injectable()
 export class CreateProjectUseCase {

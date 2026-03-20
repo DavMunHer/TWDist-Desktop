@@ -3,7 +3,7 @@ import { Component, computed, input, output, signal } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { TWDModalType } from '@shared/ui/modal/modals-type';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
-import { MenuSectionComponent } from './sidebar-menu-section/menu-section.component';
+import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/menu-section.component';
 
 @Component({
   selector: 'app-sidebar',

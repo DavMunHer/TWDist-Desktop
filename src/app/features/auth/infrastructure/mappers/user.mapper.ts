@@ -1,6 +1,6 @@
-import { User } from "../../domain/entities/user.entity";
-import { RegisterCredentialsDto } from "../dto/request/register-credentials.dto";
-import { UserResponseDto } from "../dto/response/user-response.dto";
+import { User } from "@features/auth/domain/entities/user.entity";
+import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
+import { UserResponseDto } from "@features/auth/infrastructure/dto/response/user-response.dto";
 
 export class UserMapper {
   static toDomain(dto: UserResponseDto): User {

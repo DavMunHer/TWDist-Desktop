@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Section } from '../entities/section.entity';
+import { Section } from '@features/projects/domain/entities/section.entity';
 
 export abstract class SectionRepository {
   abstract create(section: Section): Observable<Section>;

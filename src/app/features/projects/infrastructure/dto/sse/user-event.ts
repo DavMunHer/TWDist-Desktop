@@ -1,4 +1,4 @@
-import { ProjectSummaryDto } from '../response/project-summary.dto';
+import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
 
 export type UserEventType =
   | 'project_created'

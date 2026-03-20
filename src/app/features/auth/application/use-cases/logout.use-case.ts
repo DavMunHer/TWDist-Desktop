@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { AuthRepository } from "../../domain/repositories/auth.repository";
+import { AuthRepository } from "@features/auth/domain/repositories/auth.repository";
 import { Observable } from "rxjs";
 
 @Injectable()

@@ -1,5 +1,5 @@
-import { SectionDto } from '../section.dto';
-import { TaskDto } from '../task.dto';
+import { SectionDto } from '@features/projects/infrastructure/dto/section.dto';
+import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
 
 export type ProjectEventType =
   | 'section_created'

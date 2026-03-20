@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConfigurationComponent } from './configuration.component';
+import { ConfigurationComponent } from '@shared/ui/modal/configuration/configuration.component';
 
 describe('ConfigurationComponent', () => {
   let component: ConfigurationComponent;

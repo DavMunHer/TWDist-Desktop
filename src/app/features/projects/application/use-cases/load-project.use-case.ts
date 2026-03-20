@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ProjectRepository, ProjectAggregate } from '../../domain/repositories/project.repository';
+import { ProjectRepository, ProjectAggregate } from '@features/projects/domain/repositories/project.repository';
 
 @Injectable()
 export class LoadProjectUseCase {
