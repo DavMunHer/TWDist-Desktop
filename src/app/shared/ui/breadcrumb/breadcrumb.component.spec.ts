@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 describe('BreadcrumbComponent', () => {
   let fixture: ComponentFixture<BreadcrumbComponent>;
@@ -9,6 +11,7 @@ describe('BreadcrumbComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [BreadcrumbComponent],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BreadcrumbComponent);

@@ -10,6 +10,8 @@ import { ProjectStore } from '@features/projects/presentation/store/project.stor
 import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { UpcomingComponent } from '@features/upcoming/presentation/components/upcoming/upcoming.component';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 describe('HomeComponent breadcrumb integration', () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -48,6 +50,7 @@ describe('HomeComponent breadcrumb integration', () => {
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
+        provideZonelessChangeDetection(),
         { provide: Router, useValue: routerMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: ProjectStore, useValue: projectStoreMock },
