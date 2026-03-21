@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
@@ -8,7 +10,8 @@ describe('ProfileComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProfileComponent]
+      imports: [ProfileComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

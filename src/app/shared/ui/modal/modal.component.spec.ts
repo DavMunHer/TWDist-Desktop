@@ -4,6 +4,8 @@ import { ModalComponent } from '@shared/ui/modal/modal.component';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { By } from '@angular/platform-browser';
 import { vi } from 'vitest';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 describe('ModalComponent', () => {
   let component: ModalComponent;
@@ -12,7 +14,8 @@ describe('ModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalComponent]
+      imports: [ModalComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

@@ -4,6 +4,8 @@ import { UpcomingComponent } from '@features/upcoming/presentation/components/up
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { By } from '@angular/platform-browser';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;
@@ -11,7 +13,8 @@ describe('UpcomingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UpcomingComponent]
+      imports: [UpcomingComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

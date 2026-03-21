@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SectionTitleComponent } from '@features/projects/presentation/components/home/project-view/project-section/section-title/section-title.component';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 describe('SectionTitleComponent', () => {
   let component: SectionTitleComponent;
@@ -8,7 +10,8 @@ describe('SectionTitleComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SectionTitleComponent]
+      imports: [SectionTitleComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 

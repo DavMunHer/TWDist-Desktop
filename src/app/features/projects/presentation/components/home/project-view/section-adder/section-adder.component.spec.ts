@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SectionAdderComponent } from '@features/projects/presentation/components/home/project-view/section-adder/section-adder.component';
+import { provideZonelessChangeDetection } from '@angular/core';
+
 
 describe('SectionAdderComponent', () => {
   let component: SectionAdderComponent;
@@ -8,7 +10,8 @@ describe('SectionAdderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SectionAdderComponent]
+      imports: [SectionAdderComponent],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 
