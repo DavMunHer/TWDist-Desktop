@@ -1,10 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { LoadProjectUseCase } from '@features/projects/application/use-cases/load-project.use-case';
-import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects.use-case';
-import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project.use-case';
-import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite.use-case';
-import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project.use-case';
+import { LoadProjectUseCase } from '@features/projects/application/use-cases/load-project/load-project.use-case';
+import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects/load-all-projects.use-case';
+import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project/create-project.use-case';
+import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite/toggle-favorite.use-case';
+import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project/delete-project.use-case';
 import { initialProjectState, ProjectState } from '@features/projects/presentation/models/project-state';
 import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 import {
