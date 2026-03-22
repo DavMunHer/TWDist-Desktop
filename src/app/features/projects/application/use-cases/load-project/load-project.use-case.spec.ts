@@ -6,9 +6,10 @@ import { of } from 'rxjs';
 import { LoadProjectUseCase } from './load-project.use-case';
 import { ProjectRepository, ProjectAggregate } from '@features/projects/domain/repositories/project.repository';
 import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
 const aggregate: ProjectAggregate = {
-  project: new Project('p1', 'P', false, []),
+  project: new Project('p1', ProjectName.create('PP'), false, []),
   sections: [],
   tasks: [],
 };

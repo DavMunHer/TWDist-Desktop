@@ -16,6 +16,7 @@ import { SectionStore } from '@features/projects/presentation/store/section.stor
 import { TaskStore } from '@features/projects/presentation/store/task.store';
 import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
 import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 import { ProjectEventsService } from '@features/projects/infrastructure/services/project-events.service';
 import { UserEventsService } from '@features/projects/infrastructure/services/user-events.service';
 import { ProjectEvent, DeletePayload } from '@features/projects/infrastructure/dto/sse/project-event';
@@ -121,7 +122,7 @@ export class ProjectStore {
 
     return {
       id: project.id,
-      name: project.name,
+      name: project.name.value,
       sections: sectionViewModels,
     };
   });
@@ -173,11 +174,10 @@ export class ProjectStore {
    */
   createProject(projectDto: ProjectDto): void {
     const tempId = `temp-${Date.now()}`;
-    const optimisticProject = new Project(
-      tempId,
-      projectDto.name,
+    const optimisticProject = Project.create(
+      ProjectName.create(projectDto.name),
       projectDto.favorite,
-      [],
+      tempId,
     );
 
     // Show the project in the UI right away
@@ -447,7 +447,7 @@ export class ProjectStore {
         const dto = event.data as ProjectSummaryDto;
         const projectId = String(dto.id);
         if (!this.state().projects[projectId]) {
-          const project = new Project(projectId, dto.name, dto.favorite, []);
+          const project = new Project(projectId, ProjectName.create(dto.name), dto.favorite, []);
           this.upsertProject(projectId, project);
           this.projectSummaryStore.mergePendingCounts({ [projectId]: dto.pendingCount });
         }
@@ -459,7 +459,7 @@ export class ProjectStore {
         const projectId = String(dto.id);
         const existing = this.state().projects[projectId];
         if (existing) {
-          const updated = new Project(projectId, dto.name, dto.favorite, existing.sectionIds);
+          const updated = new Project(projectId, ProjectName.create(dto.name), dto.favorite, existing.sectionIds);
           this.upsertProject(projectId, updated);
           this.projectSummaryStore.mergePendingCounts({ [projectId]: dto.pendingCount });
         }

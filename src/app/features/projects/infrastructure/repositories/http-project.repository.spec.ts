@@ -5,9 +5,10 @@ import { afterEach, beforeEach, describe, it, expect } from 'vitest';
 import { provideZonelessChangeDetection } from '@angular/core';
 
 import { HttpProjectRepository } from './http-project.repository';
-import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
 import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
+import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
 /**
  * Vitest/esbuild: constructor DI metadata may be missing — construct repository with HttpClient from TestBed.
@@ -28,14 +29,14 @@ describe('HttpProjectRepository', () => {
     httpMock.verify();
   });
 
-  it('create posts to /projects/create and maps response', () => {
-    const dto: ProjectDto = { name: 'N', favorite: false };
-    const response: ProjectResponeDto = { id: '1', name: 'N', favorite: false, sections: [] };
+  it('create posts ProjectMapper body and maps response', () => {
+    const project = Project.create(ProjectName.create('NN'), false);
+    const response: ProjectResponeDto = { id: '1', name: 'NN', favorite: false, sections: [] };
     let result: unknown;
-    repository.create(dto).subscribe((p) => (result = p));
+    repository.create(project).subscribe((p) => (result = p));
     const req = httpMock.expectOne('/projects/create');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(dto);
+    expect(req.request.body).toEqual({ name: 'NN', favorite: false });
     req.flush(response);
     expect((result as { id: string }).id).toBe('1');
   });
@@ -43,7 +44,7 @@ describe('HttpProjectRepository', () => {
   it('findById GETs /projects/:id and maps aggregate', () => {
     const response: ProjectResponeDto = {
       id: '7',
-      name: 'P',
+      name: 'PP',
       favorite: true,
       sections: [],
     };
@@ -55,7 +56,7 @@ describe('HttpProjectRepository', () => {
 
   it('getAll GETs /projects/get', () => {
     const list: ProjectSummaryDto[] = [
-      { id: '1', name: 'A', favorite: false, pendingCount: 0 },
+      { id: '1', name: 'AA', favorite: false, pendingCount: 0 },
     ];
     repository.getAll().subscribe();
     const req = httpMock.expectOne('/projects/get');

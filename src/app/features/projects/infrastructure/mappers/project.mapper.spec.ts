@@ -4,6 +4,7 @@ import { ProjectMapper } from './project.mapper';
 import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
 import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
 import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
 describe('ProjectMapper', () => {
   const fullDto: ProjectResponeDto = {
@@ -33,7 +34,8 @@ describe('ProjectMapper', () => {
     const p = ProjectMapper.toDomain(fullDto);
     expect(p).toBeInstanceOf(Project);
     expect(p.id).toBe('10');
-    expect(p.name).toBe('App');
+    expect(p.name).toBeInstanceOf(ProjectName);
+    expect(p.name.value).toBe('App');
     expect(p.favorite).toBe(true);
     expect(p.sectionIds).toEqual(['1']);
   });
@@ -47,14 +49,15 @@ describe('ProjectMapper', () => {
   });
 
   it('toSummary maps summary dto', () => {
-    const dto: ProjectSummaryDto = { id: '5', name: 'X', favorite: false, pendingCount: 3 };
+    const dto: ProjectSummaryDto = { id: '5', name: 'XX', favorite: false, pendingCount: 3 };
     const s = ProjectMapper.toSummary(dto);
     expect(s.project.id).toBe('5');
+    expect(s.project.name.value).toBe('XX');
     expect(s.pendingCount).toBe(3);
   });
 
   it('toDto maps name and favorite', () => {
-    const p = new Project('1', 'N', true, []);
-    expect(ProjectMapper.toDto(p)).toEqual({ name: 'N', favorite: true });
+    const p = new Project('1', ProjectName.create('NN'), true, []);
+    expect(ProjectMapper.toDto(p)).toEqual({ name: 'NN', favorite: true });
   });
 });
