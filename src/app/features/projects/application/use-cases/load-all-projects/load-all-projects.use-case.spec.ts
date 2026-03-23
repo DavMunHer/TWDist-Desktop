@@ -31,7 +31,14 @@ describe('LoadAllProjectsUseCase', () => {
   });
 
   it('delegates to projectRepository.getAll', () => {
-    useCase.execute().subscribe((r) => expect(r).toEqual(summaries));
+    const expected = [
+      {
+        project: { id: '1', name: 'AA', favorite: false, sectionIds: [] },
+        pendingCount: 2,
+      },
+    ];
+
+    useCase.execute().subscribe((r) => expect(r).toEqual(expected));
     expect(repo.getAll).toHaveBeenCalled();
   });
 });

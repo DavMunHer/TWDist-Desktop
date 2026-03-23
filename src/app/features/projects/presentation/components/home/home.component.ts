@@ -29,9 +29,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   protected projects = computed(() =>
     this.projectStore.projects().map((p) => ({
       id: p.id,
-      name: p.name.value,
+      name: p.name,
       favorite: p.favorite,
-      pendingTasks: this.summaryStore.pendingCountFor(p.id, p.sectionIds),
+      pendingTasks: this.summaryStore.pendingCountFor(p.id),
     })),
   );
 
@@ -95,7 +95,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.rightPanelView.set('project');
     const projectId = this.route.snapshot.paramMap.get('id');
 
-    if (projectId && this.projectStore.selectedProjectId() !== projectId) {
+    if (!projectId) return;
+
+    const selectedId = this.projectStore.selectedProjectId();
+    const selectedProject = this.projectStore.projects().find((p) => p.id === projectId);
+
+    // On initial load / reload, we may only have project summaries (sectionIds = [])
+    // which makes the UI show an empty project until we fetch full details.
+    const shouldLoadDetails =
+      selectedId !== projectId || !selectedProject || selectedProject.sectionIds.length === 0;
+
+    if (shouldLoadDetails) {
       this.projectStore.loadProject(projectId);
     }
   }

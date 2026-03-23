@@ -33,7 +33,13 @@ describe('LoadProjectUseCase', () => {
   });
 
   it('delegates to projectRepository.findById', () => {
-    useCase.execute('p1').subscribe((r) => expect(r).toEqual(aggregate));
+    const expected = {
+      project: { id: 'p1', name: 'PP', favorite: false, sectionIds: [] },
+      sections: [],
+      tasks: [],
+    };
+
+    useCase.execute('p1').subscribe((r) => expect(r).toEqual(expected));
     expect(repo.findById).toHaveBeenCalledWith('p1');
   });
 });
