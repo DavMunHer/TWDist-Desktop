@@ -30,4 +30,4 @@ jobs:
         run: bunx ng build --configuration=production --progress=false
 
       - name: Run Unit Tests
-        run: bunx ng test --watch=false --browsers=ChromeHeadless
+        run: bunx ng test --watch=false

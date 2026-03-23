@@ -11,7 +11,8 @@
     "electron:tsc": "tsc -p electron/tsconfig.json",
     "electron:serve": "wait-on tcp:4200 && cross-env NODE_ENV=development electron .",
     "electron:dev": "concurrently -k \"ng serve\" \"bun run electron:tsc && bun run electron:serve\"",
-    "electron:build": "bun run build && bun run electron:tsc && electron-builder"
+    "electron:build": "bun run build && bun run electron:tsc && electron-builder",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -38,8 +39,11 @@
     "@angular-devkit/build-angular": "^20.3.20",
     "@angular/cli": "^20.3.20",
     "@angular/compiler-cli": "^20.3.18",
+    "angular-eslint": "21.0.1",
+    "eslint": "^9.39.1",
     "jsdom": "^27.0.0",
     "typescript": "~5.8.3",
+    "typescript-eslint": "8.46.4",
     "vitest": "^3.2.4"
   },
   "build": {
