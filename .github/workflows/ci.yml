@@ -1,0 +1,35 @@
+name: Angular CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' 
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint check
+        run: npm run lint 
+
+      - name: Verify Compilation
+        run: npx ng build --configuration=production --progress=false
+
+      - name: Run Unit Tests
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+        # Note: In Angular 20+, if you've migrated to Vitest, 
+        # this command is significantly faster.
