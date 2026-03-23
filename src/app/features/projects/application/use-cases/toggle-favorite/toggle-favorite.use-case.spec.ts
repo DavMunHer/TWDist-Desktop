@@ -14,14 +14,14 @@ describe('ToggleFavoriteUseCase', () => {
     repo = {
       toggleFavorite: vi.fn().mockReturnValue(of(void 0)),
     };
-    useCase = new ToggleFavoriteUseCase(repo as ProjectRepository);
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: ToggleFavoriteUseCase, useValue: useCase },
+        ToggleFavoriteUseCase,
         { provide: ProjectRepository, useValue: repo },
       ],
     });
+    useCase = TestBed.inject(ToggleFavoriteUseCase);
   });
 
   it('delegates to projectRepository.toggleFavorite', () => {

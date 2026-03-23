@@ -19,10 +19,10 @@ describe('HttpProjectRepository', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting(), HttpProjectRepository],
     });
     httpMock = TestBed.inject(HttpTestingController);
-    repository = new HttpProjectRepository(TestBed.inject(HttpClient));
+    repository = TestBed.inject(HttpProjectRepository);
   });
 
   afterEach(() => {

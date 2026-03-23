@@ -14,10 +14,10 @@ describe('HttpSectionRepository', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting(), HttpSectionRepository],
     });
     httpMock = TestBed.inject(HttpTestingController);
-    repository = new HttpSectionRepository(TestBed.inject(HttpClient));
+    repository = TestBed.inject(HttpSectionRepository);
   });
 
   afterEach(() => {

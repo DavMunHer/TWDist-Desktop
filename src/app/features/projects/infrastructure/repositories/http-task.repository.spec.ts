@@ -16,10 +16,10 @@ describe('HttpTaskRepository', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting(), HttpTaskRepository],
     });
     httpMock = TestBed.inject(HttpTestingController);
-    repository = new HttpTaskRepository(TestBed.inject(HttpClient));
+    repository = TestBed.inject(HttpTaskRepository);
   });
 
   afterEach(() => {

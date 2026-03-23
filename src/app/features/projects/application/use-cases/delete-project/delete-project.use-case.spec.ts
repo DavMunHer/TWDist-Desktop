@@ -14,14 +14,14 @@ describe('DeleteProjectUseCase', () => {
     repo = {
       delete: vi.fn().mockReturnValue(of(void 0)),
     };
-    useCase = new DeleteProjectUseCase(repo as ProjectRepository);
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: DeleteProjectUseCase, useValue: useCase },
+        DeleteProjectUseCase,
         { provide: ProjectRepository, useValue: repo },
       ],
     });
+    useCase = TestBed.inject(DeleteProjectUseCase);
   });
 
   it('delegates to projectRepository.delete', () => {
