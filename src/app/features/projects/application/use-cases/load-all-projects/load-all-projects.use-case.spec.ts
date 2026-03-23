@@ -20,14 +20,14 @@ describe('LoadAllProjectsUseCase', () => {
     repo = {
       getAll: vi.fn().mockReturnValue(of(summaries)),
     };
-    useCase = new LoadAllProjectsUseCase(repo as ProjectRepository);
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: LoadAllProjectsUseCase, useValue: useCase },
+        LoadAllProjectsUseCase,
         { provide: ProjectRepository, useValue: repo },
       ],
     });
+    useCase = TestBed.inject(LoadAllProjectsUseCase);
   });
 
   it('delegates to projectRepository.getAll', () => {

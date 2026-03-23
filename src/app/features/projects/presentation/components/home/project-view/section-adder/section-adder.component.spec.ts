@@ -65,7 +65,7 @@ describe('SectionAdderComponent', () => {
   it('calls createSection, resets control, and closes form on valid submit', () => {
     fixture.nativeElement.querySelector('.add-section-button-container')?.click();
     fixture.detectChanges();
-    (component as any).newSectionNameCtrl.setValue('  New section  ');
+    component['newSectionNameCtrl'].setValue('  New section  ');
     fixture.detectChanges();
 
     const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
@@ -74,14 +74,14 @@ describe('SectionAdderComponent', () => {
 
     expect(projectStoreMock.createSection).toHaveBeenCalledOnce();
     expect(projectStoreMock.createSection).toHaveBeenCalledWith('New section');
-    expect((component as any).newSectionNameCtrl.value).toBe('');
+    expect(component['newSectionNameCtrl'].value).toBe('');
     expect(fixture.nativeElement.querySelector('.add-section-button-container')).toBeTruthy();
   });
 
   it('closes form on cancel without creating a section', () => {
     fixture.nativeElement.querySelector('.add-section-button-container')?.click();
     fixture.detectChanges();
-    (component as any).newSectionNameCtrl.setValue('Aborted');
+    component['newSectionNameCtrl'].setValue('Aborted');
     fixture.detectChanges();
 
     fixture.nativeElement.querySelector('.cancel-button')?.click();

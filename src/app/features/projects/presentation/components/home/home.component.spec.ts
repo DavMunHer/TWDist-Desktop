@@ -138,32 +138,32 @@ describe('HomeComponent', () => {
   describe('sidebar menu actions', () => {
     it('navigates by URL when menu item has route', () => {
       const item: TWDSidebarMenuItem = { name: 'Today', pendingTasks: 0, route: '/projects/today' };
-      (component as any).onSidebarMenuItemClick(item);
+      component['onSidebarMenuItemClick'](item);
       expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/projects/today');
       expect(routerMock.navigate).not.toHaveBeenCalled();
     });
 
     it('navigates to project when menu item has id only', () => {
       const item: TWDSidebarMenuItem = { name: 'X', pendingTasks: 0, id: 'proj-1', icon: 'project' };
-      (component as any).onSidebarMenuItemClick(item);
+      component['onSidebarMenuItemClick'](item);
       expect(routerMock.navigate).toHaveBeenCalledWith(['/projects', 'proj-1']);
     });
 
     it('delegates favorite toggle to project store', () => {
-      (component as any).onSidebarFavoriteClick('pid');
+      component['onSidebarFavoriteClick']('pid');
       expect(projectStoreMock.toggleProjectFavorite).toHaveBeenCalledWith('pid');
     });
 
     it('delegates delete to project store', () => {
-      (component as any).onSidebarDeleteClick('pid');
+      component['onSidebarDeleteClick']('pid');
       expect(projectStoreMock.deleteProject).toHaveBeenCalledWith('pid');
     });
 
     it('toggleSidebar updates visibleSidebar signal', () => {
-      (component as any).toggleSidebar(false);
-      expect((component as any).visibleSidebar()).toBe(false);
-      (component as any).toggleSidebar(true);
-      expect((component as any).visibleSidebar()).toBe(true);
+      component['toggleSidebar'](false);
+      expect(component['visibleSidebar']()).toBe(false);
+      component['toggleSidebar'](true);
+      expect(component['visibleSidebar']()).toBe(true);
     });
   });
 
@@ -173,7 +173,7 @@ describe('HomeComponent', () => {
     });
 
     it('propagates breadcrumb icon click to open sidebar when hidden', () => {
-      (component as any).visibleSidebar.set(false);
+      component['visibleSidebar'].set(false);
       fixture.detectChanges();
 
       const breadcrumbDE = fixture.debugElement.query(By.directive(BreadcrumbComponent));
@@ -181,7 +181,7 @@ describe('HomeComponent', () => {
       breadcrumb.iconClick.emit(true);
       fixture.detectChanges();
 
-      expect((component as any).visibleSidebar()).toBe(true);
+      expect(component['visibleSidebar']()).toBe(true);
     });
   });
 });
