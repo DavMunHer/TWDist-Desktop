@@ -1,4 +1,4 @@
-import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectOutput } from '@features/projects/application/dtos/project-output';
 
 /**
  * Normalized state for all projects, keyed by ID.
@@ -13,7 +13,7 @@ import { Project } from '@features/projects/domain/entities/project.entity';
  */
 export interface ProjectState {
   /** All loaded projects indexed by ID */
-  projects: Record<string, Project>;
+  projects: Record<string, ProjectOutput>;
   /** Currently selected / active project ID */
   selectedProjectId: string | null;
   /** Whether a data operation is in progress */

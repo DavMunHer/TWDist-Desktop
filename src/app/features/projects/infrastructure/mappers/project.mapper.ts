@@ -1,4 +1,5 @@
 import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 import { Section } from '@features/projects/domain/entities/section.entity';
 import { Task } from '@features/projects/domain/entities/task.entity';
 import { ProjectAggregate, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
@@ -13,7 +14,7 @@ export class ProjectMapper {
     const sectionIds = (dto.sections ?? []).map(s => String(s.id));
     return new Project(
       String(dto.id),
-      dto.name,
+      ProjectName.create(dto.name),
       dto.favorite,
       sectionIds
     );
@@ -45,7 +46,7 @@ export class ProjectMapper {
   static toSummary(dto: ProjectSummaryDto): ProjectSummary {
     const project = new Project(
       String(dto.id),
-      dto.name,
+      ProjectName.create(dto.name),
       dto.favorite,
       []
     );
@@ -58,7 +59,7 @@ export class ProjectMapper {
 
   static toDto(project: Project): Partial<ProjectDto> {
     return {
-      name: project.name,
+      name: project.name.value,
       favorite: project.favorite
     };
   }
