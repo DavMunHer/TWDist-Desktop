@@ -221,7 +221,10 @@ export class ProjectStore {
         this.taskStore.mergeTasks(tasks);
 
         this.upsertProject(project.id, project);
-        this.state.update(s => ({ ...s, loading: false }));
+        this.state.update(s => ({
+          ...s,
+          loading: false,
+        }));
 
         this.connectToProjectEvents(projectId);
       },
@@ -252,11 +255,25 @@ export class ProjectStore {
 
         this.projectSummaryStore.mergePendingCounts(pendingCounts);
 
-        this.state.update(s => ({
-          ...s,
-          projects: projectsDict,
-          loading: false,
-        }));
+        // `loadAllProjects()` returns summaries (no sections yet => `sectionIds: []`).
+        // If a full `loadProject()` already happened for some id (e.g. navigating directly
+        // to `/projects/:id` on reload), we must not overwrite its `sectionIds`.
+        this.state.update(s => {
+          const mergedProjects: Record<string, ProjectOutput> = { ...projectsDict };
+          for (const [id, existing] of Object.entries(s.projects)) {
+            const incoming = mergedProjects[id];
+            if (!incoming) continue;
+            if (existing.sectionIds.length > 0) {
+              mergedProjects[id] = { ...incoming, sectionIds: existing.sectionIds };
+            }
+          }
+
+          return {
+            ...s,
+            projects: mergedProjects,
+            loading: false,
+          };
+        });
 
         // Auto-select the first project if none is selected yet
         const ids = Object.keys(projectsDict);

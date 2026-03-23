@@ -14,6 +14,7 @@ import { TodayComponent } from '@features/today/presentation/components/today/to
 import { UpcomingComponent } from '@features/upcoming/presentation/components/upcoming/upcoming.component';
 import { TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { ProjectViewModel } from '@features/projects/presentation/models/project.view-model';
+import { ProjectOutput } from '@features/projects/application/dtos/project-output';
 
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -38,7 +39,7 @@ describe('HomeComponent', () => {
   };
 
   const projectStoreMock = {
-    projects: signal([]),
+    projects: signal<ProjectOutput[]>([]),
     selectedProjectId: signal<string | null>(null),
     /** Required by embedded {@link ProjectViewComponent} template */
     projectView: signal<ProjectViewModel | null>(null).asReadonly(),
@@ -124,9 +125,10 @@ describe('HomeComponent', () => {
       expect(projectStoreMock.loadProject).toHaveBeenCalledWith('p2');
     });
 
-    it('does not call loadProject when route id matches selectedProjectId', () => {
+    it('does not call loadProject when route id matches selectedProjectId and sectionIds is non-empty', () => {
       activatedRouteMock.snapshot.paramMap = convertToParamMap({ id: 'p1' });
       projectStoreMock.selectedProjectId.set('p1');
+      projectStoreMock.projects.set([{ id: 'p1', name: 'P', favorite: false, sectionIds: ['s1'] }]);
       vi.clearAllMocks();
       flushRoute('/projects/p1');
       expect(projectStoreMock.loadProject).not.toHaveBeenCalled();
