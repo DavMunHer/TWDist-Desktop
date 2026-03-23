@@ -1,0 +1,33 @@
+name: Angular CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        env:
+            ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+
+      - name: Verify Compilation
+        run: bunx ng build --configuration=production --progress=false
+
+      - name: Run Unit Tests
+        run: bunx ng test --watch=false
+
+      - name: Lint check
+        run: bun run lint
