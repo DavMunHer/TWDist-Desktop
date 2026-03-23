@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal, inject } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { TWDModalType } from '@shared/ui/modal/modals-type';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
@@ -12,10 +12,12 @@ import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/me
   styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
+  private readonly modalService = inject(ModalService);
+
   protected toggleDropdownVal = signal<boolean>(false);
 
   public sidebarVisibleInput = input.required<boolean>();
-  public onSidebarClose = output<boolean>();
+  public sidebarClose = output<boolean>();
 
   public navMenuSectionInfo = input.required<TWDSidebarMenu>();
   public favoriteMenuSectionInfo = input.required<TWDSidebarMenu>();
@@ -25,14 +27,12 @@ export class SidebarComponent {
   public favoriteClick = output<string>();
   public deleteClick = output<string>();
 
-  constructor(private readonly modalService: ModalService) {}
-
   openModal(type: TWDModalType, title: string) {
     this.modalService.open(type, { title });
   }
 
   toggleSidebar() {
-    this.onSidebarClose.emit(false);
+    this.sidebarClose.emit(false);
   }
 
   toggleDropdown() {

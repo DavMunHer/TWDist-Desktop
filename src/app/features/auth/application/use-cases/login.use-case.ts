@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { AuthRepository } from "@features/auth/domain/repositories/auth.repository";
 import { Observable } from "rxjs";
 import { User } from "@features/auth/domain/entities/user.entity";
@@ -6,7 +6,8 @@ import { LoginCredentialsDto } from "@features/auth/infrastructure/dto/request/l
 
 @Injectable()
 export class LoginUseCase {
-  constructor(private authRepository: AuthRepository) {}
+  private authRepository = inject(AuthRepository);
+
 
   execute(credentials: LoginCredentialsDto): Observable<User> {
     // Just return user, cookie is handled automatically

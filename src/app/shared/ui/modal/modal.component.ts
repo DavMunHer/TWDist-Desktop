@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfigurationComponent } from "@shared/ui/modal/configuration/configuration.component";
 import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
@@ -12,12 +12,12 @@ import { CreateProjectComponent } from "@features/projects/presentation/componen
   styleUrl: './modal.component.css'
 })
 export class ModalComponent {
+  private modalService = inject(ModalService);
 
-  constructor(private modalService: ModalService) { }
 
   modalType = computed(() => this.modalService.modalType())
   modalTitle = computed(() => {
-    const data = this.modalService.modalData();
+    const data = this.modalService.modalData() as { title?: string } | null;
     return data?.title ?? '';
   });
 

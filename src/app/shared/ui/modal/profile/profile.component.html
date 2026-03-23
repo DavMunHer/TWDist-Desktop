@@ -24,10 +24,10 @@
   <section>
     <h3>Password</h3>
     <div>
-      <label>Old Password</label>
-      <input type="text" [(ngModel)]="oldPassword">
-      <label>New Password</label>
-      <input type="text" [(ngModel)]="newPassword">
+      <label for="oldPassword">Old Password</label>
+      <input id="oldPassword" type="text" [(ngModel)]="oldPassword">
+      <label for="newPassword">New Password</label>
+      <input id="newPassword" type="text" [(ngModel)]="newPassword">
       <button class="btn default" (click)="updatePassword()">Update</button>
     </div>
   </section>

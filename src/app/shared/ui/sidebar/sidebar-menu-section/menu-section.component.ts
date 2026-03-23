@@ -1,16 +1,18 @@
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, inject } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { TWDModalType } from '@shared/ui/modal/modals-type';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 
 @Component({
-  selector: 'sidebar-menu-section',
+  selector: 'app-sidebar-menu-section',
   imports: [NgTemplateOutlet, NgClass],
   templateUrl: './menu-section.component.html',
   styleUrl: './menu-section.component.css',
 })
 export class MenuSectionComponent {
+  private readonly modalService = inject(ModalService);
+
   public menuSectionInfo = input.required<TWDSidebarMenu>();
   public showPlusIcon = input<boolean>(false);
 
@@ -19,8 +21,6 @@ export class MenuSectionComponent {
   public deleteClick = output<string>();
 
   protected openMenuProjectId = signal<string | null>(null);
-
-  constructor(private readonly modalService: ModalService) {}
 
   private readonly projectIconColors = [
     '#008B8B',

@@ -19,7 +19,7 @@
     </div>
     <ul>
         @for (item of menuSectionInfo().items; track $index) {
-        <li class="sidebar-hover" (click)="onMenuItemClick(item)">
+        <li class="sidebar-hover" tabindex="0" (keydown.enter)="onMenuItemClick(item)" (click)="onMenuItemClick(item)">
             <div class="project-start">
                 @switch (item.icon){
                 @case ('project') {
@@ -39,7 +39,7 @@
                 <span class="pending-tasks">{{item.pendingTasks}}</span>
                 @if (item.icon === 'project') {
                 <div class="project-menu-wrapper">
-                    <div class="project-menu-trigger" (click)="toggleProjectMenu(item.id, $event)">
+                    <div class="project-menu-trigger" tabindex="0" (keydown.enter)="toggleProjectMenu(item.id, $event)" (click)="toggleProjectMenu(item.id, $event)">
                         <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -61,7 +61,7 @@
                         </svg>
                     </div>
                     @if (openMenuProjectId() === item.id) {
-                    <div class="project-menu-backdrop" (click)="closeMenu($event)"></div>
+                    <div class="project-menu-backdrop" tabindex="0" (keydown.enter)="closeMenu($event)" (click)="closeMenu($event)"></div>
                     <div class="project-menu-dropdown">
                         <button type="button" class="project-menu-item"
                             (click)="onFavoriteClick(item.id, $event)">
@@ -160,7 +160,7 @@
 
 <ng-template #plusIcon>
     <svg class="ico" width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-        (click)="openModal('create-project', 'Create project')">
+        tabindex="0" (keydown.enter)="openModal('create-project', 'Create project')" (click)="openModal('create-project', 'Create project')">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
         <g id="SVGRepo_iconCarrier">

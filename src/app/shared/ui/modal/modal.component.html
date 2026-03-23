@@ -1,6 +1,6 @@
 @if (modalType()) {
-<div class="modal-backdrop" (click)="close()">
-  <div class="modal-container" (click)="$event.stopPropagation()">
+<div class="modal-backdrop" tabindex="0" (keydown.enter)="close()" (click)="close()">
+  <div class="modal-container" tabindex="0" (keydown.enter)="$event.stopPropagation()" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <span class="modal-title">{{ modalTitle() }}</span>
       <button class="modal-close" (click)="close()">✕</button>
@@ -8,10 +8,10 @@
     <hr>
     @switch (modalType()) {
     @case ('configuration') {
-    <configuration-modal />
+    <app-configuration-modal />
     }
     @case ('profile') {
-    <profile-modal />
+    <app-profile-modal />
     }
     @case ('create-project') {
     <create-project-modal (closeModal)="close()" />

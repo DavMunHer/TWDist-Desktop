@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -12,10 +12,8 @@ import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
 @Injectable()
 export class HttpProjectRepository extends ProjectRepository {
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {
-    super();
-  }
 
   private baseUrl = '/projects';
 

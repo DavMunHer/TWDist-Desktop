@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { AuthRepository } from "@features/auth/domain/repositories/auth.repository";
 import { catchError, map, Observable, of, tap, throwError } from "rxjs";
 import { LoginCredentialsDto } from "@features/auth/infrastructure/dto/request/login-credentials.dto";
@@ -13,12 +13,9 @@ import { AuthError } from "@features/auth/domain/errors/auth.error";
 
 @Injectable()
 export class HttpAuthRepository extends AuthRepository {
-  constructor(
-    private http: HttpClient,
-    private sessionHintService: SessionHintService,
-  ) {
-    super();
-  }
+  private http = inject(HttpClient);
+  private sessionHintService = inject(SessionHintService);
+
 
   login(credentials: LoginCredentialsDto): Observable<User> {
     return this.http.post<UserResponseDto>('/auth/login', credentials)

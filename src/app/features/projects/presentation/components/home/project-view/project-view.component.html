@@ -1,6 +1,6 @@
 <section class="project-section">
   <nav>
-    <breadcrumb [showIcon]="showIcon()" (onIconClick)="handleIconChange()"/>
+    <breadcrumb [showIcon]="showIcon()" (iconClick)="handleIconChange()"/>
   </nav>
   <header class="project-header">
     {{projectInfo()?.name}}
@@ -10,6 +10,6 @@
     @for (section of projectInfo()?.sections; track $index) {
     <project-section [sectionInfo]="section" (onTaskUpdate)="updateTaskToCompleted(section, $event)" />
     }
-  <section-adder />
+  <app-section-adder />
   </main>
 </section>

@@ -100,6 +100,7 @@ export class SectionStore {
   /** Remove a section entirely from the store */
   removeSection(sectionId: string): void {
     this.state.update(s => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [sectionId]: _, ...rest } = s.sections;
       return { ...s, sections: rest };
     });

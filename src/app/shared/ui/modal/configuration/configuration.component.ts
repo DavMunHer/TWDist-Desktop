@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'configuration-modal',
+  selector: 'app-configuration-modal',
   imports: [],
   templateUrl: './configuration.component.html',
   styleUrl: './configuration.component.css'

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'profile-modal',
+  selector: 'app-profile-modal',
   imports: [FormsModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'

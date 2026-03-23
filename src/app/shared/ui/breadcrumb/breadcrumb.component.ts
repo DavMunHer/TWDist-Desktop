@@ -11,10 +11,10 @@ export class BreadcrumbComponent {
   public route = input<string>('default-route');
 
   public showIcon = input.required<boolean>();
-  public onIconClick = output<boolean>();
+  public iconClick = output<boolean>();
 
   openSidebar() {
-    this.onIconClick.emit(true);
+    this.iconClick.emit(true);
   }
 }
 
