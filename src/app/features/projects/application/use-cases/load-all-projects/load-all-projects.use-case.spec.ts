@@ -33,7 +33,7 @@ describe('LoadAllProjectsUseCase', () => {
   it('delegates to projectRepository.getAll', () => {
     const expected = [
       {
-        project: { id: '1', name: 'AA', favorite: false },
+        project: { id: '1', name: 'AA', favorite: false, sectionIds: [] },
         pendingCount: 2,
       },
     ];

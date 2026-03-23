@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ProjectRepository, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
+import { toProjectOutput } from '@features/projects/application/mappers/project-output.mapper';
 import { map } from 'rxjs/operators';
 
 export interface ProjectSummaryOutput {
@@ -17,11 +18,7 @@ export class LoadAllProjectsUseCase {
     return this.projectRepository.getAll().pipe(
       map((summaries: ProjectSummary[]) =>
         summaries.map((s) => ({
-          project: {
-            id: s.project.id,
-            name: s.project.name.value,
-            favorite: s.project.favorite,
-          },
+          project: toProjectOutput(s.project, []),
           pendingCount: s.pendingCount,
         })),
       ),

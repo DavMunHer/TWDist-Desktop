@@ -20,6 +20,7 @@ import { UserEventsService } from '@features/projects/infrastructure/services/us
 import { ProjectEvent, DeletePayload } from '@features/projects/infrastructure/dto/sse/project-event';
 import { UserEvent, ProjectDeletePayload } from '@features/projects/infrastructure/dto/sse/user-event';
 import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
+import { Section } from '@features/projects/domain/entities/section.entity';
 import { SectionMapper } from '@features/projects/infrastructure/mappers/section.mapper';
 import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
 import { SectionDto } from '@features/projects/infrastructure/dto/section.dto';
@@ -109,9 +110,10 @@ export class ProjectStore {
           subtasks: buildTaskTree(task.subtaskIds),
         }));
 
-    const sectionViewModels: SectionViewModel[] = Object.values(sections)
-      .filter((section) => section.projectId === project.id)
-      .map((section) => ({
+    const sectionViewModels: SectionViewModel[] = project.sectionIds
+      .map(sectionId => sections[sectionId])
+      .filter((s): s is Section => !!s)
+      .map(section => ({
         id: section.id,
         name: section.name,
         tasks: buildTaskTree(section.taskIds),
@@ -175,6 +177,7 @@ export class ProjectStore {
       id: tempId,
       name: input.name,
       favorite: input.favorite,
+      sectionIds: [],
     };
 
     // Show the project in the UI right away
@@ -344,8 +347,17 @@ export class ProjectStore {
       return;
     }
 
-    // ProjectStore no longer maintains `sectionIds`; the UI derives sections from SectionStore.
-    this.sectionStore.createSection(projectId, sectionName);
+    // Keep ProjectOutput.sectionIds in sync so the UI doesn't need to scan every section.
+    this.sectionStore.createSection(projectId, sectionName, (section) => {
+      const existing = this.state().projects[projectId];
+      if (!existing) return;
+      if (existing.sectionIds.includes(section.id)) return;
+
+      this.upsertProject(projectId, {
+        ...existing,
+        sectionIds: [...existing.sectionIds, section.id],
+      });
+    });
   }
 
   // ===================================================================
@@ -431,6 +443,7 @@ export class ProjectStore {
             id: projectId,
             name: dto.name,
             favorite: dto.favorite,
+            sectionIds: [],
           };
           this.upsertProject(projectId, project);
           this.projectSummaryStore.mergePendingCounts({ [projectId]: dto.pendingCount });
@@ -477,6 +490,14 @@ export class ProjectStore {
         const dto = event.data as SectionDto;
         const section = SectionMapper.toDomain(dto, projectId);
         this.sectionStore.mergeSections([section]);
+
+        const existing = this.state().projects[projectId];
+        if (existing && !existing.sectionIds.includes(section.id)) {
+          this.upsertProject(projectId, {
+            ...existing,
+            sectionIds: [...existing.sectionIds, section.id],
+          });
+        }
         break;
       }
 
@@ -491,6 +512,14 @@ export class ProjectStore {
         const { id } = event.data as DeletePayload;
         const sectionId = String(id);
         this.sectionStore.removeSection(sectionId);
+
+        const existing = this.state().projects[projectId];
+        if (existing && existing.sectionIds.includes(sectionId)) {
+          this.upsertProject(projectId, {
+            ...existing,
+            sectionIds: existing.sectionIds.filter((sId) => sId !== sectionId),
+          });
+        }
         break;
       }
 

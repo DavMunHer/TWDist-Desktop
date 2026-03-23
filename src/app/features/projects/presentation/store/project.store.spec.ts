@@ -32,7 +32,7 @@ describe('ProjectStore', () => {
     loadAllExecute.mockReturnValue(of([]));
     loadProjectExecute.mockReturnValue(
       of({
-        project: new Project('p1', ProjectName.create('First'), false, []),
+        project: { id: 'p1', name: 'First', favorite: false, sectionIds: [] },
         sections: [],
         tasks: [],
       }),
@@ -89,7 +89,7 @@ describe('ProjectStore', () => {
 
   it('toggleProjectFavorite optimistically flips favorite and calls use case', () => {
     loadAllExecute.mockReturnValue(
-      of([{ project: new Project('p1', ProjectName.create('First'), false, []), pendingCount: 0 }]),
+      of([{ project: { id: 'p1', name: 'First', favorite: false, sectionIds: [] }, pendingCount: 0 }]),
     );
     store.loadAllProjects();
     loadProjectExecute.mockClear();

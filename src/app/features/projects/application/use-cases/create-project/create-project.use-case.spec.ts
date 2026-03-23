@@ -30,7 +30,7 @@ describe('CreateProjectUseCase', () => {
   });
 
   it('validates name, builds Project and delegates to projectRepository.create', () => {
-    const expectedOutput = { id: 'new-id', name: 'NN', favorite: true };
+    const expectedOutput = { id: 'new-id', name: 'NN', favorite: true, sectionIds: [] };
 
     useCase.execute(input).subscribe((out) => expect(out).toEqual(expectedOutput));
     expect(repo.create).toHaveBeenCalled();

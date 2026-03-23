@@ -3,7 +3,7 @@ import { ProjectRepository } from "@features/projects/domain/repositories/projec
 import { Observable } from "rxjs";
 import { Project } from "@features/projects/domain/entities/project.entity";
 import { ProjectName } from "@features/projects/domain/value-objects/project-name.value-object";
-import { ProjectOutput } from "@features/projects/application/dtos/project-output";
+import { toProjectOutput } from '@features/projects/application/mappers/project-output.mapper';
 import { map } from "rxjs/operators";
 
 export interface CreateProjectInput {
@@ -15,6 +15,7 @@ export interface CreateProjectOutput {
   id: string;
   name: string;
   favorite: boolean;
+  sectionIds: string[];
 }
 
 @Injectable()
@@ -26,11 +27,7 @@ export class CreateProjectUseCase {
     const project = Project.create(projectName, input.favorite);
 
     return this.projectRepository.create(project).pipe(
-      map((saved) => ({
-        id: saved.id,
-        name: saved.name.value,
-        favorite: saved.favorite,
-      })),
+      map((saved) => toProjectOutput(saved, [])),
     );
   }
 }

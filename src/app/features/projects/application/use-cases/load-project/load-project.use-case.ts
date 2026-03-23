@@ -4,6 +4,7 @@ import { ProjectRepository, ProjectAggregate } from '@features/projects/domain/r
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
 import { Section } from '@features/projects/domain/entities/section.entity';
 import { Task } from '@features/projects/domain/entities/task.entity';
+import { toProjectOutput } from '@features/projects/application/mappers/project-output.mapper';
 import { map } from 'rxjs/operators';
 
 export interface LoadProjectOutput {
@@ -19,11 +20,7 @@ export class LoadProjectUseCase {
   execute(projectId: string): Observable<LoadProjectOutput> {
     return this.projectRepository.findById(projectId).pipe(
       map((agg: ProjectAggregate) => ({
-        project: {
-          id: agg.project.id,
-          name: agg.project.name.value,
-          favorite: agg.project.favorite,
-        },
+        project: toProjectOutput(agg.project, agg.sections),
         sections: agg.sections,
         tasks: agg.tasks,
       })),

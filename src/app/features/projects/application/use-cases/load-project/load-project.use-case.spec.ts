@@ -34,7 +34,7 @@ describe('LoadProjectUseCase', () => {
 
   it('delegates to projectRepository.findById', () => {
     const expected = {
-      project: { id: 'p1', name: 'PP', favorite: false },
+      project: { id: 'p1', name: 'PP', favorite: false, sectionIds: [] },
       sections: [],
       tasks: [],
     };
