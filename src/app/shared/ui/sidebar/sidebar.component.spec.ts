@@ -63,7 +63,7 @@ describe('SidebarComponent', () => {
   });
 
   it('emits false when toggle view icon is clicked', () => {
-    const emitSpy = vi.spyOn(component.onSidebarClose, 'emit');
+    const emitSpy = vi.spyOn(component.sidebarClose, 'emit');
     const toggleIconDE = fixture.debugElement.query(By.css('.icon-view'));
 
     toggleIconDE.triggerEventHandler('click');
@@ -85,13 +85,13 @@ describe('SidebarComponent', () => {
   });
 
   it('renders favorite section only when it has items', () => {
-    let sections = fixture.nativeElement.querySelectorAll('sidebar-menu-section');
+    let sections = fixture.nativeElement.querySelectorAll('app-sidebar-menu-section');
     expect(sections.length).toBe(3);
 
     fixture.componentRef.setInput('favoriteMenuSectionInfo', favoriteMenuEmpty);
     fixture.detectChanges();
 
-    sections = fixture.nativeElement.querySelectorAll('sidebar-menu-section');
+    sections = fixture.nativeElement.querySelectorAll('app-sidebar-menu-section');
     expect(sections.length).toBe(2);
   });
 });

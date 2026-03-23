@@ -17,6 +17,7 @@ describe('ProjectSectionComponent', () => {
 
     fixture = TestBed.createComponent(ProjectSectionComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('sectionInfo', { id: 'test-section', name: 'Test Section', tasks: [] });
     fixture.detectChanges();
   });
 

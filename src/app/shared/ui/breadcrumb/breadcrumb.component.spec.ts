@@ -41,7 +41,7 @@ describe('BreadcrumbComponent', () => {
   });
 
   it('emits true when the left icon is clicked', () => {
-    const emitSpy = vi.spyOn(component.onIconClick, 'emit');
+    const emitSpy = vi.spyOn(component.iconClick, 'emit');
 
     const iconEl: HTMLElement | null =
       fixture.nativeElement.querySelector('.breadcrumb-toggle-ico');

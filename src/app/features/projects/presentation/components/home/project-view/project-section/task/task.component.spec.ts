@@ -17,6 +17,7 @@ describe('TaskComponent', () => {
 
     fixture = TestBed.createComponent(TaskComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('taskInfo', { id: 'test-task', name: 'Test Task', completed: false });
     fixture.detectChanges();
   });
 

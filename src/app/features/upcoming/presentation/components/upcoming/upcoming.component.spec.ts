@@ -47,7 +47,7 @@ describe('Breadcrumb integration inside the UpcomingComponent', () => {
     const breadcrumbDE = fixture.debugElement.query(By.directive(BreadcrumbComponent));
     const breadcrumb = breadcrumbDE.componentInstance as BreadcrumbComponent;
 
-    breadcrumb.onIconClick.emit(true); // simulate child event
+    breadcrumb.iconClick.emit(true); // simulate child event
     expect(parentEmit).toHaveBeenCalledWith(true);
   });
 });

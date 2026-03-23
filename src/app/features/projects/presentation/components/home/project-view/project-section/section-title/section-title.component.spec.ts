@@ -17,6 +17,7 @@ describe('SectionTitleComponent', () => {
 
     fixture = TestBed.createComponent(SectionTitleComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('title', 'Test Title');
     fixture.detectChanges();
   });
 
