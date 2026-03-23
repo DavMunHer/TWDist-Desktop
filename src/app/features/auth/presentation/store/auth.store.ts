@@ -35,7 +35,7 @@ export class AuthStore {
     this.registrationSuccess.set(false);
 
     this.createUserUseCase.execute(credentials).pipe(
-      tap((user) => {
+      tap(() => {
         // Registration successful - user created but not authenticated
         this.state.update(s => ({
           ...s,

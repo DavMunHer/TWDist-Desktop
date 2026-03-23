@@ -56,32 +56,32 @@ describe('LoginComponent', () => {
 
   describe('Form validation', () => {
     it('is invalid when empty', () => {
-      expect((component as any).loginForm.invalid).toBe(true);
+      expect(component['loginForm'].invalid).toBe(true);
     });
 
     it('email control is invalid with a bad format', () => {
-      (component as any).loginForm.setValue({ email: 'not-an-email', password: 'password123' });
-      expect((component as any).loginForm.controls.email.invalid).toBe(true);
+      component['loginForm'].setValue({ email: 'not-an-email', password: 'password123' });
+      expect(component['loginForm'].controls.email.invalid).toBe(true);
     });
 
     it('email control is invalid when empty', () => {
-      (component as any).loginForm.setValue({ email: '', password: 'password123' });
-      expect((component as any).loginForm.controls.email.invalid).toBe(true);
+      component['loginForm'].setValue({ email: '', password: 'password123' });
+      expect(component['loginForm'].controls.email.invalid).toBe(true);
     });
 
     it('password control is invalid when shorter than 8 characters', () => {
-      (component as any).loginForm.setValue({ email: 'test@test.com', password: 'short' });
-      expect((component as any).loginForm.controls.password.invalid).toBe(true);
+      component['loginForm'].setValue({ email: 'test@test.com', password: 'short' });
+      expect(component['loginForm'].controls.password.invalid).toBe(true);
     });
 
     it('password control is invalid when empty', () => {
-      (component as any).loginForm.setValue({ email: 'test@test.com', password: '' });
-      expect((component as any).loginForm.controls.password.invalid).toBe(true);
+      component['loginForm'].setValue({ email: 'test@test.com', password: '' });
+      expect(component['loginForm'].controls.password.invalid).toBe(true);
     });
 
     it('is valid with a correct email and a password of at least 8 characters', () => {
-      (component as any).loginForm.setValue({ email: 'test@test.com', password: 'password123' });
-      expect((component as any).loginForm.valid).toBe(true);
+      component['loginForm'].setValue({ email: 'test@test.com', password: 'password123' });
+      expect(component['loginForm'].valid).toBe(true);
     });
   });
 
@@ -89,13 +89,13 @@ describe('LoginComponent', () => {
 
   describe('login() method', () => {
     it('does NOT call authStore.login() when the form is invalid', () => {
-      (component as any).login();
+      component.login();
       expect(mockAuthStore.login).not.toHaveBeenCalled();
     });
 
     it('calls authStore.login() with the correct LoginCredentialsDto when valid', () => {
-      (component as any).loginForm.setValue({ email: 'test@test.com', password: 'password123' });
-      (component as any).login();
+      component['loginForm'].setValue({ email: 'test@test.com', password: 'password123' });
+      component.login();
 
       expect(mockAuthStore.login).toHaveBeenCalledOnce();
       expect(mockAuthStore.login).toHaveBeenCalledWith({
@@ -105,7 +105,7 @@ describe('LoginComponent', () => {
     });
 
     it('can also be triggered by submitting the form element', () => {
-      (component as any).loginForm.setValue({ email: 'test@test.com', password: 'password123' });
+      component['loginForm'].setValue({ email: 'test@test.com', password: 'password123' });
 
       const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
       form.dispatchEvent(new Event('submit'));
