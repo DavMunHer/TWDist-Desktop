@@ -6,9 +6,10 @@ import { of } from 'rxjs';
 import { LoadAllProjectsUseCase } from './load-all-projects.use-case';
 import { ProjectRepository, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
 import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
 const summaries: ProjectSummary[] = [
-  { project: new Project('1', 'A', false, []), pendingCount: 2 },
+  { project: new Project('1', ProjectName.create('AA'), false, []), pendingCount: 2 },
 ];
 
 describe('LoadAllProjectsUseCase', () => {
@@ -30,7 +31,14 @@ describe('LoadAllProjectsUseCase', () => {
   });
 
   it('delegates to projectRepository.getAll', () => {
-    useCase.execute().subscribe((r) => expect(r).toEqual(summaries));
+    const expected = [
+      {
+        project: { id: '1', name: 'AA', favorite: false, sectionIds: [] },
+        pendingCount: 2,
+      },
+    ];
+
+    useCase.execute().subscribe((r) => expect(r).toEqual(expected));
     expect(repo.getAll).toHaveBeenCalled();
   });
 });

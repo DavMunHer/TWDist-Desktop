@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ProjectRepository, ProjectAggregate, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
-import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 import { ProjectMapper } from '@features/projects/infrastructure/mappers/project.mapper';
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
@@ -19,8 +18,8 @@ export class HttpProjectRepository extends ProjectRepository {
 
   private baseUrl = '/projects';
 
-  create(project: ProjectDto): Observable<Project> {
-    return this.http.post<ProjectResponeDto>(`${this.baseUrl}/create`, project, requiresAuthContext())
+  create(project: Project): Observable<Project> {
+    return this.http.post<ProjectResponeDto>(`${this.baseUrl}/create`, ProjectMapper.toDto(project), requiresAuthContext())
       .pipe(map(responseDto => ProjectMapper.toDomain(responseDto)));
   }
 
@@ -37,7 +36,7 @@ export class HttpProjectRepository extends ProjectRepository {
   }
 
   update(project: Project): Observable<Project> {
-    return this.http.put<ProjectResponeDto>(`${this.baseUrl}/${project.id}/update`, project, requiresAuthContext())
+    return this.http.put<ProjectResponeDto>(`${this.baseUrl}/${project.id}/update`, ProjectMapper.toDto(project), requiresAuthContext())
       .pipe(map(responseDto => ProjectMapper.toDomain(responseDto)));
   }
 

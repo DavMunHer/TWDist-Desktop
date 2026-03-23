@@ -15,6 +15,7 @@ import { ProjectSummaryStore } from './project-summary.store';
 import { ProjectEventsService } from '@features/projects/infrastructure/services/project-events.service';
 import { UserEventsService } from '@features/projects/infrastructure/services/user-events.service';
 import { Project } from '@features/projects/domain/entities/project.entity';
+import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
 describe('ProjectStore', () => {
   let store: ProjectStore;
@@ -31,7 +32,7 @@ describe('ProjectStore', () => {
     loadAllExecute.mockReturnValue(of([]));
     loadProjectExecute.mockReturnValue(
       of({
-        project: new Project('p1', 'First', false, []),
+        project: { id: 'p1', name: 'First', favorite: false, sectionIds: [] },
         sections: [],
         tasks: [],
       }),
@@ -88,7 +89,7 @@ describe('ProjectStore', () => {
 
   it('toggleProjectFavorite optimistically flips favorite and calls use case', () => {
     loadAllExecute.mockReturnValue(
-      of([{ project: new Project('p1', 'First', false, []), pendingCount: 0 }]),
+      of([{ project: { id: 'p1', name: 'First', favorite: false, sectionIds: [] }, pendingCount: 0 }]),
     );
     store.loadAllProjects();
     loadProjectExecute.mockClear();
