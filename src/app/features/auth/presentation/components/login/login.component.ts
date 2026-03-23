@@ -5,7 +5,7 @@ import { AuthStore } from '@features/auth/presentation/store/auth.store';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'login',
+  selector: 'app-login',
   imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
