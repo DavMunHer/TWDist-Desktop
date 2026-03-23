@@ -1,41 +1,57 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { CreateProjectComponent } from '@features/projects/presentation/components/create-project/create-project.component';
-import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
-import { vi } from 'vitest';
-
-
 
 describe('CreateProjectComponent', () => {
   let component: CreateProjectComponent;
   let fixture: ComponentFixture<CreateProjectComponent>;
 
   const projectStoreMock = {
-    projects: signal([]),
-    selectedProjectId: signal<string | null>(null),
-    loadAllProjects: vi.fn(),
-    loadProject: vi.fn(),
-    toggleProjectFavorite: vi.fn(),
-    deleteProject: vi.fn(),
-    disconnectFromEvents: vi.fn(),
+    createProject: vi.fn(),
   };
 
   beforeEach(async () => {
+    vi.clearAllMocks();
+
     await TestBed.configureTestingModule({
       imports: [CreateProjectComponent],
       providers: [
         provideZonelessChangeDetection(),
-        { provide: ProjectStore, useValue: projectStoreMock }
-      ]
-    })
-    .compileComponents();
+        { provide: ProjectStore, useValue: projectStoreMock },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CreateProjectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('creates the component', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('create() calls projectStore.createProject and emits closeModal', () => {
+    const closeSpy = vi.spyOn(component.closeModal, 'emit');
+    (component as any).createProjetForm.patchValue({
+      projectName: 'longenough',
+      favorite: true,
+    });
+
+    component.create();
+
+    expect(projectStoreMock.createProject).toHaveBeenCalledWith({
+      name: 'longenough',
+      favorite: true,
+    });
+    expect(closeSpy).toHaveBeenCalled();
+  });
+
+  it('cancel() emits closeModal', () => {
+    const closeSpy = vi.spyOn(component.closeModal, 'emit');
+    component.cancel();
+    expect(closeSpy).toHaveBeenCalled();
   });
 });

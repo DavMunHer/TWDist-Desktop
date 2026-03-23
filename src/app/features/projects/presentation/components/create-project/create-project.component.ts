@@ -12,7 +12,7 @@ export class CreateProjectComponent {
   protected createProjetForm = new FormGroup({
     projectName: new FormControl<string>('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8)],
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
     }),
     favorite: new FormControl<boolean>(false, { nonNullable: true }),
   });

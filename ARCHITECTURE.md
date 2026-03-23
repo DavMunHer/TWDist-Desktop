@@ -181,7 +181,7 @@ export class ProjectViewComponent implements OnInit {
 
 ```typescript
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { LoadProjectUseCase } from '../../application/use-cases/load-project.use-case';
+import { LoadProjectUseCase } from '../../application/use-cases/load-project/load-project.use-case';
 import { Project } from '../../domain/entities/project.entity';
 import { Section } from '../../domain/entities/section.entity';
 import { Task } from '../../domain/entities/task.entity';

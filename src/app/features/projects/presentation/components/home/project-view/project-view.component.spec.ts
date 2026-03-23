@@ -29,7 +29,7 @@ describe('ProjectViewComponent', () => {
         { provide: ProjectStore, useValue: projectStoreMock }
       ]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectViewComponent);
     component = fixture.componentInstance;
@@ -39,5 +39,5 @@ describe('ProjectViewComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
+  })
 });
