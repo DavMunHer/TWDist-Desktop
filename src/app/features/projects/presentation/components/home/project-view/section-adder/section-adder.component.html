@@ -10,7 +10,7 @@
             </div>
         </form>
     } @else {
-    <div class="add-section-button-container" (click)="openSectionForm()">
+    <div tabindex="0" class="add-section-button-container" (click)="openSectionForm()" (keydown.enter)="openSectionForm()">
         <div class="icon-container">
             <svg class="icon add-section-icon" viewBox="0 0 29 29" fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg">

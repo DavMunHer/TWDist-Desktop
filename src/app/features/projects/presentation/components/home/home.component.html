@@ -18,7 +18,7 @@
       } @else if (rightPanelView() === 'upcoming') {
       <app-upcoming [showIcon]="visibleSidebar()" (showIconChange)="toggleSidebar($event)"></app-upcoming>
       } @else {
-      <project-view [showIcon]="visibleSidebar()" (showIconChange)="toggleSidebar($event)"></project-view>
+      <app-project-view [showIcon]="visibleSidebar()" (showIconChange)="toggleSidebar($event)"></app-project-view>
       }
     </section>
   </div>

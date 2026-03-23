@@ -72,15 +72,15 @@ describe('HomeComponent breadcrumb integration', () => {
   });
 
   it('propagates breadcrumb click up to Home and opens sidebar', () => {
-    (component as any).visibleSidebar.set(false);
+    component['visibleSidebar'].set(false);
     fixture.detectChanges();
 
     const breadcrumbDE = fixture.debugElement.query(By.directive(BreadcrumbComponent));
     const breadcrumb = breadcrumbDE.componentInstance as BreadcrumbComponent;
 
-    breadcrumb.onIconClick.emit(true);
+    breadcrumb.iconClick.emit(true);
     fixture.detectChanges();
 
-    expect((component as any).visibleSidebar()).toBe(true);
+    expect(component['visibleSidebar']()).toBe(true);
   });
 });

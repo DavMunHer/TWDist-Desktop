@@ -2,7 +2,7 @@ import { NgClass } from '@angular/common';
 import { Component, input } from '@angular/core';
 
 @Component({
-  selector: 'section-title',
+  selector: 'app-section-title',
   imports: [NgClass],
   templateUrl: './section-title.component.html',
   styleUrl: './section-title.component.css'
