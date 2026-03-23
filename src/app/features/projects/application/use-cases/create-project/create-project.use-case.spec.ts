@@ -5,11 +5,10 @@ import { of } from 'rxjs';
 
 import { CreateProjectUseCase } from './create-project.use-case';
 import { ProjectRepository } from '@features/projects/domain/repositories/project.repository';
-import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
-const dto: ProjectDto = { name: 'NN', favorite: true };
+const input = { name: 'NN', favorite: true };
 const created = new Project('new-id', ProjectName.create('NN'), true, []);
 
 describe('CreateProjectUseCase', () => {
@@ -31,7 +30,9 @@ describe('CreateProjectUseCase', () => {
   });
 
   it('validates name, builds Project and delegates to projectRepository.create', () => {
-    useCase.execute(dto).subscribe((p) => expect(p).toEqual(created));
+    const expectedOutput = { id: 'new-id', name: 'NN', favorite: true };
+
+    useCase.execute(input).subscribe((out) => expect(out).toEqual(expectedOutput));
     expect(repo.create).toHaveBeenCalled();
     const arg = (repo.create as ReturnType<typeof vi.fn>).mock.calls[0][0] as Project;
     expect(arg).toBeInstanceOf(Project);

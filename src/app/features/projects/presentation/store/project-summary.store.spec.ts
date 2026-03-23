@@ -35,7 +35,7 @@ describe('ProjectSummaryStore', () => {
 
   it('mergePendingCounts and pendingCountFor returns cached value', () => {
     store.mergePendingCounts({ p1: 42 });
-    expect(store.pendingCountFor('p1', [])).toBe(42);
+    expect(store.pendingCountFor('p1')).toBe(42);
   });
 
   it('removePendingCount drops cached entry', () => {
@@ -53,6 +53,6 @@ describe('ProjectSummaryStore', () => {
       t1: new Task('t1', 's1', 'Open', false, start, undefined, undefined, undefined, undefined, undefined, []),
       t2: new Task('t2', 's1', 'Done', true, start, undefined, undefined, undefined, undefined, undefined, []),
     });
-    expect(store.pendingCountFor('p1', ['s1'])).toBe(1);
+    expect(store.pendingCountFor('p1')).toBe(1);
   });
 });

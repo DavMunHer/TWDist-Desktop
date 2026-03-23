@@ -2,11 +2,11 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LoadProjectUseCase } from '@features/projects/application/use-cases/load-project/load-project.use-case';
 import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects/load-all-projects.use-case';
-import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project/create-project.use-case';
+import { CreateProjectInput, CreateProjectUseCase } from '@features/projects/application/use-cases/create-project/create-project.use-case';
 import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite/toggle-favorite.use-case';
 import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project/delete-project.use-case';
 import { initialProjectState, ProjectState } from '@features/projects/presentation/models/project-state';
-import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
+import { ProjectOutput } from '@features/projects/application/dtos/project-output';
 import {
   ProjectViewModel,
   SectionViewModel,
@@ -15,8 +15,6 @@ import {
 import { SectionStore } from '@features/projects/presentation/store/section.store';
 import { TaskStore } from '@features/projects/presentation/store/task.store';
 import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
-import { Project } from '@features/projects/domain/entities/project.entity';
-import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 import { ProjectEventsService } from '@features/projects/infrastructure/services/project-events.service';
 import { UserEventsService } from '@features/projects/infrastructure/services/user-events.service';
 import { ProjectEvent, DeletePayload } from '@features/projects/infrastructure/dto/sse/project-event';
@@ -96,7 +94,7 @@ export class ProjectStore {
     if (!project) return null;
 
     const sections = this.sectionStore.sections();
-    const tasks    = this.taskStore.tasks();
+    const tasks = this.taskStore.tasks();
 
     /** Recursively build TaskViewModel tree from a flat tasks dict */
     const buildTaskTree = (taskIds: readonly string[]): TaskViewModel[] =>
@@ -111,10 +109,9 @@ export class ProjectStore {
           subtasks: buildTaskTree(task.subtaskIds),
         }));
 
-    const sectionViewModels: SectionViewModel[] = project.sectionIds
-      .map(sId => sections[sId])
-      .filter(Boolean)
-      .map(section => ({
+    const sectionViewModels: SectionViewModel[] = Object.values(sections)
+      .filter((section) => section.projectId === project.id)
+      .map((section) => ({
         id: section.id,
         name: section.name,
         tasks: buildTaskTree(section.taskIds),
@@ -122,7 +119,7 @@ export class ProjectStore {
 
     return {
       id: project.id,
-      name: project.name.value,
+      name: project.name,
       sections: sectionViewModels,
     };
   });
@@ -143,7 +140,7 @@ export class ProjectStore {
   }
 
   /** Insert or replace a project in the dictionary. */
-  private upsertProject(id: string, project: Project): void {
+  private upsertProject(id: string, project: ProjectOutput): void {
     this.state.update(s => ({
       ...s,
       projects: { ...s.projects, [id]: project },
@@ -172,20 +169,20 @@ export class ProjectStore {
    * server responds the temporary entry is swapped for the real one;
    * on failure the optimistic entry is rolled back.
    */
-  createProject(projectDto: ProjectDto): void {
+  createProject(input: CreateProjectInput): void {
     const tempId = `temp-${Date.now()}`;
-    const optimisticProject = Project.create(
-      ProjectName.create(projectDto.name),
-      projectDto.favorite,
-      tempId,
-    );
+    const optimisticProject: ProjectOutput = {
+      id: tempId,
+      name: input.name,
+      favorite: input.favorite,
+    };
 
     // Show the project in the UI right away
     this.upsertProject(tempId, optimisticProject);
     this.projectSummaryStore.mergePendingCounts({ [tempId]: 0 });
 
     // Fire the backend request in parallel
-    this.createProjectUseCase.execute(projectDto).subscribe({
+    this.createProjectUseCase.execute(input).subscribe({
       next: (project) => {
         // Replace the temp project with the real one from the backend
         this.removeProject(tempId);
@@ -242,22 +239,11 @@ export class ProjectStore {
 
     this.loadAllProjectsUseCase.execute().subscribe({
       next: (summaries) => {
-        const currentProjects = this.state().projects;
-        const projectsDict: Record<string, Project> = {};
+        const projectsDict: Record<string, ProjectOutput> = {};
         const pendingCounts: Record<string, number> = {};
 
         for (const { project, pendingCount } of summaries) {
-          const existingProject = currentProjects[project.id];
-          const sectionIds = existingProject?.sectionIds.length
-            ? existingProject.sectionIds
-            : project.sectionIds;
-
-          projectsDict[project.id] = new Project(
-            project.id,
-            project.name,
-            project.favorite,
-            sectionIds,
-          );
+          projectsDict[project.id] = project;
           pendingCounts[project.id] = pendingCount;
         }
 
@@ -293,13 +279,14 @@ export class ProjectStore {
     const project = this.state().projects[projectId];
     if (!project) return;
 
-    const toggled = project.toggleFavorite();
+    const toggledFavorite = !project.favorite;
+    const toggled: ProjectOutput = { ...project, favorite: toggledFavorite };
 
     // Update the UI immediately
     this.upsertProject(projectId, toggled);
 
     // Then call the backend
-    this.toggleFavoriteUseCase.execute(projectId, toggled.favorite).subscribe({
+    this.toggleFavoriteUseCase.execute(projectId, toggledFavorite).subscribe({
       error: (error) => {
         // Revert to the original project on failure
         this.upsertProject(projectId, project);
@@ -357,15 +344,8 @@ export class ProjectStore {
       return;
     }
 
-    this.sectionStore.createSection(projectId, sectionName, (section) => {
-      const project = this.state().projects[projectId];
-      if (!project) return;
-      // The same section can arrive both through this callback (HTTP response)
-      // and via the SSE `section_created` event. Guarding here keeps
-      // `project.sectionIds` unique even if both paths fire for the same ID.
-      if (project.sectionIds.includes(section.id)) return;
-      this.upsertProject(projectId, project.addSection(section.id));
-    });
+    // ProjectStore no longer maintains `sectionIds`; the UI derives sections from SectionStore.
+    this.sectionStore.createSection(projectId, sectionName);
   }
 
   // ===================================================================
@@ -447,7 +427,11 @@ export class ProjectStore {
         const dto = event.data as ProjectSummaryDto;
         const projectId = String(dto.id);
         if (!this.state().projects[projectId]) {
-          const project = new Project(projectId, ProjectName.create(dto.name), dto.favorite, []);
+          const project: ProjectOutput = {
+            id: projectId,
+            name: dto.name,
+            favorite: dto.favorite,
+          };
           this.upsertProject(projectId, project);
           this.projectSummaryStore.mergePendingCounts({ [projectId]: dto.pendingCount });
         }
@@ -459,8 +443,11 @@ export class ProjectStore {
         const projectId = String(dto.id);
         const existing = this.state().projects[projectId];
         if (existing) {
-          const updated = new Project(projectId, ProjectName.create(dto.name), dto.favorite, existing.sectionIds);
-          this.upsertProject(projectId, updated);
+          this.upsertProject(projectId, {
+            ...existing,
+            name: dto.name,
+            favorite: dto.favorite,
+          });
           this.projectSummaryStore.mergePendingCounts({ [projectId]: dto.pendingCount });
         }
         break;
@@ -490,10 +477,6 @@ export class ProjectStore {
         const dto = event.data as SectionDto;
         const section = SectionMapper.toDomain(dto, projectId);
         this.sectionStore.mergeSections([section]);
-        const project = this.state().projects[projectId];
-        if (project && !project.sectionIds.includes(section.id)) {
-          this.upsertProject(projectId, project.addSection(section.id));
-        }
         break;
       }
 
@@ -507,10 +490,6 @@ export class ProjectStore {
       case 'section_deleted': {
         const { id } = event.data as DeletePayload;
         const sectionId = String(id);
-        const project = this.state().projects[projectId];
-        if (project) {
-          this.upsertProject(projectId, project.removeSection(sectionId));
-        }
         this.sectionStore.removeSection(sectionId);
         break;
       }

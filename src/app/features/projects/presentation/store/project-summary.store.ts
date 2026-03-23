@@ -41,7 +41,6 @@ export class ProjectSummaryStore {
    */
   pendingCountFor(
     projectId: string,
-    sectionIds: readonly string[],
   ): number {
     const cached = this.state().pendingCounts[projectId];
     if (cached !== undefined) return cached;
@@ -50,10 +49,8 @@ export class ProjectSummaryStore {
     const tasks = this.taskStore.tasks();
 
     let count = 0;
-    for (const sectionId of sectionIds) {
-      const section = sections[sectionId];
-      if (!section) continue;
-
+    for (const section of Object.values(sections)) {
+      if (section.projectId !== projectId) continue;
       for (const taskId of section.taskIds) {
         const task = tasks[taskId];
         if (task && !task.completed) count++;

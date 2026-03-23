@@ -29,9 +29,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   protected projects = computed(() =>
     this.projectStore.projects().map((p) => ({
       id: p.id,
-      name: p.name.value,
+      name: p.name,
       favorite: p.favorite,
-      pendingTasks: this.summaryStore.pendingCountFor(p.id, p.sectionIds),
+      pendingTasks: this.summaryStore.pendingCountFor(p.id),
     })),
   );
 
