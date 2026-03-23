@@ -23,8 +23,8 @@ jobs:
         env:
             ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
-      #- name: Lint check
-      #  run: bunx ng lint
+      - name: Lint check
+        run: bunx ng lint
 
       - name: Verify Compilation
         run: bunx ng build --configuration=production --progress=false
