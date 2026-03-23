@@ -2,7 +2,7 @@ import { NgClass } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
 @Component({
-  selector: 'breadcrumb',
+  selector: 'app-breadcrumb',
   imports: [NgClass],
   templateUrl: './breadcrumb.component.html',
   styleUrl: './breadcrumb.component.css',
