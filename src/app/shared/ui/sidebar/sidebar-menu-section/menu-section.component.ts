@@ -1,7 +1,5 @@
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, input, output, signal, inject } from '@angular/core';
-import { ModalService } from '@shared/ui/modal/modal.service';
-import { TWDModalType } from '@shared/ui/modal/modals-type';
+import { Component, input, output, signal } from '@angular/core';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 
 @Component({
@@ -11,14 +9,13 @@ import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-m
   styleUrl: './menu-section.component.css',
 })
 export class MenuSectionComponent {
-  private readonly modalService = inject(ModalService);
-
   public menuSectionInfo = input.required<TWDSidebarMenu>();
   public showPlusIcon = input<boolean>(false);
 
   public menuItemClick = output<TWDSidebarMenuItem>();
   public favoriteClick = output<string>();
   public deleteClick = output<string>();
+  public plusIconClick = output<void>();
 
   protected openMenuProjectId = signal<string | null>(null);
 
@@ -44,8 +41,8 @@ export class MenuSectionComponent {
     return this.projectIconColors[index];
   }
 
-  openModal(type: TWDModalType, title: string) {
-    this.modalService.open(type, { title });
+  onPlusIconClick(): void {
+    this.plusIconClick.emit();
   }
 
   onMenuItemClick(item: TWDSidebarMenuItem): void {

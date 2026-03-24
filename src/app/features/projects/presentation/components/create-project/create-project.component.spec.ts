@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CreateProjectComponent } from '@features/projects/presentation/components/create-project/create-project.component';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
+import { ModalRef } from '@shared/ui/modal/modal-ref';
 
 describe('CreateProjectComponent', () => {
   let component: CreateProjectComponent;
@@ -11,6 +12,10 @@ describe('CreateProjectComponent', () => {
 
   const projectStoreMock = {
     createProject: vi.fn(),
+  };
+
+  const modalRefMock = {
+    close: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -21,6 +26,7 @@ describe('CreateProjectComponent', () => {
       providers: [
         provideZonelessChangeDetection(),
         { provide: ProjectStore, useValue: projectStoreMock },
+        { provide: ModalRef, useValue: modalRefMock },
       ],
     }).compileComponents();
 
@@ -33,8 +39,7 @@ describe('CreateProjectComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('create() calls projectStore.createProject and emits closeModal', () => {
-    const closeSpy = vi.spyOn(component.closeModal, 'emit');
+  it('create() calls projectStore.createProject and closes the modal', () => {
     component['createProjetForm'].patchValue({
       projectName: 'longenough',
       favorite: true,
@@ -46,12 +51,11 @@ describe('CreateProjectComponent', () => {
       name: 'longenough',
       favorite: true,
     });
-    expect(closeSpy).toHaveBeenCalled();
+    expect(modalRefMock.close).toHaveBeenCalled();
   });
 
-  it('cancel() emits closeModal', () => {
-    const closeSpy = vi.spyOn(component.closeModal, 'emit');
+  it('cancel() closes the modal', () => {
     component.cancel();
-    expect(closeSpy).toHaveBeenCalled();
+    expect(modalRefMock.close).toHaveBeenCalled();
   });
 });

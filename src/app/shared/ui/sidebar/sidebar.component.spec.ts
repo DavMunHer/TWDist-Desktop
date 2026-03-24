@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ModalService } from '@shared/ui/modal/modal.service';
+import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
 import { TWDSidebarMenu } from '@shared/ui/sidebar/sidebar-menu';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -81,7 +82,15 @@ describe('SidebarComponent', () => {
 
     profileOptionDE.triggerEventHandler('click');
 
-    expect(openSpy).toHaveBeenCalledWith('profile', { title: 'Profile' });
+    expect(openSpy).toHaveBeenCalledWith(ProfileComponent, { title: 'Profile' });
+  });
+
+  it('emits createProjectClick when plus icon in projects section is clicked', () => {
+    const emitSpy = vi.spyOn(component.createProjectClick, 'emit');
+
+    component.onCreateProjectClick();
+
+    expect(emitSpy).toHaveBeenCalledTimes(1);
   });
 
   it('renders favorite section only when it has items', () => {

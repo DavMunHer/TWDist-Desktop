@@ -1,20 +1,26 @@
-import { Injectable, signal } from '@angular/core';
-import { TWDModalType } from '@shared/ui/modal/modals-type';
+import { Injectable, signal, Type } from '@angular/core';
+
+export interface ModalConfig {
+  title: string;
+  data?: Record<string, unknown>;
+}
+
+export interface ActiveModal {
+  component: Type<unknown>;
+  config: ModalConfig;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ModalService {
-  modalType = signal<TWDModalType | null>(null);
-  modalData = signal<unknown>(null);
+  readonly activeModal = signal<ActiveModal | null>(null);
 
-  open(type: TWDModalType, data?: unknown) {
-    this.modalType.set(type);
-    this.modalData.set(data ?? null);
+  open<C>(component: Type<C>, config: ModalConfig): void {
+    this.activeModal.set({ component, config });
   }
 
-  close() {
-    this.modalType.set(null);
-    this.modalData.set(null);
+  close(): void {
+    this.activeModal.set(null);
   }
 }
