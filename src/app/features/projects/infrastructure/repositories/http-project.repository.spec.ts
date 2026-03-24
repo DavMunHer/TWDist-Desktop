@@ -10,9 +10,6 @@ import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/respons
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
-/**
- * Vitest/esbuild: constructor DI metadata may be missing — construct repository with HttpClient from TestBed.
- */
 describe('HttpProjectRepository', () => {
   let repository: HttpProjectRepository;
   let httpMock: HttpTestingController;
