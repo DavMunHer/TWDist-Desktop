@@ -133,6 +133,7 @@ export class TaskStore {
   /** Remove a task entirely from the store */
   removeTask(taskId: string): void {
     this.state.update(s => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [taskId]: _, ...rest } = s.tasks;
       return { ...s, tasks: rest };
     });

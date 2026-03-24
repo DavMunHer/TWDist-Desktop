@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ProjectRepository, ProjectAggregate } from '@features/projects/domain/repositories/project.repository';
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
@@ -15,7 +15,7 @@ export interface LoadProjectOutput {
 
 @Injectable()
 export class LoadProjectUseCase {
-  constructor(private projectRepository: ProjectRepository) {}
+  private projectRepository = inject(ProjectRepository);
 
   execute(projectId: string): Observable<LoadProjectOutput> {
     return this.projectRepository.findById(projectId).pipe(

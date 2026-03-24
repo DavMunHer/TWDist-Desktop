@@ -19,14 +19,14 @@ describe('CreateProjectUseCase', () => {
     repo = {
       create: vi.fn().mockReturnValue(of(created)),
     };
-    useCase = new CreateProjectUseCase(repo as ProjectRepository);
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: CreateProjectUseCase, useValue: useCase },
+        CreateProjectUseCase,
         { provide: ProjectRepository, useValue: repo },
       ],
     });
+    useCase = TestBed.inject(CreateProjectUseCase);
   });
 
   it('validates name, builds Project and delegates to projectRepository.create', () => {

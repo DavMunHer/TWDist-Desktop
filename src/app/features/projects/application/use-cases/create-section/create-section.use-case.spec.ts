@@ -19,18 +19,15 @@ describe('CreateSectionUseCase', () => {
       create: vi.fn().mockReturnValue(of(created)),
     };
     projectRepo = {};
-    useCase = new CreateSectionUseCase(
-      sectionRepo as SectionRepository,
-      projectRepo as ProjectRepository,
-    );
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: CreateSectionUseCase, useValue: useCase },
+        CreateSectionUseCase,
         { provide: SectionRepository, useValue: sectionRepo },
         { provide: ProjectRepository, useValue: projectRepo },
       ],
     });
+    useCase = TestBed.inject(CreateSectionUseCase);
   });
 
   it('builds Section via Section.create and calls sectionRepository.create', () => {

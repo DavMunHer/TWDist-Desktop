@@ -1,6 +1,6 @@
 export interface IElectronAPI {
   sendMessage: (msg: string) => void;
-  onResponse: (callback: (response: any) => void) => void;
+  onResponse: (callback: (response: unknown) => void) => void;
 }
 
 declare global {

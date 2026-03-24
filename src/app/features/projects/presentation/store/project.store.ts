@@ -152,6 +152,7 @@ export class ProjectStore {
   /** Remove a project from the dictionary by id. */
   private removeProject(id: string): void {
     this.state.update(s => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [id]: _, ...rest } = s.projects;
       return { ...s, projects: rest };
     });
@@ -542,7 +543,7 @@ export class ProjectStore {
 
       case 'task_created': {
         const dto = event.data as TaskDto;
-        const sectionId = String((event.data as any).sectionId ?? dto.id);
+        const sectionId = String((event.data as Record<string, unknown>)['sectionId'] ?? dto.id);
         const taskId = String(dto.id);
         const tasks = TaskMapper.flattenToDomain(dto, sectionId);
         this.taskStore.mergeTasks(tasks);
@@ -555,7 +556,7 @@ export class ProjectStore {
 
       case 'task_updated': {
         const dto = event.data as TaskDto;
-        const sectionId = String((event.data as any).sectionId);
+        const sectionId = String((event.data as Record<string, unknown>)['sectionId']);
         const tasks = TaskMapper.flattenToDomain(dto, sectionId);
         this.taskStore.mergeTasks(tasks);
         break;

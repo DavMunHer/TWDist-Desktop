@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { HttpClient, provideHttpClient } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
 
@@ -14,12 +14,6 @@ import { LoginCredentialsDto } from '@features/auth/infrastructure/dto/request/l
 const CREDENTIALS: LoginCredentialsDto = { email: 'test@test.com', password: 'password123' };
 const USER_DTO: UserResponseDto = { id: 1, email: 'test@test.com', username: 'testuser' };
 
-/**
- * NOTE: vitest uses esbuild which does NOT emit TypeScript decorator metadata.
- * HttpAuthRepository uses constructor injection, so we cannot rely on the DI factory.
- * Fix: after TestBed is set up, instantiate HttpAuthRepository manually by pulling
- * HttpClient and SessionHintService from the injector.
- */
 describe('HttpAuthRepository', () => {
   let repository: HttpAuthRepository;
   let httpMock: HttpTestingController;
@@ -31,16 +25,13 @@ describe('HttpAuthRepository', () => {
         provideZonelessChangeDetection(),
         provideHttpClient(),
         provideHttpClientTesting(),
-        // SessionHintService is providedIn: 'root' – available automatically
+        HttpAuthRepository,
       ],
     });
 
     httpMock = TestBed.inject(HttpTestingController);
     sessionHintService = TestBed.inject(SessionHintService);
-
-    // Manually construct the repository: bypasses the broken DI factory
-    const http = TestBed.inject(HttpClient);
-    repository = new HttpAuthRepository(http, sessionHintService);
+    repository = TestBed.inject(HttpAuthRepository);
 
     localStorage.clear();
   });
@@ -120,7 +111,7 @@ describe('HttpAuthRepository', () => {
     it('does NOT call markAuthenticated() when login fails', () => {
       const markSpy = vi.spyOn(sessionHintService, 'markAuthenticated');
 
-      repository.login(CREDENTIALS).subscribe({ error: () => {} });
+      repository.login(CREDENTIALS).subscribe({ error: () => undefined });
       httpMock
         .expectOne('/auth/login')
         .flush({}, { status: 401, statusText: 'Unauthorized' });

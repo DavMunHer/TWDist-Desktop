@@ -23,16 +23,14 @@ describe('LoginUseCase', () => {
       register: vi.fn(),
     };
 
-    // Instantiate directly to bypass the DI factory (esbuild lacks emitDecoratorMetadata)
-    useCase = new LoginUseCase(mockAuthRepository as AuthRepository);
-
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: LoginUseCase, useValue: useCase },
+        LoginUseCase,
         { provide: AuthRepository, useValue: mockAuthRepository },
       ],
     });
+    useCase = TestBed.inject(LoginUseCase);
   });
 
   it('creates the use case', () => {

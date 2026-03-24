@@ -39,7 +39,7 @@ describe('ModalComponent', () => {
     fixture.detectChanges();
 
     const title = fixture.nativeElement.querySelector('.modal-title') as HTMLElement | null;
-    const configurationContent = fixture.nativeElement.querySelector('configuration-modal');
+    const configurationContent = fixture.nativeElement.querySelector('app-configuration-modal');
 
     expect(title?.textContent).toContain('Configuration');
     expect(configurationContent).toBeTruthy();

@@ -5,7 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
 @Component({
-  selector: 'section-adder',
+  selector: 'app-section-adder',
   imports: [AutoFocusDirective, ReactiveFormsModule],
   templateUrl: './section-adder.component.html',
   styleUrl: './section-adder.component.css',

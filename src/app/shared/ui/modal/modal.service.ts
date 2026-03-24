@@ -6,9 +6,9 @@ import { TWDModalType } from '@shared/ui/modal/modals-type';
 })
 export class ModalService {
   modalType = signal<TWDModalType | null>(null);
-  modalData = signal<any>(null);
+  modalData = signal<unknown>(null);
 
-  open(type: TWDModalType, data?: any) {
+  open(type: TWDModalType, data?: unknown) {
     this.modalType.set(type);
     this.modalData.set(data ?? null);
   }

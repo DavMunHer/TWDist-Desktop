@@ -17,14 +17,14 @@ describe('CreateTaskUseCase', () => {
     repo = {
       create: vi.fn().mockReturnValue(of(created)),
     };
-    useCase = new CreateTaskUseCase(repo as TaskRepository);
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: CreateTaskUseCase, useValue: useCase },
+        CreateTaskUseCase,
         { provide: TaskRepository, useValue: repo },
       ],
     });
+    useCase = TestBed.inject(CreateTaskUseCase);
   });
 
   it('delegates Task.create output to taskRepository.create', () => {

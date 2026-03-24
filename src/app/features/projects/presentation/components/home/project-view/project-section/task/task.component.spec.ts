@@ -38,8 +38,8 @@ describe('TaskComponent', () => {
     expect(nameEl?.textContent?.trim()).toBe('Write tests');
   });
 
-  it('emits onTaskCompleted when completion control is activated', () => {
-    const emitSpy = vi.spyOn(component.onTaskCompleted, 'emit');
+  it('emits taskCompleted when completion control is activated', () => {
+    const emitSpy = vi.spyOn(component.taskCompleted, 'emit');
     const label: HTMLElement = fixture.nativeElement.querySelector('.completed-button-label');
     label?.click();
     // Clicking the <label> runs its (click) handler and, in jsdom, can also activate the nested

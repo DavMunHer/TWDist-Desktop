@@ -6,7 +6,7 @@ import { SectionViewModel, TaskViewModel } from '@features/projects/presentation
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
 @Component({
-  selector: 'project-view',
+  selector: 'app-project-view',
   imports: [ProjectSectionComponent, SectionAdderComponent, BreadcrumbComponent],
   templateUrl: './project-view.component.html',
   styleUrl: './project-view.component.css',

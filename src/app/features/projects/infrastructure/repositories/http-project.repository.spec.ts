@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, provideHttpClient } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { afterEach, beforeEach, describe, it, expect } from 'vitest';
 import { provideZonelessChangeDetection } from '@angular/core';
@@ -10,19 +10,16 @@ import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/respons
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
-/**
- * Vitest/esbuild: constructor DI metadata may be missing — construct repository with HttpClient from TestBed.
- */
 describe('HttpProjectRepository', () => {
   let repository: HttpProjectRepository;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideZonelessChangeDetection(), provideHttpClient(), provideHttpClientTesting(), HttpProjectRepository],
     });
     httpMock = TestBed.inject(HttpTestingController);
-    repository = new HttpProjectRepository(TestBed.inject(HttpClient));
+    repository = TestBed.inject(HttpProjectRepository);
   });
 
   afterEach(() => {

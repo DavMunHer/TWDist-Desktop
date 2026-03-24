@@ -3,7 +3,7 @@
     <div class="top-section">
       <div class="sidebar-profile ">
         <div class="profile-dropdown sidebar-hover" [ngClass]="{'open' : toggleDropdownVal()}"
-          (click)="toggleDropdown()">
+          tabindex="0" (keydown.enter)="toggleDropdown()" (click)="toggleDropdown()">
           <img class="profile-avatar" src="\Default_pfp.png" alt="Profile Picture">
           <span class="profile-name">Oscar</span>
           <svg id="arrow-down" width="20px" height="20px" viewBox="0 0 24 24" fill="none"
@@ -17,7 +17,7 @@
             </g>
           </svg>
           <div class="dropdown-content">
-            <div (click)="openModal('profile', 'Profile')">
+            <div tabindex="0" (keydown.enter)="openModal('profile', 'Profile')" (click)="openModal('profile', 'Profile')">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                 stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="8" r="3.5" />
@@ -27,7 +27,7 @@
               <a>Profile</a>
             </div>
             <hr>
-            <div (click)="openModal('configuration', 'Configuration')">
+            <div tabindex="0" (keydown.enter)="openModal('configuration', 'Configuration')" (click)="openModal('configuration', 'Configuration')">
               <svg width="24px" height="24px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
                 stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -66,7 +66,7 @@
             </g>
           </svg>
         </div>
-        <div class="icon-nt icon-view sidebar-hover" (click)="toggleSidebar()">
+        <div class="icon-nt icon-view sidebar-hover" tabindex="0" (keydown.enter)="toggleSidebar()" (click)="toggleSidebar()">
           <svg width="20px" height="20px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none"
             stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="1" width="14" height="14" rx="2" ry="2" />
@@ -77,13 +77,13 @@
     </div>
 
     <div class="sidebar-menu">
-      <sidebar-menu-section
+      <app-sidebar-menu-section
         [menuSectionInfo]="navMenuSectionInfo()"
         (menuItemClick)="menuItemClick.emit($event)"
       />
 
       @if (favoriteSectionHasItems()) {
-      <sidebar-menu-section
+      <app-sidebar-menu-section
         [menuSectionInfo]="favoriteMenuSectionInfo()"
         (menuItemClick)="menuItemClick.emit($event)"
         (favoriteClick)="favoriteClick.emit($event)"
@@ -91,7 +91,7 @@
       />
       }
 
-      <sidebar-menu-section
+      <app-sidebar-menu-section
         [showPlusIcon]="true"
         [menuSectionInfo]="projectsMenuSectionInfo()"
         (menuItemClick)="menuItemClick.emit($event)"

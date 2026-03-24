@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -10,9 +10,8 @@ import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
 @Injectable()
 export class HttpTaskRepository extends TaskRepository {
-  constructor(private http: HttpClient) {
-    super();
-  }
+  private http = inject(HttpClient);
+
 
   create(projectId: string, task: Task): Observable<Task> {
     const dto = TaskMapper.toCreateDto(task);

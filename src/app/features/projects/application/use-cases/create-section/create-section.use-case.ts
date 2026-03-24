@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Section } from '@features/projects/domain/entities/section.entity';
@@ -7,10 +7,9 @@ import { ProjectRepository } from '@features/projects/domain/repositories/projec
 
 @Injectable()
 export class CreateSectionUseCase {
-  constructor(
-    private sectionRepository: SectionRepository,
-    private projectRepository: ProjectRepository
-  ) {}
+  private sectionRepository = inject(SectionRepository);
+  private projectRepository = inject(ProjectRepository);
+
 
   execute(projectId: string, sectionName: string): Observable<Section> {
     const section = Section.create(sectionName, projectId);

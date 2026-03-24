@@ -22,14 +22,14 @@ describe('LoadProjectUseCase', () => {
     repo = {
       findById: vi.fn().mockReturnValue(of(aggregate)),
     };
-    useCase = new LoadProjectUseCase(repo as ProjectRepository);
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: LoadProjectUseCase, useValue: useCase },
+        LoadProjectUseCase,
         { provide: ProjectRepository, useValue: repo },
       ],
     });
+    useCase = TestBed.inject(LoadProjectUseCase);
   });
 
   it('delegates to projectRepository.findById', () => {

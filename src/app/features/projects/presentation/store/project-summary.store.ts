@@ -74,6 +74,7 @@ export class ProjectSummaryStore {
   /** Remove the pending count entry for a given project (e.g. temp ID cleanup) */
   removePendingCount(projectId: string): void {
     this.state.update(s => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [projectId]: _, ...rest } = s.pendingCounts;
       return { ...s, pendingCounts: rest };
     });

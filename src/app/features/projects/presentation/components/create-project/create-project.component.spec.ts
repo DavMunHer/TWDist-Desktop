@@ -35,7 +35,7 @@ describe('CreateProjectComponent', () => {
 
   it('create() calls projectStore.createProject and emits closeModal', () => {
     const closeSpy = vi.spyOn(component.closeModal, 'emit');
-    (component as any).createProjetForm.patchValue({
+    component['createProjetForm'].patchValue({
       projectName: 'longenough',
       favorite: true,
     });

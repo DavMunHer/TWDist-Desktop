@@ -54,9 +54,9 @@ describe('ProjectSectionComponent', () => {
   });
 
   it('emits onTaskUpdate when a task reports completion', () => {
-    const emitSpy = vi.spyOn(component.onTaskUpdate, 'emit');
+    const emitSpy = vi.spyOn(component.taskUpdate, 'emit');
     const taskDE = fixture.debugElement.query(By.directive(TaskComponent));
-    taskDE.triggerEventHandler('onTaskCompleted', undefined);
+    taskDE.triggerEventHandler('taskCompleted', undefined);
     expect(emitSpy).toHaveBeenCalledWith(task);
   });
 });

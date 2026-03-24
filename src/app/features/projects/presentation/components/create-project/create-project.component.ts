@@ -1,9 +1,9 @@
 import { Component, inject, output } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
 @Component({
-  selector: 'create-project-modal',
+  selector: 'app-create-project-modal',
   imports: [ReactiveFormsModule],
   templateUrl: './create-project.component.html',
   styleUrl: './create-project.component.css'
