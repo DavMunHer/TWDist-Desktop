@@ -14,6 +14,7 @@ export class MenuSectionComponent {
 
   public menuItemClick = output<TWDSidebarMenuItem>();
   public favoriteClick = output<string>();
+  public editClick = output<string>();
   public deleteClick = output<string>();
   public plusIconClick = output<void>();
 
@@ -58,6 +59,13 @@ export class MenuSectionComponent {
 
   closeMenu(event: Event): void {
     event.stopPropagation();
+    this.openMenuProjectId.set(null);
+  }
+
+  onEditClick(projectId: string | undefined, event: Event): void {
+    event.stopPropagation();
+    if (!projectId) return;
+    this.editClick.emit(projectId);
     this.openMenuProjectId.set(null);
   }
 

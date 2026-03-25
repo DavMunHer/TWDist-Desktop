@@ -87,6 +87,7 @@
         [menuSectionInfo]="favoriteMenuSectionInfo()"
         (menuItemClick)="menuItemClick.emit($event)"
         (favoriteClick)="favoriteClick.emit($event)"
+        (editClick)="editClick.emit($event)"
         (deleteClick)="deleteClick.emit($event)"
       />
       }
@@ -96,6 +97,7 @@
         [menuSectionInfo]="projectsMenuSectionInfo()"
         (menuItemClick)="menuItemClick.emit($event)"
         (favoriteClick)="favoriteClick.emit($event)"
+        (editClick)="editClick.emit($event)"
         (deleteClick)="deleteClick.emit($event)"
         (plusIconClick)="onCreateProjectClick()"
       />

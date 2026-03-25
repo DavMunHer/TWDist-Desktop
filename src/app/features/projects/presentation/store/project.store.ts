@@ -5,6 +5,7 @@ import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases
 import { CreateProjectInput, CreateProjectUseCase } from '@features/projects/application/use-cases/create-project/create-project.use-case';
 import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite/toggle-favorite.use-case';
 import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project/delete-project.use-case';
+import { UpdateProjectInput, UpdateProjectUseCase } from '@features/projects/application/use-cases/update-project/update-project.use-case';
 import { initialProjectState, ProjectState } from '@features/projects/presentation/models/project-state';
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
 import {
@@ -44,6 +45,7 @@ export class ProjectStore {
   private readonly createProjectUseCase = inject(CreateProjectUseCase);
   private readonly toggleFavoriteUseCase = inject(ToggleFavoriteUseCase);
   private readonly deleteProjectUseCase = inject(DeleteProjectUseCase);
+  private readonly updateProjectUseCase = inject(UpdateProjectUseCase);
 
   // --------------- Peer stores ---------------
   private readonly sectionStore         = inject(SectionStore);
@@ -199,6 +201,35 @@ export class ProjectStore {
         this.removeProject(tempId);
         this.projectSummaryStore.removePendingCount(tempId);
         this.setError(error.message, 'create project', error);
+      },
+    });
+  }
+
+  /**
+   * Update an existing project's name and/or favorite status with **optimistic UI**.
+   *
+   * The store is updated immediately so the user sees the change without delay.
+   * If the backend call fails the original state is restored.
+   */
+  updateProject(input: UpdateProjectInput): void {
+    const existing = this.state().projects[input.id];
+    if (!existing) return;
+
+    const optimistic: ProjectOutput = {
+      ...existing,
+      name: input.name,
+      favorite: input.favorite,
+    };
+
+    this.upsertProject(input.id, optimistic);
+
+    this.updateProjectUseCase.execute(input).subscribe({
+      next: (updated) => {
+        this.upsertProject(updated.id, { ...existing, name: updated.name, favorite: input.favorite });
+      },
+      error: (error) => {
+        this.upsertProject(input.id, existing);
+        this.setError(error.message, 'update project', error);
       },
     });
   }
