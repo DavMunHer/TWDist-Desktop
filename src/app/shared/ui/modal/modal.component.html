@@ -1,22 +1,13 @@
-@if (modalType()) {
+@if (activeModal()) {
 <div class="modal-backdrop" tabindex="0" (keydown.enter)="close()" (click)="close()">
   <div class="modal-container" tabindex="0" (keydown.enter)="$event.stopPropagation()" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <span class="modal-title">{{ modalTitle() }}</span>
-      <button class="modal-close" (click)="close()">✕</button>
+      <span class="modal-title">{{ title() }}</span>
+      <button class="modal-close" (click)="close()">&#10005;</button>
     </div>
-    <hr>
-    @switch (modalType()) {
-    @case ('configuration') {
-    <app-configuration-modal />
-    }
-    @case ('profile') {
-    <app-profile-modal />
-    }
-    @case ('create-project') {
-    <app-create-project-modal (closeModal)="close()" />
-    }
-    }
+    <div class="modal-body">
+      <ng-container #outlet />
+    </div>
   </div>
 </div>
 }

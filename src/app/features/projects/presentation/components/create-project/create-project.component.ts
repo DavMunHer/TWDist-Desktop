@@ -1,6 +1,7 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
+import { ModalRef } from '@shared/ui/modal/modal-ref';
 
 @Component({
   selector: 'app-create-project-modal',
@@ -17,19 +18,18 @@ export class CreateProjectComponent {
     favorite: new FormControl<boolean>(false, { nonNullable: true }),
   });
 
-  public closeModal = output<void>();
-
-  private projectStore = inject(ProjectStore);
+  private readonly modalRef = inject(ModalRef);
+  private readonly projectStore = inject(ProjectStore);
 
   create() {
     this.projectStore.createProject({
       name: this.createProjetForm.controls.projectName.value,
       favorite: this.createProjetForm.controls.favorite.value,
     });
-    this.closeModal.emit();
+    this.modalRef.close();
   }
 
   cancel() {
-    this.closeModal.emit();
+    this.modalRef.close();
   }
 }

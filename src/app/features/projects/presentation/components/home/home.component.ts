@@ -9,6 +9,8 @@ import { TodayComponent } from '@features/today/presentation/components/today/to
 import { UpcomingComponent } from '@features/upcoming/presentation/components/upcoming/upcoming.component';
 import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { CreateProjectComponent } from '@features/projects/presentation/components/create-project/create-project.component';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +21,7 @@ import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-m
 export class HomeComponent implements OnInit, OnDestroy {
   private readonly projectStore = inject(ProjectStore);
   private readonly summaryStore = inject(ProjectSummaryStore);
+  private readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -131,6 +134,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   protected onSidebarDeleteClick(projectId: string): void {
     this.projectStore.deleteProject(projectId);
+  }
+
+  protected openCreateProjectModal(): void {
+    this.modalService.open(CreateProjectComponent, { title: 'Create Project' });
   }
 
   ngOnDestroy(): void {

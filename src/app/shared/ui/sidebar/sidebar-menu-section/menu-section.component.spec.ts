@@ -5,13 +5,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/menu-section.component';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TWDSidebarMenu } from '@shared/ui/sidebar/sidebar-menu';
-import { ModalService } from '@shared/ui/modal/modal.service';
 
 
 describe('MenuSectionComponent', () => {
   let component: MenuSectionComponent;
   let fixture: ComponentFixture<MenuSectionComponent>;
-  let modalService: ModalService;
 
   const menuWithProject: TWDSidebarMenu = {
     title: 'Projects',
@@ -29,7 +27,6 @@ describe('MenuSectionComponent', () => {
 
     fixture = TestBed.createComponent(MenuSectionComponent);
     component = fixture.componentInstance;
-    modalService = TestBed.inject(ModalService);
     fixture.componentRef.setInput('menuSectionInfo', menuWithProject);
     fixture.componentRef.setInput('showPlusIcon', false);
     fixture.detectChanges();
@@ -57,15 +54,16 @@ describe('MenuSectionComponent', () => {
     expect(emitSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('opens create-project modal when plus icon is visible and clicked', () => {
+  it('emits plusIconClick when plus icon is visible and clicked', () => {
     fixture.componentRef.setInput('showPlusIcon', true);
     fixture.detectChanges();
-    const openSpy = vi.spyOn(modalService, 'open');
+
+    const emitSpy = vi.spyOn(component.plusIconClick, 'emit');
     const icons = fixture.nativeElement.querySelectorAll('.title-section .ico');
     const plusIconEl = icons[0] as Element | undefined;
     plusIconEl?.dispatchEvent(new Event('click'));
 
-    expect(openSpy).toHaveBeenCalledWith('create-project', { title: 'Create project' });
+    expect(emitSpy).toHaveBeenCalledTimes(1);
   });
 
   it('emits favoriteClick with project id from menu action', () => {
@@ -94,4 +92,3 @@ describe('MenuSectionComponent', () => {
     expect(emitSpy).toHaveBeenCalledTimes(1);
   });
 });
-

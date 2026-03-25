@@ -1,7 +1,8 @@
 import { NgClass } from '@angular/common';
 import { Component, computed, input, output, signal, inject } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
-import { TWDModalType } from '@shared/ui/modal/modals-type';
+import { ConfigurationComponent } from '@shared/ui/modal/configuration/configuration.component';
+import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/menu-section.component';
 
@@ -26,9 +27,18 @@ export class SidebarComponent {
   public menuItemClick = output<TWDSidebarMenuItem>();
   public favoriteClick = output<string>();
   public deleteClick = output<string>();
+  public createProjectClick = output<void>();
 
-  openModal(type: TWDModalType, title: string) {
-    this.modalService.open(type, { title });
+  openProfileModal(): void {
+    this.modalService.open(ProfileComponent, { title: 'Profile' });
+  }
+
+  openConfigurationModal(): void {
+    this.modalService.open(ConfigurationComponent, { title: 'Configuration' });
+  }
+
+  onCreateProjectClick(): void {
+    this.createProjectClick.emit();
   }
 
   toggleSidebar() {

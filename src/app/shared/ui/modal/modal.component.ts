@@ -1,27 +1,58 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  Injector,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
+import { ModalRef, MODAL_DATA } from '@shared/ui/modal/modal-ref';
 import { ModalService } from '@shared/ui/modal/modal.service';
-import { ConfigurationComponent } from "@shared/ui/modal/configuration/configuration.component";
-import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
-import { CreateProjectComponent } from "@features/projects/presentation/components/create-project/create-project.component";
 
 @Component({
   selector: 'app-modal',
-  imports: [ConfigurationComponent, ProfileComponent, CreateProjectComponent],
   standalone: true,
+  imports: [],
   templateUrl: './modal.component.html',
-  styleUrl: './modal.component.css'
+  styleUrl: './modal.component.css',
 })
 export class ModalComponent {
-  private modalService = inject(ModalService);
+  private readonly modalService = inject(ModalService);
+  private readonly injector = inject(Injector);
 
+  @ViewChild('outlet', { read: ViewContainerRef })
+  set outlet(vcr: ViewContainerRef | undefined) {
+    if (!vcr) return;
+    this.renderContent(vcr);
+  }
 
-  modalType = computed(() => this.modalService.modalType())
-  modalTitle = computed(() => {
-    const data = this.modalService.modalData() as { title?: string } | null;
-    return data?.title ?? '';
-  });
+  readonly activeModal = computed(() => this.modalService.activeModal());
+  readonly title = computed(() => this.modalService.activeModal()?.config.title ?? '');
 
-  close() {
+  close(): void {
     this.modalService.close();
+  }
+
+  private renderContent(vcr: ViewContainerRef): void {
+    const modal = this.activeModal();
+    if (!modal) return;
+
+    vcr.clear();
+
+    const childInjector = Injector.create({
+      parent: this.injector,
+      providers: [
+        {
+          provide: ModalRef,
+          useValue: new ModalRef(() => this.close()),
+        },
+        {
+          provide: MODAL_DATA,
+          useValue: modal.config.data ?? {},
+        },
+      ],
+    });
+
+    vcr.createComponent(modal.component, { injector: childInjector });
   }
 }

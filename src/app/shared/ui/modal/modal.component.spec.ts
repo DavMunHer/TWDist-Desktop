@@ -1,11 +1,17 @@
+import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { By } from '@angular/platform-browser';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModalComponent } from '@shared/ui/modal/modal.component';
 import { ModalService } from '@shared/ui/modal/modal.service';
-import { By } from '@angular/platform-browser';
-import { vi } from 'vitest';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { ModalRef } from '@shared/ui/modal/modal-ref';
 
+@Component({
+  selector: 'app-stub-modal-content',
+  template: '<p class="stub-content">Stub Content</p>',
+  standalone: true,
+})
+class StubModalContentComponent {}
 
 describe('ModalComponent', () => {
   let component: ModalComponent;
@@ -15,9 +21,8 @@ describe('ModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ModalComponent],
-      providers: [provideZonelessChangeDetection()]
-    })
-    .compileComponents();
+      providers: [provideZonelessChangeDetection()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ModalComponent);
     component = fixture.componentInstance;
@@ -34,19 +39,19 @@ describe('ModalComponent', () => {
     expect(backdrop).toBeNull();
   });
 
-  it('renders title and configuration content when opened', () => {
-    modalService.open('configuration', { title: 'Configuration' });
+  it('renders title and dynamic content when opened', () => {
+    modalService.open(StubModalContentComponent, { title: 'Test Title' });
     fixture.detectChanges();
 
     const title = fixture.nativeElement.querySelector('.modal-title') as HTMLElement | null;
-    const configurationContent = fixture.nativeElement.querySelector('app-configuration-modal');
+    const content = fixture.nativeElement.querySelector('.stub-content');
 
-    expect(title?.textContent).toContain('Configuration');
-    expect(configurationContent).toBeTruthy();
+    expect(title?.textContent?.trim()).toBe('Test Title');
+    expect(content).toBeTruthy();
   });
 
   it('closes when backdrop is clicked', () => {
-    modalService.open('configuration', { title: 'Configuration' });
+    modalService.open(StubModalContentComponent, { title: 'Test' });
     fixture.detectChanges();
 
     const closeSpy = vi.spyOn(modalService, 'close');
@@ -57,7 +62,7 @@ describe('ModalComponent', () => {
   });
 
   it('closes when header close button is clicked', () => {
-    modalService.open('profile', { title: 'Profile' });
+    modalService.open(StubModalContentComponent, { title: 'Test' });
     fixture.detectChanges();
 
     const closeSpy = vi.spyOn(modalService, 'close');
@@ -65,5 +70,24 @@ describe('ModalComponent', () => {
     closeButton.triggerEventHandler('click');
 
     expect(closeSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears backdrop after close', () => {
+    modalService.open(StubModalContentComponent, { title: 'Test' });
+    fixture.detectChanges();
+
+    modalService.close();
+    fixture.detectChanges();
+
+    const backdrop = fixture.nativeElement.querySelector('.modal-backdrop');
+    expect(backdrop).toBeNull();
+  });
+
+  it('provides ModalRef to the dynamic content component', () => {
+    modalService.open(StubModalContentComponent, { title: 'Test' });
+    fixture.detectChanges();
+
+    const modalRef = TestBed.inject(ModalRef, null, { optional: true });
+    expect(modalRef).toBeNull();
   });
 });
