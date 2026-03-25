@@ -23,7 +23,10 @@ export class UpdateProjectUseCase {
     const project = new Project(input.id, projectName, input.favorite, input.sectionIds);
 
     return this.projectRepository.update(project).pipe(
-      map((saved) => toProjectOutput(saved, [])),
+      map((saved) => ({
+        ...toProjectOutput(saved, []),
+        sectionIds: [...input.sectionIds],
+      })),
     );
   }
 }

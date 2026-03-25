@@ -225,7 +225,7 @@ export class ProjectStore {
 
     this.updateProjectUseCase.execute(input).subscribe({
       next: (updated) => {
-        this.upsertProject(updated.id, { ...existing, name: updated.name, favorite: updated.favorite });
+        this.upsertProject(updated.id, { ...existing, name: updated.name, favorite: input.favorite });
       },
       error: (error) => {
         this.upsertProject(input.id, existing);

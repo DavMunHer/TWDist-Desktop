@@ -33,7 +33,7 @@ describe('UpdateProjectUseCase', () => {
     (repo.update as ReturnType<typeof vi.fn>).mockReturnValue(of(saved));
 
     const input = { id: 'p1', name: 'New Name', favorite: true, sectionIds: ['s1'] };
-    const expectedOutput = { id: 'p1', name: 'New Name', favorite: true, sectionIds: [] };
+    const expectedOutput = { id: 'p1', name: 'New Name', favorite: true, sectionIds: ['s1'] };
 
     useCase.execute(input).subscribe((out) => expect(out).toEqual(expectedOutput));
 
