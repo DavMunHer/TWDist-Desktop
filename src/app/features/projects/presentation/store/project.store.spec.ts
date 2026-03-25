@@ -9,6 +9,7 @@ import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases
 import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project/create-project.use-case';
 import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite/toggle-favorite.use-case';
 import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project/delete-project.use-case';
+import { UpdateProjectUseCase } from '@features/projects/application/use-cases/update-project/update-project.use-case';
 import { SectionStore } from './section.store';
 import { TaskStore } from './task.store';
 import { ProjectSummaryStore } from './project-summary.store';
@@ -36,6 +37,7 @@ describe('ProjectStore', () => {
   const removeTaskFromSection = vi.fn();
   const removeTask = vi.fn();
   const toggleFavoriteExecute = vi.fn();
+  const updateProjectExecute = vi.fn();
   const connectProjectEvents = vi.fn();
   const connectUserEvents = vi.fn();
 
@@ -64,6 +66,7 @@ describe('ProjectStore', () => {
         { provide: CreateProjectUseCase, useValue: { execute: createProjectExecute } },
         { provide: ToggleFavoriteUseCase, useValue: { execute: toggleFavoriteExecute } },
         { provide: DeleteProjectUseCase, useValue: { execute: deleteProjectExecute } },
+        { provide: UpdateProjectUseCase, useValue: { execute: updateProjectExecute } },
         {
           provide: SectionStore,
           useValue: {

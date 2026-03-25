@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CreateProjectComponent } from '@features/projects/presentation/components/create-project/create-project.component';
@@ -39,13 +40,13 @@ describe('CreateProjectComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('create() calls projectStore.createProject and closes the modal', () => {
-    component['createProjetForm'].patchValue({
+  it('submit() calls projectStore.createProject and closes the modal', () => {
+    (component as unknown as { projectForm: FormGroup }).projectForm.patchValue({
       projectName: 'longenough',
       favorite: true,
     });
 
-    component.create();
+    component.submit();
 
     expect(projectStoreMock.createProject).toHaveBeenCalledWith({
       name: 'longenough',
