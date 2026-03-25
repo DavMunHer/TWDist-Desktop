@@ -132,6 +132,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.projectStore.toggleProjectFavorite(projectId);
   }
 
+  protected onSidebarEditClick(projectId: string): void {
+    const project = this.projectStore.projects().find((p) => p.id === projectId);
+    if (!project) return;
+    this.modalService.open(CreateProjectComponent, {
+      title: 'Edit Project',
+      data: {
+        id: project.id,
+        name: project.name,
+        favorite: project.favorite,
+        sectionIds: project.sectionIds,
+      },
+    });
+  }
+
   protected onSidebarDeleteClick(projectId: string): void {
     this.projectStore.deleteProject(projectId);
   }

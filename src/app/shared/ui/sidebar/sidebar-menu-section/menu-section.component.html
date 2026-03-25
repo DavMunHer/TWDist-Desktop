@@ -90,6 +90,22 @@
                             </span>
                             <span>{{ item.favorite ? 'Quitar de Favoritos' : 'Añadir a Favoritos' }}</span>
                         </button>
+                        <button type="button" class="project-menu-item"
+                            (click)="onEditClick(item.id, $event)">
+                            <span class="project-menu-icon">
+                                <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                    <g id="SVGRepo_iconCarrier">
+                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </g>
+                                </svg>
+                            </span>
+                            <span>Editar proyecto</span>
+                        </button>
                         <button type="button" class="project-menu-item project-menu-item--danger"
                             (click)="onDeleteClick(item.id, $event)">
                             <span class="project-menu-icon">

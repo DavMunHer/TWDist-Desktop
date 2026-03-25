@@ -26,6 +26,7 @@ export class SidebarComponent {
 
   public menuItemClick = output<TWDSidebarMenuItem>();
   public favoriteClick = output<string>();
+  public editClick = output<string>();
   public deleteClick = output<string>();
   public createProjectClick = output<void>();
 

@@ -1,5 +1,5 @@
 <div class="profile-modal">
-  <form class="create-project-form" [formGroup]="createProjetForm" (submit)="create()">
+  <form class="create-project-form" [formGroup]="projectForm" (submit)="submit()">
     <div class="form-group">
       <label for="projectName">Project Name</label>
       <input type="text" id="projectName" name="projectName" formControlName="projectName"
@@ -18,8 +18,7 @@
     <hr>
     <div class="create-project-buttons-section">
       <button class="cancel" type="button" (click)="cancel()">Cancel</button>
-      <button class="create" type="submit">Create Project</button>
+      <button class="create" type="submit">{{ isEditMode ? 'Update Project' : 'Create Project' }}</button>
     </div>
-
   </form>
 </div>
