@@ -39,7 +39,7 @@
                                         <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                     </svg>
                                 </span>
-                                <span>Editar</span>
+                                <span>Edit</span>
                             </button>
                             <button type="button" class="section-menu-item section-menu-item--danger" (click)="onDelete($event)">
                                 <span class="section-menu-icon">
@@ -50,7 +50,7 @@
                                         <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                     </svg>
                                 </span>
-                                <span>Eliminar</span>
+                                <span>Delete</span>
                             </button>
                         </div>
                     }
@@ -58,8 +58,8 @@
             </div>
             @if (editing()) {
                 <div class="section-edit-actions">
-                    <button type="button" class="section-save-btn" (click)="onSave()">Guardar</button>
-                    <button type="button" class="section-cancel-btn" (click)="onCancel()">Cancelar</button>
+                    <button type="button" class="section-save-btn" (click)="onSave()">Save</button>
+                    <button type="button" class="section-cancel-btn" (click)="onCancel()">Cancel</button>
                 </div>
             }
         </header>
