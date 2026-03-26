@@ -4,6 +4,8 @@ import { beforeEach, describe, it, expect, vi } from 'vitest';
 
 import { SectionStore } from './section.store';
 import { CreateSectionUseCase } from '@features/projects/application/use-cases/sections/create-section/create-section.use-case';
+import { UpdateSectionUseCase } from '@features/projects/application/use-cases/sections/update-section/update-section.use-case';
+import { DeleteSectionUseCase } from '@features/projects/application/use-cases/sections/delete-section/delete-section.use-case';
 import { TaskStore } from './task.store';
 import { Section } from '@features/projects/domain/entities/section.entity';
 
@@ -16,6 +18,8 @@ describe('SectionStore', () => {
         provideZonelessChangeDetection(),
         SectionStore,
         { provide: CreateSectionUseCase, useValue: { execute: vi.fn() } },
+        { provide: UpdateSectionUseCase, useValue: { execute: vi.fn() } },
+        { provide: DeleteSectionUseCase, useValue: { execute: vi.fn() } },
         {
           provide: TaskStore,
           useValue: { tasks: signal<Record<string, unknown>>({}).asReadonly() },
