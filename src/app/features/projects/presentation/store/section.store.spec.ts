@@ -3,7 +3,7 @@ import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 
 import { SectionStore } from './section.store';
-import { CreateSectionUseCase } from '@features/projects/application/use-cases/create-section/create-section.use-case';
+import { CreateSectionUseCase } from '@features/projects/application/use-cases/sections/create-section/create-section.use-case';
 import { TaskStore } from './task.store';
 import { Section } from '@features/projects/domain/entities/section.entity';
 

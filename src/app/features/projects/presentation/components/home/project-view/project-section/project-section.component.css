@@ -4,10 +4,169 @@
     & .project-section {
         padding-inline: 15px;
         padding-block: 10px;
-        width: 250px;
+        width: 280px;
 
         & .section-header {
             margin-block: 10px;
+
+            & .section-header-row {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                & .section-title-area {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    min-width: 0;
+
+                    & .section-name-input {
+                        field-sizing: content;
+                        font-size: 14px;
+                        font-weight: bold;
+                        font-family: inherit;
+                        background: transparent;
+                        border: none;
+                        outline: none;
+                        padding: 2px 4px;
+                        border-radius: 4px;
+                        cursor: default;
+                        color: inherit;
+
+                        &.editing {
+                            cursor: text;
+                            background: #f5f5f5;
+                            border: 1px solid #ccc;
+                        }
+                    }
+
+                }
+
+                & .section-end-area {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    margin-left: auto;
+                    flex-shrink: 0;
+
+                    & .section-task-count {
+                        font-size: 14px;
+                        font-weight: normal;
+                        color: #999;
+                        white-space: nowrap;
+                    }
+                }
+
+                & .section-menu-wrapper {
+                    position: relative;
+                    flex-shrink: 0;
+
+                    & .section-menu-trigger {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 3px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        color: #555;
+
+                        &:hover {
+                            background-color: #e0e0e0;
+                        }
+                    }
+
+                    & .section-menu-backdrop {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100vw;
+                        height: 100vh;
+                        z-index: 99;
+                    }
+
+                    & .section-menu-dropdown {
+                        position: absolute;
+                        right: 0;
+                        top: 100%;
+                        min-width: 160px;
+                        background: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+                        padding: 4px 0;
+                        z-index: 100;
+
+                        & .section-menu-item {
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            padding: 7px 12px;
+                            border: none;
+                            background: none;
+                            font-size: 13px;
+                            color: #333;
+                            cursor: pointer;
+                            text-align: left;
+                            font-family: inherit;
+
+                            &:hover {
+                                background-color: #f3f3f3;
+                            }
+
+                            &--danger {
+                                color: #d33;
+                            }
+
+                            & .section-menu-icon {
+                                display: inline-flex;
+                                align-items: center;
+                                justify-content: center;
+                                width: 16px;
+                                height: 16px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            & .section-edit-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 6px;
+                padding-inline: 4px;
+
+                & .section-save-btn {
+                    padding: 4px 12px;
+                    border-radius: 5px;
+                    border: none;
+                    background: #222;
+                    color: #fff;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-family: inherit;
+
+                    &:hover {
+                        background: #444;
+                    }
+                }
+
+                & .section-cancel-btn {
+                    padding: 4px 12px;
+                    border-radius: 5px;
+                    border: 1px solid #ccc;
+                    background: #fff;
+                    color: #333;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-family: inherit;
+
+                    &:hover {
+                        background: #f3f3f3;
+                    }
+                }
+            }
         }
 
         & .tasks-container {

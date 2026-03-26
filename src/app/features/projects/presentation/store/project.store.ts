@@ -1,11 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { LoadProjectUseCase } from '@features/projects/application/use-cases/load-project/load-project.use-case';
-import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects/load-all-projects.use-case';
-import { CreateProjectInput, CreateProjectUseCase } from '@features/projects/application/use-cases/create-project/create-project.use-case';
-import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite/toggle-favorite.use-case';
-import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project/delete-project.use-case';
-import { UpdateProjectInput, UpdateProjectUseCase } from '@features/projects/application/use-cases/update-project/update-project.use-case';
+import { LoadProjectUseCase } from '@features/projects/application/use-cases/projects/load-project/load-project.use-case';
+import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/projects/load-all-projects/load-all-projects.use-case';
+import { CreateProjectInput, CreateProjectUseCase } from '@features/projects/application/use-cases/projects/create-project/create-project.use-case';
+import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/projects/toggle-favorite/toggle-favorite.use-case';
+import { DeleteProjectUseCase } from '@features/projects/application/use-cases/projects/delete-project/delete-project.use-case';
+import { UpdateProjectInput, UpdateProjectUseCase } from '@features/projects/application/use-cases/projects/update-project/update-project.use-case';
 import { initialProjectState, ProjectState } from '@features/projects/presentation/models/project-state';
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
 import {
@@ -118,6 +118,7 @@ export class ProjectStore {
       .map(section => ({
         id: section.id,
         name: section.name,
+        taskCount: section.taskIds.length,
         tasks: buildTaskTree(section.taskIds),
       }));
 
@@ -387,6 +388,30 @@ export class ProjectStore {
   // ===================================================================
   // ACTIONS — Section (delegated)
   // ===================================================================
+
+  /** Update a section's name (optimistic, delegates to SectionStore) */
+  updateSectionName(sectionId: string, newName: string): void {
+    this.sectionStore.updateSection(sectionId, newName);
+  }
+
+  /**
+   * Delete a section from the currently selected project (optimistic).
+   * Removes the sectionId from the project's `sectionIds` and delegates
+   * the HTTP call to SectionStore.
+   */
+  deleteSectionFromProject(sectionId: string): void {
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) return;
+
+    this.sectionStore.deleteSection(projectId, sectionId, () => {
+      const existing = this.state().projects[projectId];
+      if (!existing) return;
+      this.upsertProject(projectId, {
+        ...existing,
+        sectionIds: existing.sectionIds.filter(id => id !== sectionId),
+      });
+    });
+  }
 
   /** Create a section inside the currently selected project */
   createSection(sectionName: string): void {
