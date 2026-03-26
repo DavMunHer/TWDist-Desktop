@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { CreateSectionUseCase } from '@features/projects/application/use-cases/sections/create-section/create-section.use-case';
-import { UpdateSectionUseCase } from '@features/projects/application/use-cases/sections/update-section/update-section.use-case';
+import { UpdateSectionInput, UpdateSectionUseCase } from '@features/projects/application/use-cases/sections/update-section/update-section.use-case';
 import { DeleteSectionUseCase } from '@features/projects/application/use-cases/sections/delete-section/delete-section.use-case';
 import { initialSectionState, SectionState } from '@features/projects/presentation/models/section-state';
 import { Section } from '@features/projects/domain/entities/section.entity';
@@ -115,11 +115,20 @@ export class SectionStore {
       sections: { ...s.sections, [sectionId]: optimistic },
     }));
 
-    this.updateSectionUseCase.execute(optimistic).subscribe({
+    const input: UpdateSectionInput = {
+      id: existing.id,
+      name: newName,
+      projectId: existing.projectId,
+    };
+
+    this.updateSectionUseCase.execute(input).subscribe({
       next: (updated) => {
         this.state.update(s => ({
           ...s,
-          sections: { ...s.sections, [sectionId]: updated },
+          sections: {
+            ...s.sections,
+            [sectionId]: new Section(updated.id, updated.name, updated.projectId, existing.taskIds),
+          },
         }));
       },
       error: (error) => {
