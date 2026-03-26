@@ -88,7 +88,7 @@
                                 </svg>
                                 }
                             </span>
-                            <span>{{ item.favorite ? 'Quitar de Favoritos' : 'Añadir a Favoritos' }}</span>
+                            <span>{{ item.favorite ? 'Remove from Favorites' : 'Add to Favorites' }}</span>
                         </button>
                         <button type="button" class="project-menu-item"
                             (click)="onEditClick(item.id, $event)">
@@ -104,7 +104,7 @@
                                     </g>
                                 </svg>
                             </span>
-                            <span>Editar proyecto</span>
+                            <span>Edit project</span>
                         </button>
                         <button type="button" class="project-menu-item project-menu-item--danger"
                             (click)="onDeleteClick(item.id, $event)">
@@ -121,7 +121,7 @@
                                     </g>
                                 </svg>
                             </span>
-                            <span>Eliminar proyecto</span>
+                            <span>Delete project</span>
                         </button>
                     </div>
                     }

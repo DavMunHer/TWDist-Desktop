@@ -4,8 +4,8 @@ import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { TaskStore } from './task.store';
-import { CreateTaskUseCase } from '@features/projects/application/use-cases/create-task/create-task.use-case';
-import { ToggleTaskCompletionUseCase } from '@features/projects/application/use-cases/toggle-task-completion/toggle-task-completion.use-case';
+import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
+import { ToggleTaskCompletionUseCase } from '@features/projects/application/use-cases/tasks/toggle-task-completion/toggle-task-completion.use-case';
 import { Task } from '@features/projects/domain/entities/task.entity';
 
 describe('TaskStore', () => {

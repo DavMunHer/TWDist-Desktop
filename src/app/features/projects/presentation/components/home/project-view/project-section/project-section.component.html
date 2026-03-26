@@ -1,12 +1,70 @@
 <section class="project-section-container">
     <div class="project-section">
         <header class="section-header">
-            <app-section-title [title]="sectionInfo().name" [titleStyle]="'bold'" />
+            <div class="section-header-row">
+                <div class="section-title-area">
+                    <input
+                        class="section-name-input"
+                        [class.editing]="editing()"
+                        [formControl]="sectionNameCtrl"
+                        (keydown.enter)="onSave()"
+                        (keydown.escape)="onCancel()"
+                        [readonly]="!editing()"
+                        type="text"
+                    />
+                </div>
+                <div class="section-end-area">
+                    <span class="section-task-count">{{ sectionInfo().taskCount }}</span>
+                </div>
+                <div class="section-menu-wrapper">
+                    <div
+                        class="section-menu-trigger"
+                        tabindex="0"
+                        (click)="toggleMenu($event)"
+                        (keydown.enter)="toggleMenu($event)"
+                    >
+                        <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M21 12C21 13.1046 20.1046 14 19 14C17.8954 14 17 13.1046 17 12C17 10.8954 17.8954 10 19 10C20.1046 10 21 10.8954 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M7 12C7 13.1046 6.10457 14 5 14C3.89543 14 3 13.1046 3 12C3 10.8954 3.89543 10 5 10C6.10457 10 7 10.8954 7 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    @if (menuOpen()) {
+                        <div class="section-menu-backdrop" (click)="closeMenu($event)" (keydown.enter)="closeMenu($event)" tabindex="0"></div>
+                        <div class="section-menu-dropdown">
+                            <button type="button" class="section-menu-item" (click)="onEdit($event)">
+                                <span class="section-menu-icon">
+                                    <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </span>
+                                <span>Edit</span>
+                            </button>
+                            <button type="button" class="section-menu-item section-menu-item--danger" (click)="onDelete($event)">
+                                <span class="section-menu-icon">
+                                    <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 6H5H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M10 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </span>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (editing()) {
+                <div class="section-edit-actions">
+                    <button type="button" class="section-save-btn" (click)="onSave()">Save</button>
+                    <button type="button" class="section-cancel-btn" (click)="onCancel()">Cancel</button>
+                </div>
+            }
         </header>
         <main class="tasks-container">
-            @for (task of sectionInfo().tasks; track $index) {
-                <app-task [taskInfo]="task" (taskCompleted)="emitTaskToCompleted(task)" />
-            }
+            <!-- Tasks will be implemented here -->
         </main>
     </div>
 </section>

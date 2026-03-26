@@ -4,12 +4,12 @@ import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { Observable, of, throwError } from 'rxjs';
 
 import { ProjectStore } from './project.store';
-import { LoadProjectUseCase } from '@features/projects/application/use-cases/load-project/load-project.use-case';
-import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/load-all-projects/load-all-projects.use-case';
-import { CreateProjectUseCase } from '@features/projects/application/use-cases/create-project/create-project.use-case';
-import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/toggle-favorite/toggle-favorite.use-case';
-import { DeleteProjectUseCase } from '@features/projects/application/use-cases/delete-project/delete-project.use-case';
-import { UpdateProjectUseCase } from '@features/projects/application/use-cases/update-project/update-project.use-case';
+import { LoadProjectUseCase } from '@features/projects/application/use-cases/projects/load-project/load-project.use-case';
+import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/projects/load-all-projects/load-all-projects.use-case';
+import { CreateProjectUseCase } from '@features/projects/application/use-cases/projects/create-project/create-project.use-case';
+import { ToggleFavoriteUseCase } from '@features/projects/application/use-cases/projects/toggle-favorite/toggle-favorite.use-case';
+import { DeleteProjectUseCase } from '@features/projects/application/use-cases/projects/delete-project/delete-project.use-case';
+import { UpdateProjectUseCase } from '@features/projects/application/use-cases/projects/update-project/update-project.use-case';
 import { SectionStore } from './section.store';
 import { TaskStore } from './task.store';
 import { ProjectSummaryStore } from './project-summary.store';

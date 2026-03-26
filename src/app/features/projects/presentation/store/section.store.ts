@@ -1,5 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { CreateSectionUseCase } from '@features/projects/application/use-cases/create-section/create-section.use-case';
+import { CreateSectionUseCase } from '@features/projects/application/use-cases/sections/create-section/create-section.use-case';
+import { UpdateSectionInput, UpdateSectionUseCase } from '@features/projects/application/use-cases/sections/update-section/update-section.use-case';
+import { DeleteSectionUseCase } from '@features/projects/application/use-cases/sections/delete-section/delete-section.use-case';
 import { initialSectionState, SectionState } from '@features/projects/presentation/models/section-state';
 import { Section } from '@features/projects/domain/entities/section.entity';
 import { TaskStore } from '@features/projects/presentation/store/task.store';
@@ -13,6 +15,8 @@ import { TaskStore } from '@features/projects/presentation/store/task.store';
 @Injectable({ providedIn: 'root' })
 export class SectionStore {
   private readonly createSectionUseCase = inject(CreateSectionUseCase);
+  private readonly updateSectionUseCase = inject(UpdateSectionUseCase);
+  private readonly deleteSectionUseCase = inject(DeleteSectionUseCase);
   private readonly taskStore = inject(TaskStore);
 
   private readonly state = signal<SectionState>(initialSectionState);
@@ -94,6 +98,78 @@ export class SectionStore {
           [sectionId]: section.addTask(taskId),
         },
       };
+    });
+  }
+
+  /**
+   * Update a section's name with **optimistic UI**.
+   * The store is updated immediately; on failure the original name is restored.
+   */
+  updateSection(sectionId: string, newName: string): void {
+    const existing = this.state().sections[sectionId];
+    if (!existing) return;
+
+    const optimistic = existing.updateName(newName);
+    this.state.update(s => ({
+      ...s,
+      sections: { ...s.sections, [sectionId]: optimistic },
+    }));
+
+    const input: UpdateSectionInput = {
+      id: existing.id,
+      name: newName,
+      projectId: existing.projectId,
+    };
+
+    this.updateSectionUseCase.execute(input).subscribe({
+      next: (updated) => {
+        this.state.update(s => ({
+          ...s,
+          sections: {
+            ...s.sections,
+            [sectionId]: new Section(updated.id, updated.name, updated.projectId, existing.taskIds),
+          },
+        }));
+      },
+      error: (error) => {
+        this.state.update(s => ({
+          ...s,
+          sections: { ...s.sections, [sectionId]: existing },
+        }));
+        console.error('Failed to update section:', error);
+      },
+    });
+  }
+
+  /**
+   * Delete a section with **optimistic UI**.
+   * The section is removed immediately; on failure it is restored.
+   * The optional `onDeleted` callback is invoked before the HTTP call so
+   * `ProjectStore` can remove the sectionId from `ProjectOutput.sectionIds`.
+   */
+  deleteSection(
+    projectId: string,
+    sectionId: string,
+    onDeleted?: () => void,
+  ): void {
+    const existing = this.state().sections[sectionId];
+    if (!existing) return;
+
+    this.state.update(s => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [sectionId]: _, ...rest } = s.sections;
+      return { ...s, sections: rest };
+    });
+    onDeleted?.();
+
+    this.deleteSectionUseCase.execute(projectId, sectionId).subscribe({
+      error: (error) => {
+        this.state.update(s => ({
+          ...s,
+          sections: { ...s.sections, [sectionId]: existing },
+        }));
+        console.error('Failed to delete section:', error);
+      },
     });
   }
 

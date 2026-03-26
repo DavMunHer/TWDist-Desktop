@@ -7,7 +7,21 @@ export interface ProjectViewModel {
 export interface SectionViewModel {
   id: string;
   name: string;
+  taskCount: number;
   tasks: TaskViewModel[];
+}
+
+export interface SectionUpdateEvent {
+  id: string;
+  name: string;
+}
+
+export interface SectionDeleteEvent {
+  id: string;
+}
+
+export interface TaskUpdateEvent {
+  id: string;
 }
 
 export interface TaskViewModel {

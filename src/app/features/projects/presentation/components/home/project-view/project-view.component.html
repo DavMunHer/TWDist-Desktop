@@ -8,7 +8,12 @@
 
   <main class="project-main-container">
     @for (section of projectInfo()?.sections; track $index) {
-    <app-project-section [sectionInfo]="section" (taskUpdate)="updateTaskToCompleted(section, $event)" />
+    <app-project-section
+      [sectionInfo]="section"
+      (taskUpdate)="updateTaskToCompleted($event)"
+      (sectionUpdate)="onSectionUpdate($event)"
+      (sectionDelete)="onSectionDelete($event)"
+    />
     }
   <app-section-adder />
   </main>
