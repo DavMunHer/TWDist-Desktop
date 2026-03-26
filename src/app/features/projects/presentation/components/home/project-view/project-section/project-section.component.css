@@ -20,6 +20,12 @@
                     gap: 6px;
                     min-width: 0;
 
+                    & .section-name-wrapper {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 2px;
+                    }
+
                     & .section-name-input {
                         field-sizing: content;
                         font-size: 14px;
@@ -38,6 +44,16 @@
                             background: #f5f5f5;
                             border: 1px solid #ccc;
                         }
+
+                        &.invalid {
+                            border-color: #d33;
+                        }
+                    }
+
+                    & .field-error {
+                        font-size: 11px;
+                        color: #d33;
+                        padding-inline: 4px;
                     }
 
                 }

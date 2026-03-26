@@ -21,12 +21,20 @@
         row-gap: 5px;
 
         & .form-container {
-            
+            display: flex;
+            flex-direction: column;
+            row-gap: 3px;
+
             & .section-input {
                 width: var(--input-width);
                 border-radius: 5px;
                 border: 1px solid #4444;
                 padding: 3px 6px;
+            }
+
+            & .field-error {
+                font-size: 11px;
+                color: #d33;
             }
         }
 

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
@@ -15,34 +15,47 @@ export class SectionAdderComponent {
 
   protected showSectionForm = signal<boolean>(false);
 
-  protected newSectionNameCtrl = new FormControl('', { nonNullable: true });
+  protected newSectionNameCtrl = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
+  });
   protected newSectionSig = toSignal(this.newSectionNameCtrl.valueChanges, {
     initialValue: '',
   });
+
+  protected get sectionNameError(): string | null {
+    const errors = this.newSectionNameCtrl.errors;
+    if (!errors) return null;
+    if (errors['required']) return 'Section name is required';
+    if (errors['minlength']) return 'Must be at least 2 characters';
+    if (errors['maxlength']) return 'Must be at most 50 characters';
+    return null;
+  }
 
   protected handleClick() {
     this.showSectionForm.set(true);
   }
 
   protected openSectionForm() {
-    // This will also hid the current "Add section" button, being replaced by the section form
+    // This will also hide the current "Add section" button, being replaced by the section form
     this.showSectionForm.set(true);
   }
 
   protected closeSectionForm() {
-    // When section form is closed, the add section button appears again!
+    // When section form is closed, the add section button appears again
+    this.newSectionNameCtrl.reset();
     this.showSectionForm.set(false);
   }
 
   protected handleFormSubmission(event: Event) {
-    event.preventDefault(); // For not reloading the page when sending form
+    event.preventDefault();
 
-    const name = this.newSectionSig().trim();
-    if (!name) {
+    if (this.newSectionNameCtrl.invalid) {
+      this.newSectionNameCtrl.markAsTouched();
       return;
     }
 
-    this.projectStore.createSection(name);
+    this.projectStore.createSection(this.newSectionNameCtrl.value.trim());
     this.newSectionNameCtrl.reset();
     this.closeSectionForm();
   }
