@@ -3,6 +3,9 @@
         <form class="new-section-container" (submit)="handleFormSubmission($event)">
             <div class="form-container">
                 <input appAutoFocus [formControl]="newSectionNameCtrl" class="section-input" type="text" placeholder="New section name">
+                @if (newSectionNameCtrl.touched && sectionNameError) {
+                    <span class="field-error">{{ sectionNameError }}</span>
+                }
             </div>
             <div class="form-actions-container">
                 <button class="confirm-button" type="submit">Add section</button>
