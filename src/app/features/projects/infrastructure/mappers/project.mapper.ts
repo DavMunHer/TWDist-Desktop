@@ -4,13 +4,13 @@ import { Section } from '@features/projects/domain/entities/section.entity';
 import { Task } from '@features/projects/domain/entities/task.entity';
 import { ProjectAggregate, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
 import { ProjectDto } from '@features/projects/infrastructure/dto/project.dto';
-import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
+import { ProjectResponseDto } from '@features/projects/infrastructure/dto/response/project.dto';
 import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
 import { SectionMapper } from '@features/projects/infrastructure/mappers/section.mapper';
 import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
 
 export class ProjectMapper {
-  static toDomain(dto: ProjectResponeDto): Project {
+  static toDomain(dto: ProjectResponseDto): Project {
     const sectionIds = (dto.sections ?? []).map(s => String(s.id));
     return new Project(
       String(dto.id),
@@ -24,7 +24,7 @@ export class ProjectMapper {
    * Maps a full API response (project + nested sections + tasks) into
    * a normalized ProjectAggregate for the store.
    */
-  static toAggregate(dto: ProjectResponeDto): ProjectAggregate {
+  static toAggregate(dto: ProjectResponseDto): ProjectAggregate {
     const projectId = String(dto.id);
     const sections: Section[] = [];
     const tasks: Task[] = [];

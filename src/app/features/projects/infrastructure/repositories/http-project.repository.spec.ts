@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, it, expect } from 'vitest';
 import { provideZonelessChangeDetection } from '@angular/core';
 
 import { HttpProjectRepository } from './http-project.repository';
-import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
+import { ProjectResponseDto } from '@features/projects/infrastructure/dto/response/project.dto';
 import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
@@ -28,7 +28,7 @@ describe('HttpProjectRepository', () => {
 
   it('create posts ProjectMapper body and maps response', () => {
     const project = Project.create(ProjectName.create('NN'), false);
-    const response: ProjectResponeDto = { id: '1', name: 'NN', favorite: false, sections: [] };
+    const response: ProjectResponseDto = { id: '1', name: 'NN', favorite: false, sections: [] };
     let result: unknown;
     repository.create(project).subscribe((p) => (result = p));
     const req = httpMock.expectOne('/projects/create');
@@ -39,7 +39,7 @@ describe('HttpProjectRepository', () => {
   });
 
   it('findById GETs /projects/:id and maps aggregate', () => {
-    const response: ProjectResponeDto = {
+    const response: ProjectResponseDto = {
       id: '7',
       name: 'PP',
       favorite: true,
