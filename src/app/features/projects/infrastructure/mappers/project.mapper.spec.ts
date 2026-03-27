@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 
 import { ProjectMapper } from './project.mapper';
-import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
+import { ProjectResponseDto } from '@features/projects/infrastructure/dto/response/project.dto';
 import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
 describe('ProjectMapper', () => {
-  const fullDto: ProjectResponeDto = {
+  const fullDto: ProjectResponseDto = {
     id: '10',
     name: 'App',
     favorite: true,

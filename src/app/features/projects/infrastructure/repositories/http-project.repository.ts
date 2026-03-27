@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { ProjectRepository, ProjectAggregate, ProjectSummary } from '@features/projects/domain/repositories/project.repository';
 import { ProjectMapper } from '@features/projects/infrastructure/mappers/project.mapper';
 import { Project } from '@features/projects/domain/entities/project.entity';
-import { ProjectResponeDto } from '@features/projects/infrastructure/dto/response/project.dto';
+import { ProjectResponseDto } from '@features/projects/infrastructure/dto/response/project.dto';
 import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/response/project-summary.dto';
 import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
@@ -17,13 +17,13 @@ export class HttpProjectRepository extends ProjectRepository {
   private baseUrl = '/projects';
 
   create(project: Project): Observable<Project> {
-    return this.http.post<ProjectResponeDto>(`${this.baseUrl}/create`, ProjectMapper.toDto(project), requiresAuthContext())
+    return this.http.post<ProjectResponseDto>(`${this.baseUrl}/create`, ProjectMapper.toDto(project), requiresAuthContext())
       .pipe(map(responseDto => ProjectMapper.toDomain(responseDto)));
   }
 
   findById(projectId: string): Observable<ProjectAggregate> {
     return this.http
-      .get<ProjectResponeDto>(`${this.baseUrl}/${projectId}`, requiresAuthContext())
+      .get<ProjectResponseDto>(`${this.baseUrl}/${projectId}`, requiresAuthContext())
       .pipe(map(dto => ProjectMapper.toAggregate(dto)));
   }
 
@@ -34,7 +34,7 @@ export class HttpProjectRepository extends ProjectRepository {
   }
 
   update(project: Project): Observable<Project> {
-    return this.http.put<ProjectResponeDto>(`${this.baseUrl}/${project.id}/update`, ProjectMapper.toDto(project), requiresAuthContext())
+    return this.http.put<ProjectResponseDto>(`${this.baseUrl}/${project.id}/update`, ProjectMapper.toDto(project), requiresAuthContext())
       .pipe(map(responseDto => ProjectMapper.toDomain(responseDto)));
   }
 
