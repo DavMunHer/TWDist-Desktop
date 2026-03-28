@@ -36,7 +36,10 @@ describe('Breadcrumb integration inside the TodayComponent', () => {
   let component: TodayComponent;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [TodayComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [TodayComponent],
+      providers: [provideZonelessChangeDetection()],
+    }).compileComponents();
     fixture = TestBed.createComponent(TodayComponent);
     fixture.componentRef.setInput('showIcon', false); // required input on parent
     component = fixture.componentInstance;
