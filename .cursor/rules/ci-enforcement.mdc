@@ -1,0 +1,7 @@
+---
+description: Mandatory CI verification for all Angular changes.
+globs: "**/*"
+alwaysApply: true
+---
+
+Before reporting a task as complete, you MUST run local CI via `act -W .github/workflows/ci.yml -j build-and-test` or the individual npm commands. Fix all failures before proceeding.
