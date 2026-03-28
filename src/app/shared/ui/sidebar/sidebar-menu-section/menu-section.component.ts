@@ -1,9 +1,10 @@
 import { NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 
 @Component({
   selector: 'app-sidebar-menu-section',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet, NgClass],
   templateUrl: './menu-section.component.html',
   styleUrl: './menu-section.component.css',

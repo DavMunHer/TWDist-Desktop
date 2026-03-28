@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, input, output, signal, inject } from '@angular/core';
+import { Component, computed, input, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfigurationComponent } from '@shared/ui/modal/configuration/configuration.component';
 import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
@@ -8,6 +8,7 @@ import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/me
 
 @Component({
   selector: 'app-sidebar',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass, MenuSectionComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',

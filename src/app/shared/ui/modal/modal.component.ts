@@ -1,16 +1,10 @@
-import {
-  Component,
-  computed,
-  inject,
-  Injector,
-  ViewChild,
-  ViewContainerRef,
-} from '@angular/core';
+import { Component, computed, inject, Injector, ViewChild, ViewContainerRef, ChangeDetectionStrategy } from '@angular/core';
 import { ModalRef, MODAL_DATA } from '@shared/ui/modal/modal-ref';
 import { ModalService } from '@shared/ui/modal/modal.service';
 
 @Component({
   selector: 'app-modal',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [],
   templateUrl: './modal.component.html',

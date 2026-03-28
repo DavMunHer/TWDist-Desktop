@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 import { MODAL_DATA, ModalRef } from '@shared/ui/modal/modal-ref';
@@ -12,6 +12,7 @@ interface EditProjectData {
 
 @Component({
   selector: 'app-create-project-modal',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule],
   templateUrl: './create-project.component.html',
   styleUrl: './create-project.component.css'

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, computed } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, ActivatedRoute } from '@angular/router';
 import { filter, startWith } from 'rxjs';
@@ -14,6 +14,7 @@ import { CreateProjectComponent } from '@features/projects/presentation/componen
 
 @Component({
   selector: 'app-home',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SidebarComponent, ProjectViewComponent, TodayComponent, UpcomingComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
