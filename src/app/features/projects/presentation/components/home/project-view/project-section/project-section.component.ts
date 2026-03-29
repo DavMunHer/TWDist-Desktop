@@ -1,9 +1,10 @@
-import { Component, input, OnInit, output, signal } from '@angular/core';
+import { Component, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionDeleteEvent, SectionUpdateEvent, SectionViewModel, TaskUpdateEvent } from '@features/projects/presentation/models/project.view-model';
 
 @Component({
   selector: 'app-project-section',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule],
   templateUrl: './project-section.component.html',
   styleUrl: './project-section.component.css',

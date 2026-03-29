@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AppComponent } from '../../app/app.component';
@@ -7,6 +8,7 @@ describe('Component template (standalone)', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
   });
 

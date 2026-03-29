@@ -1,10 +1,11 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthStore } from '@features/auth/presentation/store/auth.store';
 
 @Component({
   selector: 'app-signup',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.css'

@@ -16,9 +16,6 @@
             "outputPath": "dist/twdist-desktop",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -104,7 +101,8 @@
   },
   "schematics": {
     "@schematics/angular:component": {
-      "type": "component"
+      "type": "component",
+      "changeDetection": "OnPush"
     },
     "@schematics/angular:directive": {
       "type": "directive"

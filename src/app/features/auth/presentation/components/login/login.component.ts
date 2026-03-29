@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginCredentialsDto } from '@features/auth/infrastructure/dto/request/login-credentials.dto';
 import { AuthStore } from '@features/auth/presentation/store/auth.store';
@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'

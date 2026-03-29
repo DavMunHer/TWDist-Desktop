@@ -35,7 +35,10 @@ describe('Breadcrumb integration inside the UpcomingComponent', () => {
   let component: UpcomingComponent;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [UpcomingComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [UpcomingComponent],
+      providers: [provideZonelessChangeDetection()],
+    }).compileComponents();
     fixture = TestBed.createComponent(UpcomingComponent);
     fixture.componentRef.setInput('showIcon', false); // required input on parent
     component = fixture.componentInstance;

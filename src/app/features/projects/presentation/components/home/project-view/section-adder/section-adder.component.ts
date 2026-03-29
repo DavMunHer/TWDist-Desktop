@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -6,6 +6,7 @@ import { ProjectStore } from '@features/projects/presentation/store/project.stor
 
 @Component({
   selector: 'app-section-adder',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AutoFocusDirective, ReactiveFormsModule],
   templateUrl: './section-adder.component.html',
   styleUrl: './section-adder.component.css',

@@ -1,9 +1,10 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { TaskViewModel } from '@features/projects/presentation/models/project.view-model';
 
 @Component({
   selector: 'app-task',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass],
   templateUrl: './task.component.html',
   styleUrl: './task.component.css'

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -11,7 +11,9 @@ describe('Service template (signals)', () => {
   let service: ModalService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
     service = TestBed.inject(ModalService);
   });
 

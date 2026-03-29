@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile-modal',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
