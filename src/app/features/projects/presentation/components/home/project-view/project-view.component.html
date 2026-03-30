@@ -7,7 +7,7 @@
   </header>
 
   <main class="project-main-container">
-    @for (section of projectInfo()?.sections; track $index) {
+    @for (section of projectInfo()?.sections; track section.id) {
     <app-project-section
       [sectionInfo]="section"
       (taskUpdate)="updateTaskToCompleted($event)"

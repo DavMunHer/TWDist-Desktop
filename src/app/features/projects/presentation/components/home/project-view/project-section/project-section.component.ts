@@ -1,4 +1,4 @@
-import { Component, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, effect, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionDeleteEvent, SectionUpdateEvent, SectionViewModel, TaskUpdateEvent } from '@features/projects/presentation/models/project.view-model';
 
@@ -9,7 +9,7 @@ import { SectionDeleteEvent, SectionUpdateEvent, SectionViewModel, TaskUpdateEve
   templateUrl: './project-section.component.html',
   styleUrl: './project-section.component.css',
 })
-export class ProjectSectionComponent implements OnInit {
+export class ProjectSectionComponent {
   public sectionInfo = input.required<SectionViewModel>();
   public taskUpdate = output<TaskUpdateEvent>();
   public sectionUpdate = output<SectionUpdateEvent>();
@@ -23,6 +23,15 @@ export class ProjectSectionComponent implements OnInit {
     validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
   });
 
+  constructor() {
+    effect(() => {
+      const name = this.sectionInfo().name;
+      if (!this.editing()) {
+        this.sectionNameCtrl.setValue(name, { emitEvent: false });
+      }
+    });
+  }
+
   protected get sectionNameError(): string | null {
     const errors = this.sectionNameCtrl.errors;
     if (!errors) return null;
@@ -30,10 +39,6 @@ export class ProjectSectionComponent implements OnInit {
     if (errors['minlength']) return 'Must be at least 2 characters';
     if (errors['maxlength']) return 'Must be at most 50 characters';
     return null;
-  }
-
-  ngOnInit(): void {
-    this.sectionNameCtrl.setValue(this.sectionInfo().name);
   }
 
   protected toggleMenu(event: Event): void {
