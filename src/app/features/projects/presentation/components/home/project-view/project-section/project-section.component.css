@@ -18,16 +18,21 @@
                     display: flex;
                     align-items: center;
                     gap: 6px;
+                    flex: 1;
                     min-width: 0;
 
                     & .section-name-wrapper {
                         display: flex;
                         flex-direction: column;
                         gap: 2px;
+                        min-width: 0;
+                        max-width: 100%;
                     }
 
                     & .section-name-input {
-                        field-sizing: content;
+                        width: 100%;
+                        min-width: 0;
+                        box-sizing: border-box;
                         font-size: 14px;
                         font-weight: bold;
                         font-family: inherit;
@@ -38,11 +43,16 @@
                         border-radius: 4px;
                         cursor: default;
                         color: inherit;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
 
                         &.editing {
                             cursor: text;
                             background: #f5f5f5;
                             border: 1px solid #ccc;
+                            overflow-x: auto;
+                            text-overflow: clip;
                         }
 
                         &.invalid {

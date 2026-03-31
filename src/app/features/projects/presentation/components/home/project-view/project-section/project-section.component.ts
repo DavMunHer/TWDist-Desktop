@@ -1,4 +1,4 @@
-import { Component, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, linkedSignal, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionDeleteEvent, SectionUpdateEvent, SectionViewModel, TaskUpdateEvent } from '@features/projects/presentation/models/project.view-model';
 
@@ -9,7 +9,7 @@ import { SectionDeleteEvent, SectionUpdateEvent, SectionViewModel, TaskUpdateEve
   templateUrl: './project-section.component.html',
   styleUrl: './project-section.component.css',
 })
-export class ProjectSectionComponent implements OnInit {
+export class ProjectSectionComponent {
   public sectionInfo = input.required<SectionViewModel>();
   public taskUpdate = output<TaskUpdateEvent>();
   public sectionUpdate = output<SectionUpdateEvent>();
@@ -17,6 +17,11 @@ export class ProjectSectionComponent implements OnInit {
 
   protected editing = signal(false);
   protected menuOpen = signal(false);
+
+  protected sectionName = linkedSignal({
+    source: () => this.sectionInfo().name,
+    computation: (newName: string) => newName,
+  });
 
   protected sectionNameCtrl = new FormControl('', {
     nonNullable: true,
@@ -32,10 +37,6 @@ export class ProjectSectionComponent implements OnInit {
     return null;
   }
 
-  ngOnInit(): void {
-    this.sectionNameCtrl.setValue(this.sectionInfo().name);
-  }
-
   protected toggleMenu(event: Event): void {
     event.stopPropagation();
     this.menuOpen.update(v => !v);
@@ -49,8 +50,8 @@ export class ProjectSectionComponent implements OnInit {
   protected onEdit(event: Event): void {
     event.stopPropagation();
     this.menuOpen.set(false);
+    this.sectionNameCtrl.setValue(this.sectionName());
     this.editing.set(true);
-    this.sectionNameCtrl.setValue(this.sectionInfo().name);
   }
 
   protected onSave(): void {
@@ -60,14 +61,14 @@ export class ProjectSectionComponent implements OnInit {
     }
 
     const name = this.sectionNameCtrl.value.trim();
-    if (name !== this.sectionInfo().name) {
+    if (name !== this.sectionName()) {
       this.sectionUpdate.emit({ id: this.sectionInfo().id, name });
     }
     this.editing.set(false);
   }
 
   protected onCancel(): void {
-    this.sectionNameCtrl.setValue(this.sectionInfo().name);
+    this.sectionNameCtrl.setValue(this.sectionName());
     this.sectionNameCtrl.markAsUntouched();
     this.editing.set(false);
   }
