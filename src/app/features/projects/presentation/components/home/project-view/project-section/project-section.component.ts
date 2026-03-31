@@ -1,4 +1,4 @@
-import { Component, effect, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, linkedSignal, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SectionDeleteEvent, SectionUpdateEvent, SectionViewModel, TaskUpdateEvent } from '@features/projects/presentation/models/project.view-model';
 
@@ -18,19 +18,15 @@ export class ProjectSectionComponent {
   protected editing = signal(false);
   protected menuOpen = signal(false);
 
+  protected sectionName = linkedSignal({
+    source: () => this.sectionInfo().name,
+    computation: (newName: string) => newName,
+  });
+
   protected sectionNameCtrl = new FormControl('', {
     nonNullable: true,
     validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
   });
-
-  constructor() {
-    effect(() => {
-      const name = this.sectionInfo().name;
-      if (!this.editing()) {
-        this.sectionNameCtrl.setValue(name, { emitEvent: false });
-      }
-    });
-  }
 
   protected get sectionNameError(): string | null {
     const errors = this.sectionNameCtrl.errors;
@@ -54,8 +50,8 @@ export class ProjectSectionComponent {
   protected onEdit(event: Event): void {
     event.stopPropagation();
     this.menuOpen.set(false);
+    this.sectionNameCtrl.setValue(this.sectionName());
     this.editing.set(true);
-    this.sectionNameCtrl.setValue(this.sectionInfo().name);
   }
 
   protected onSave(): void {
@@ -65,14 +61,14 @@ export class ProjectSectionComponent {
     }
 
     const name = this.sectionNameCtrl.value.trim();
-    if (name !== this.sectionInfo().name) {
+    if (name !== this.sectionName()) {
       this.sectionUpdate.emit({ id: this.sectionInfo().id, name });
     }
     this.editing.set(false);
   }
 
   protected onCancel(): void {
-    this.sectionNameCtrl.setValue(this.sectionInfo().name);
+    this.sectionNameCtrl.setValue(this.sectionName());
     this.sectionNameCtrl.markAsUntouched();
     this.editing.set(false);
   }
