@@ -84,7 +84,7 @@ describe('SectionAdderComponent', () => {
     component['newSectionNameCtrl'].setValue('Aborted');
     fixture.detectChanges();
 
-    fixture.nativeElement.querySelector('.cancel-button')?.click();
+    fixture.nativeElement.querySelector('.section-cancel-btn')?.click();
     fixture.detectChanges();
 
     expect(projectStoreMock.createSection).not.toHaveBeenCalled();

@@ -3,7 +3,9 @@
     <app-breadcrumb [showIcon]="showIcon()" (iconClick)="handleIconChange()"/>
   </nav>
   <header class="project-header">
-    {{projectInfo()?.name}}
+    @if (projectInfo()?.name; as name) {
+      <app-project-name-editor [name]="name" (nameChange)="onProjectNameChange($event)" />
+    }
   </header>
 
   <main class="project-main-container">

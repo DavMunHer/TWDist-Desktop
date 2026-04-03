@@ -1,0 +1,24 @@
+<div class="project-name-wrapper">
+  @if (editing()) {
+    <input
+      class="project-name-input editing"
+      [class.invalid]="nameCtrl.touched && nameCtrl.invalid"
+      [formControl]="nameCtrl"
+      (keydown.enter)="onSave()"
+      (keydown.escape)="onCancel()"
+      (blur)="onSave()"
+      type="text"
+      appAutoFocus
+    />
+    @if (nameCtrl.touched && nameError) {
+      <span class="field-error">{{ nameError }}</span>
+    }
+  } @else {
+    <span
+      class="project-name-display"
+      tabindex="0"
+      (click)="onDisplayClick()"
+      (keydown.enter)="onDisplayClick()"
+    >{{ name() }}</span>
+  }
+</div>
