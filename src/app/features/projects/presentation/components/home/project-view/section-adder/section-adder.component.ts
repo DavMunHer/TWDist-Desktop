@@ -15,6 +15,8 @@ export class SectionAdderComponent {
   private readonly projectStore = inject(ProjectStore);
 
   protected showSectionForm = signal<boolean>(false);
+  /** True only after an invalid submit; avoids showing errors on blur when clicking Cancel. */
+  protected showSectionNameErrors = signal(false);
 
   protected newSectionNameCtrl = new FormControl('', {
     nonNullable: true,
@@ -34,16 +36,19 @@ export class SectionAdderComponent {
   }
 
   protected handleClick() {
+    this.showSectionNameErrors.set(false);
     this.showSectionForm.set(true);
   }
 
   protected openSectionForm() {
     // This will also hide the current "Add section" button, being replaced by the section form
+    this.showSectionNameErrors.set(false);
     this.showSectionForm.set(true);
   }
 
   protected closeSectionForm() {
     // When section form is closed, the add section button appears again
+    this.showSectionNameErrors.set(false);
     this.newSectionNameCtrl.reset();
     this.showSectionForm.set(false);
   }
@@ -52,6 +57,7 @@ export class SectionAdderComponent {
     event.preventDefault();
 
     if (this.newSectionNameCtrl.invalid) {
+      this.showSectionNameErrors.set(true);
       this.newSectionNameCtrl.markAsTouched();
       return;
     }
