@@ -1,12 +1,6 @@
 :host {
     --icon-size: 22px;
     --main-color: #444;
-    
-    /* Form styles */
-    --input-x-padding: 10px;
-    /* The 2px are from the font size */
-    --input-width: calc(250px - calc(var(--input-x-padding) * 2) - 2px);
-    --action-buttons-font-size: 12px;
 }
 
 .main-container {
@@ -14,67 +8,88 @@
     padding-top: 10px;
     width: 250px;
 
-
     & .new-section-container {
         display: flex;
         flex-direction: column;
-        row-gap: 5px;
+        row-gap: 6px;
 
         & .form-container {
             display: flex;
             flex-direction: column;
             row-gap: 3px;
 
-            & .section-input {
-                width: var(--input-width);
-                border-radius: 5px;
-                border: 1px solid #4444;
-                padding: 3px 6px;
+            & .section-name-input {
+                width: 100%;
+                box-sizing: border-box;
+                font-size: 14px;
+                font-weight: bold;
+                font-family: inherit;
+                background: transparent;
+                border: none;
+                outline: none;
+                padding: 2px 4px;
+                border-radius: 4px;
+                cursor: default;
+                color: inherit;
+
+                &.editing {
+                    cursor: text;
+                    background: #f5f5f5;
+                    border: 1px solid #ccc;
+                }
+
+                &.invalid {
+                    border-color: #d33;
+                }
             }
 
             & .field-error {
                 font-size: 11px;
                 color: #d33;
+                padding-inline: 4px;
             }
         }
 
         & .form-actions-container {
             display: flex;
-            column-gap: 10px;
+            gap: 8px;
+            padding-inline: 4px;
 
-            & button {
-                font-size: var(--action-buttons-font-size);
-                padding: 5px 10px;
+            & .section-save-btn {
+                padding: 4px 12px;
                 border-radius: 5px;
-                color: var(--main-color);
-                font-weight: bold;
+                border: none;
+                background: #222;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                font-family: inherit;
+
+                &:hover {
+                    background: #444;
+                }
             }
 
-            & .confirm-button {
-                /* FIXME: Change blue by the primary color of the app (should be defined in the styles.css file)  */
-                color: #fff;
-                background-color: rgb(from #0b6efd r g b / 0.85);
-                
+            & .section-cancel-btn {
+                padding: 4px 12px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                background: #fff;
+                color: #333;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                font-family: inherit;
+
                 &:hover {
-                    background-color: #0b6efd;
-                }
-                
-            }   
-            
-            & .cancel-button {
-                background-color: #eeed;
-                
-                &:hover {
-                    color: #111;
-                    background-color: #dddd;
+                    background: #f3f3f3;
                 }
             }
         }
     }
 
-
-
-    /* Here is where the other view (Add button) starts */
+    /* Add button view */
     & .add-section-button-container {
         display: flex;
         align-items: center;
@@ -106,7 +121,5 @@
                 }
             }
         }
-
     }
-
 }
