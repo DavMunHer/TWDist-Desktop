@@ -3,7 +3,30 @@
     <app-breadcrumb [showIcon]="showIcon()" (iconClick)="handleIconChange()"/>
   </nav>
   <header class="project-header">
-    {{projectInfo()?.name}}
+    <div class="project-name-wrapper">
+      @if (editingProjectName()) {
+        <input
+          class="project-name-input editing"
+          [class.invalid]="projectNameCtrl.touched && projectNameCtrl.invalid"
+          [formControl]="projectNameCtrl"
+          (keydown.enter)="onProjectNameSave()"
+          (keydown.escape)="onProjectNameCancel()"
+          (blur)="onProjectNameSave()"
+          type="text"
+          appAutoFocus
+        />
+        @if (projectNameCtrl.touched && projectNameError) {
+          <span class="field-error">{{ projectNameError }}</span>
+        }
+      } @else {
+        <span
+          class="project-name-display"
+          tabindex="0"
+          (click)="onHeaderClick()"
+          (keydown.enter)="onHeaderClick()"
+        >{{ projectInfo()?.name }}</span>
+      }
+    </div>
   </header>
 
   <main class="project-main-container">
