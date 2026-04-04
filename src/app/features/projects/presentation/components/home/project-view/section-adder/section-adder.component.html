@@ -2,8 +2,8 @@
     @if (showSectionForm()) {
         <form class="new-section-container" (submit)="handleFormSubmission($event)">
             <div class="form-container">
-                <input appAutoFocus [formControl]="newSectionNameCtrl" class="section-name-input editing" [class.invalid]="newSectionNameCtrl.touched && newSectionNameCtrl.invalid" type="text" placeholder="New section name">
-                @if (newSectionNameCtrl.touched && sectionNameError) {
+                <input appAutoFocus [formControl]="newSectionNameCtrl" class="section-name-input editing" [class.invalid]="showSectionNameErrors() && newSectionNameCtrl.invalid" type="text" placeholder="New section name">
+                @if (showSectionNameErrors() && sectionNameError) {
                     <span class="field-error">{{ sectionNameError }}</span>
                 }
             </div>

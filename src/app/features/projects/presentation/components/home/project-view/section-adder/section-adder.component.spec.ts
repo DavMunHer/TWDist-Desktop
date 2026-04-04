@@ -62,6 +62,30 @@ describe('SectionAdderComponent', () => {
     expect(projectStoreMock.createSection).not.toHaveBeenCalled();
   });
 
+  it('shows validation message after invalid submit', () => {
+    fixture.nativeElement.querySelector('.add-section-button-container')?.click();
+    fixture.detectChanges();
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    const errorEl = fixture.nativeElement.querySelector('.field-error');
+    expect(errorEl).toBeTruthy();
+    expect(errorEl.textContent).toContain('required');
+  });
+
+  it('closes form on cancel with empty field without showing validation error', () => {
+    fixture.nativeElement.querySelector('.add-section-button-container')?.click();
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('.section-cancel-btn')?.click();
+    fixture.detectChanges();
+
+    expect(projectStoreMock.createSection).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.querySelector('form.new-section-container')).toBeFalsy();
+    expect(fixture.nativeElement.querySelector('.field-error')).toBeFalsy();
+  });
+
   it('calls createSection, resets control, and closes form on valid submit', () => {
     fixture.nativeElement.querySelector('.add-section-button-container')?.click();
     fixture.detectChanges();
