@@ -139,7 +139,7 @@
 
         & .task-menu-dropdown {
             position: absolute;
-            right: 0;
+            left: 0;
             top: 100%;
             min-width: 120px;
             background: #fff;
