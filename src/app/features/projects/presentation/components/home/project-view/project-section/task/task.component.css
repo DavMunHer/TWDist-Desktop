@@ -99,7 +99,7 @@
             font-size: 13px;
             font-family: inherit;
             border-radius: 6px;
-            border: 1px solid #ccc;
+            border: 1px solid transparent;
             padding: 4px 8px;
 
             &.invalid {
@@ -141,7 +141,7 @@
             position: absolute;
             left: 0;
             top: 100%;
-            min-width: 120px;
+            min-width: 160px;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
@@ -150,16 +150,28 @@
 
             & .task-menu-item {
                 width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 7px 12px;
                 border: none;
                 background: none;
+                font-size: 13px;
+                color: #333;
+                cursor: pointer;
                 text-align: left;
                 font-family: inherit;
-                font-size: 12px;
-                padding: 6px 10px;
-                cursor: pointer;
 
                 &:hover {
-                    background: #f3f3f3;
+                    background-color: #f3f3f3;
+                }
+
+                & .task-menu-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 16px;
+                    height: 16px;
                 }
             }
 
