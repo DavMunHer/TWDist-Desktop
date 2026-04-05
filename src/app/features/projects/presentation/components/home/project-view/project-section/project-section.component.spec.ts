@@ -74,4 +74,15 @@ describe('ProjectSectionComponent', () => {
     fixture.nativeElement.querySelector('.section-menu-item--danger').click();
     expect(emitSpy).toHaveBeenCalledWith({ id: 's1' });
   });
+
+  it('emits taskCreate when adding a valid task name', () => {
+    const emitSpy = vi.spyOn(component.taskCreate, 'emit');
+    component['openTaskForm']();
+    component['newTaskNameCtrl'].setValue('Task from section');
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('.task-save-btn').click();
+
+    expect(emitSpy).toHaveBeenCalledWith({ sectionId: 's1', name: 'Task from section' });
+  });
 });
