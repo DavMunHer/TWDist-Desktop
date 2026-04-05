@@ -20,8 +20,23 @@ export interface SectionDeleteEvent {
   id: string;
 }
 
-export interface TaskUpdateEvent {
+export interface TaskToggleEvent {
   id: string;
+}
+
+export interface TaskCreateEvent {
+  sectionId: string;
+  name: string;
+}
+
+export interface TaskRenameEvent {
+  id: string;
+  name: string;
+}
+
+export interface TaskDeleteEvent {
+  id: string;
+  sectionId: string;
 }
 
 export interface TaskViewModel {

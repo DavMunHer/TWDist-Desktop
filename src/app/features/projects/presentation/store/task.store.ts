@@ -1,6 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
 import { ToggleTaskCompletionUseCase } from '@features/projects/application/use-cases/tasks/toggle-task-completion/toggle-task-completion.use-case';
+import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
+import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { initialTaskState, TaskState } from '@features/projects/presentation/models/task-state';
 import { Task } from '@features/projects/domain/entities/task.entity';
 
@@ -15,6 +17,8 @@ import { Task } from '@features/projects/domain/entities/task.entity';
 export class TaskStore {
   private readonly createTaskUseCase = inject(CreateTaskUseCase);
   private readonly toggleTaskUseCase = inject(ToggleTaskCompletionUseCase);
+  private readonly updateTaskUseCase = inject(UpdateTaskUseCase);
+  private readonly deleteTaskUseCase = inject(DeleteTaskUseCase);
 
   private readonly state = signal<TaskState>(initialTaskState);
 
@@ -133,9 +137,64 @@ export class TaskStore {
   /** Remove a task entirely from the store */
   removeTask(taskId: string): void {
     this.state.update(s => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [taskId]: _, ...rest } = s.tasks;
-      return { ...s, tasks: rest };
+      const task = s.tasks[taskId];
+      if (!task) return s;
+
+      const idsToRemove = this.collectTaskAndDescendants(taskId, s.tasks);
+      const idsSet = new Set(idsToRemove);
+      const updatedTasks = Object.fromEntries(
+        Object.entries(s.tasks).filter(([id]) => !idsSet.has(id)),
+      ) as Record<string, Task>;
+
+      if (task.parentTaskId && updatedTasks[task.parentTaskId]) {
+        updatedTasks[task.parentTaskId] = updatedTasks[task.parentTaskId].removeSubtask(taskId);
+      }
+
+      return {
+        ...s,
+        tasks: updatedTasks,
+      };
+    });
+  }
+
+  /** Update a task's name in backend and local state */
+  updateTaskName(projectId: string, taskId: string, newName: string): void {
+    const existing = this.state().tasks[taskId];
+    if (!existing) return;
+
+    const updatedName = newName.trim();
+    if (!updatedName || updatedName === existing.name) return;
+
+    const requestTask = existing.updateName(updatedName);
+
+    this.updateTaskUseCase.execute(projectId, requestTask).subscribe({
+      next: (updatedTask) => {
+        this.state.update(s => ({
+          ...s,
+          tasks: {
+            ...s.tasks,
+            [taskId]: requestTask.updateName(updatedTask.name),
+          },
+        }));
+      },
+      error: (error) => {
+        this.state.update(s => ({ ...s, error: error.message }));
+        console.error('Failed to update task name:', error);
+      },
+    });
+  }
+
+  /** Delete a task in backend and remove it (and descendants) from local state */
+  deleteTask(projectId: string, sectionId: string, taskId: string, onDeleted?: () => void): void {
+    this.deleteTaskUseCase.execute(projectId, sectionId, taskId).subscribe({
+      next: () => {
+        this.removeTask(taskId);
+        onDeleted?.();
+      },
+      error: (error) => {
+        this.state.update(s => ({ ...s, error: error.message }));
+        console.error('Failed to delete task:', error);
+      },
     });
   }
 
@@ -150,5 +209,13 @@ export class TaskStore {
         tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
       }));
     });
+  }
+
+  private collectTaskAndDescendants(taskId: string, tasks: Record<string, Task>): string[] {
+    const task = tasks[taskId];
+    if (!task) return [];
+
+    const descendants = task.subtaskIds.flatMap(subtaskId => this.collectTaskAndDescendants(subtaskId, tasks));
+    return [taskId, ...descendants];
   }
 }

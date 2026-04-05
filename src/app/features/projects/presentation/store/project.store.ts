@@ -468,6 +468,30 @@ export class ProjectStore {
     this.taskStore.toggleTaskCompletion(taskId);
   }
 
+  /** Update a task name */
+  updateTaskName(taskId: string, name: string): void {
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot update task: no project selected');
+      return;
+    }
+
+    this.taskStore.updateTaskName(projectId, taskId, name);
+  }
+
+  /** Delete a task from section */
+  deleteTask(sectionId: string, taskId: string): void {
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot delete task: no project selected');
+      return;
+    }
+
+    this.taskStore.deleteTask(projectId, sectionId, taskId, () => {
+      this.sectionStore.removeTaskFromSection(sectionId, taskId);
+    });
+  }
+
   // ===================================================================
   // SSE — real-time updates from other users
   // ===================================================================
