@@ -1,6 +1,9 @@
 .project-section-container {
     display: flex;
 
+    --icon-size: 18px;
+    --main-color: #444;
+
     & .project-section {
         padding-inline: 15px;
         padding-block: 10px;
@@ -199,6 +202,102 @@
             display: flex;
             flex-direction: column;
             row-gap: 10px;
+
+            & .new-task-container {
+                display: flex;
+                flex-direction: column;
+                row-gap: 6px;
+
+                & .task-form-container {
+                    display: flex;
+                    flex-direction: column;
+                    row-gap: 3px;
+
+                    & .task-name-input {
+                        width: 100%;
+                        box-sizing: border-box;
+                        font-size: 13px;
+                        font-family: inherit;
+                        background: #f5f5f5;
+                        border: 1px solid #ccc;
+                        outline: none;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+
+                        &.invalid {
+                            border-color: #d33;
+                        }
+                    }
+
+                    & .field-error {
+                        font-size: 11px;
+                        color: #d33;
+                        padding-inline: 4px;
+                    }
+                }
+
+                & .task-form-actions {
+                    display: flex;
+                    gap: 8px;
+                    padding-inline: 4px;
+
+                    & .task-save-btn,
+                    & .task-cancel-btn {
+                        padding: 4px 10px;
+                        border-radius: 5px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-family: inherit;
+                    }
+
+                    & .task-save-btn {
+                        border: none;
+                        background: #222;
+                        color: #fff;
+                    }
+
+                    & .task-cancel-btn {
+                        border: 1px solid #ccc;
+                        background: #fff;
+                        color: #333;
+                    }
+                }
+            }
+
+            & .add-task-button-container {
+                display: flex;
+                align-items: center;
+                padding-inline: 8px;
+                padding-block: 8px;
+                color: var(--main-color);
+                user-select: none;
+                border-radius: 6px;
+
+                &:hover {
+                    background-color: #eee;
+                    cursor: pointer;
+                    color: #000;
+
+                    & path {
+                        fill: #000 !important;
+                    }
+                }
+
+                & .icon-container {
+                    margin-right: 5px;
+                    height: var(--icon-size);
+
+                    & .icon {
+                        height: var(--icon-size);
+                        aspect-ratio: 1 / 1;
+
+                        & path {
+                            fill: var(--main-color);
+                        }
+                    }
+                }
+            }
         }
     }
 }

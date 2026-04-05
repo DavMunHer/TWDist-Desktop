@@ -370,7 +370,7 @@ export class ProjectStore {
 
       const ids = Object.keys(this.state().projects);
       if (ids.length > 0) {
-        // RELOAD: First project in list when we delete a project  
+        // RELOAD: First project in list when we delete a project
         this.loadProject(ids[0]);
       } else {
         this.state.update(s => ({ ...s, selectedProjectId: null }));
@@ -466,6 +466,30 @@ export class ProjectStore {
   /** Toggle a task's completed status */
   toggleTaskCompletion(taskId: string): void {
     this.taskStore.toggleTaskCompletion(taskId);
+  }
+
+  /** Update a task name */
+  updateTaskName(taskId: string, name: string): void {
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot update task: no project selected');
+      return;
+    }
+
+    this.taskStore.updateTaskName(projectId, taskId, name);
+  }
+
+  /** Delete a task from section */
+  deleteTask(sectionId: string, taskId: string): void {
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot delete task: no project selected');
+      return;
+    }
+
+    this.taskStore.deleteTask(projectId, sectionId, taskId, () => {
+      this.sectionStore.removeTaskFromSection(sectionId, taskId);
+    });
   }
 
   // ===================================================================

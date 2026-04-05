@@ -70,6 +70,7 @@
     }
 
     & .task-name-container {
+        flex: 1;
         color: var(--text-color);
         line-clamp: 2;
         overflow-wrap: break-word;
@@ -85,4 +86,105 @@
             text-decoration: line-through;
         }
     }
+
+    & .task-edit-container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        row-gap: 5px;
+
+        & .task-name-input {
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 13px;
+            font-family: inherit;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            padding: 4px 8px;
+
+            &.invalid {
+                border-color: #d33;
+            }
+        }
+
+        & .field-error {
+            font-size: 11px;
+            color: #d33;
+        }
+    }
+
+    & .task-menu-wrapper {
+        position: relative;
+        margin-left: 8px;
+
+        & .task-menu-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #555;
+            padding: 2px;
+
+            &:hover {
+                background: #e0e0e0;
+            }
+        }
+
+        & .task-menu-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 99;
+        }
+
+        & .task-menu-dropdown {
+            position: absolute;
+            left: 0;
+            top: 100%;
+            min-width: 160px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            padding: 4px 0;
+            z-index: 100;
+
+            & .task-menu-item {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 7px 12px;
+                border: none;
+                background: none;
+                font-size: 13px;
+                color: #333;
+                cursor: pointer;
+                text-align: left;
+                font-family: inherit;
+
+                &:hover {
+                    background-color: #f3f3f3;
+                }
+
+                & .task-menu-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+
+            & .task-menu-item--danger {
+                color: #d33;
+            }
+        }
+    }
+}
+
+.subtasks-container {
+    margin-left: 28px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
 }

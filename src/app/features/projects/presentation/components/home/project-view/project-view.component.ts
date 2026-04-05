@@ -3,7 +3,14 @@ import { ProjectSectionComponent } from '@features/projects/presentation/compone
 import { SectionAdderComponent } from '@features/projects/presentation/components/home/project-view/section-adder/section-adder.component';
 import { ProjectNameEditorComponent } from '@features/projects/presentation/components/home/project-view/project-name-editor/project-name-editor.component';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
-import { SectionDeleteEvent, SectionUpdateEvent, TaskUpdateEvent } from '@features/projects/presentation/models/project.view-model';
+import {
+  SectionDeleteEvent,
+  SectionUpdateEvent,
+  TaskCreateEvent,
+  TaskDeleteEvent,
+  TaskRenameEvent,
+  TaskToggleEvent,
+} from '@features/projects/presentation/models/project.view-model';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 
 @Component({
@@ -40,8 +47,20 @@ export class ProjectViewComponent {
 
   // ── Section / Task delegation ─────────────────────────────────────────────
 
-  protected updateTaskToCompleted(event: TaskUpdateEvent): void {
+  protected updateTaskToCompleted(event: TaskToggleEvent): void {
     this.projectStore.toggleTaskCompletion(event.id);
+  }
+
+  protected onTaskCreate(event: TaskCreateEvent): void {
+    this.projectStore.createTask(event.sectionId, event.name);
+  }
+
+  protected onTaskRename(event: TaskRenameEvent): void {
+    this.projectStore.updateTaskName(event.id, event.name);
+  }
+
+  protected onTaskDelete(event: TaskDeleteEvent): void {
+    this.projectStore.deleteTask(event.sectionId, event.id);
   }
 
   protected onSectionUpdate(event: SectionUpdateEvent): void {

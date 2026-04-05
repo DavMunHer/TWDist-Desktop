@@ -49,5 +49,7 @@ describe('TaskMapper', () => {
     expect(create.name).toBe('N');
     expect(create.description).toBe('d');
     expect(create.start_date).toEqual(start);
+    expect(create.end_date).toEqual(end);
+    expect(create.completed).toBe(false);
   });
 });
