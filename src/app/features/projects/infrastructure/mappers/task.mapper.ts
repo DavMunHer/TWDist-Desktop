@@ -42,6 +42,8 @@ export class TaskMapper {
       name: task.name,
       description: task.description,
       start_date: task.startDate,
+      end_date: task.endDate,
+      completed: task.completed,
       label: task.label,
     };
   }
