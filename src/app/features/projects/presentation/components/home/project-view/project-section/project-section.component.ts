@@ -133,8 +133,7 @@ export class ProjectSectionComponent {
       name: this.newTaskNameCtrl.value.trim(),
     });
 
-    this.newTaskNameCtrl.reset();
-    this.showTaskNameErrors.set(false);
+    this.closeTaskForm();
   }
 
   protected onTaskToggle(event: TaskToggleEvent): void {
