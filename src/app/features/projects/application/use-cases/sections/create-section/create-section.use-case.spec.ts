@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { CreateSectionUseCase } from './create-section.use-case';
 import { SectionRepository } from '@features/projects/domain/repositories/section.repository';
@@ -31,12 +31,31 @@ describe('CreateSectionUseCase', () => {
   });
 
   it('builds Section via Section.create and calls sectionRepository.create', () => {
-    let result: Section | undefined;
+    let result: { success: true; value: Section } | { success: false; error: unknown } | undefined;
     useCase.execute('p1', 'Sprint 1').subscribe((s) => (result = s));
     expect(sectionRepo.create).toHaveBeenCalled();
     const arg = (sectionRepo.create as ReturnType<typeof vi.fn>).mock.calls[0][0] as Section;
     expect(arg.name).toBe('Sprint 1');
     expect(arg.projectId).toBe('p1');
-    expect(result?.id).toBe('s-new');
+    expect(result?.success).toBe(true);
+    if (result?.success) {
+      expect(result.value.id).toBe('s-new');
+    }
+  });
+
+  it('returns validation result when section name is invalid', () => {
+    useCase.execute('p1', '').subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'SECTION_NAME_REQUIRED' } });
+    });
+
+    expect(sectionRepo.create).not.toHaveBeenCalled();
+  });
+
+  it('maps repository failures to NETWORK_ERROR', () => {
+    (sectionRepo.create as ReturnType<typeof vi.fn>).mockReturnValue(throwError(() => new Error('boom')));
+
+    useCase.execute('p1', 'Sprint 1').subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'NETWORK_ERROR' } });
+    });
   });
 });

@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { SectionRepository } from '@features/projects/domain/repositories/section.repository';
 import { Section } from '@features/projects/domain/entities/section.entity';
 import { SectionName } from '@features/projects/domain/value-objects/section-name.value-object';
 import { SectionOutput } from '@features/projects/application/dtos/section-output';
 import { toSectionOutput } from '@features/projects/application/mappers/section-output.mapper';
+import { Result, fail, ok } from '@shared/utils/result';
+import { ProjectsError } from '@features/projects/application/errors/projects.error';
 
 export interface UpdateSectionInput {
   id: string;
@@ -15,13 +17,18 @@ export interface UpdateSectionInput {
 
 @Injectable()
 export class UpdateSectionUseCase {
-  private sectionRepository = inject(SectionRepository);
+  private readonly sectionRepository = inject(SectionRepository);
 
-  execute(input: UpdateSectionInput): Observable<SectionOutput> {
-    const sectionName = SectionName.create(input.name);
-    const section = new Section(input.id, sectionName.value, input.projectId, []);
+  execute(input: UpdateSectionInput): Observable<Result<SectionOutput, ProjectsError>> {
+    const sectionNameResult = SectionName.tryCreate(input.name);
+    if (!sectionNameResult.success) {
+      return of(fail(sectionNameResult.error));
+    }
+
+    const section = new Section(input.id, sectionNameResult.value.value, input.projectId, []);
     return this.sectionRepository.update(section).pipe(
-      map(toSectionOutput),
+      map((saved): Result<SectionOutput, ProjectsError> => ok(toSectionOutput(saved))),
+      catchError(() => of(fail<ProjectsError>({ code: 'NETWORK_ERROR' }))),
     );
   }
 }

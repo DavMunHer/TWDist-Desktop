@@ -3,19 +3,32 @@ import { describe, it, expect } from 'vitest';
 import { ProjectName } from './project-name.value-object';
 
 describe('ProjectName', () => {
-  it('create trims whitespace', () => {
-    expect(ProjectName.create('  ab  ').value).toBe('ab');
+  it('tryCreate trims whitespace', () => {
+    const result = ProjectName.tryCreate('  ab  ');
+    expect(result.success).toBe(true);
+    if (!result.success) {
+      throw new Error('Expected success result');
+    }
+
+    expect(result.value.value).toBe('ab');
   });
 
-  it('rejects blank', () => {
-    expect(() => ProjectName.create('   ')).toThrow('Project name is required');
+  it('tryCreate rejects blank with code', () => {
+    const result = ProjectName.tryCreate('   ');
+    expect(result).toEqual({ success: false, error: { code: 'PROJECT_NAME_REQUIRED' } });
   });
 
-  it('rejects too short', () => {
-    expect(() => ProjectName.create('a')).toThrow('at least 2 characters');
+  it('tryCreate rejects too short with code and min', () => {
+    const result = ProjectName.tryCreate('a');
+    expect(result).toEqual({ success: false, error: { code: 'PROJECT_NAME_TOO_SHORT', min: 2 } });
   });
 
-  it('rejects too long', () => {
-    expect(() => ProjectName.create('x'.repeat(51))).toThrow('at most 50 characters');
+  it('tryCreate rejects too long with code and max', () => {
+    const result = ProjectName.tryCreate('x'.repeat(51));
+    expect(result).toEqual({ success: false, error: { code: 'PROJECT_NAME_TOO_LONG', max: 50 } });
+  });
+
+  it('create keeps legacy throw behavior for compatibility', () => {
+    expect(() => ProjectName.create('')).toThrow('Project name is required');
   });
 });

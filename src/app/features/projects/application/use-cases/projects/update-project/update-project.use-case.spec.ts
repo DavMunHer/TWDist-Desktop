@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { UpdateProjectUseCase } from './update-project.use-case';
 import { ProjectRepository } from '@features/projects/domain/repositories/project.repository';
@@ -33,7 +33,10 @@ describe('UpdateProjectUseCase', () => {
     (repo.update as ReturnType<typeof vi.fn>).mockReturnValue(of(saved));
 
     const input = { id: 'p1', name: 'New Name', favorite: true, sectionIds: ['s1'] };
-    const expectedOutput = { id: 'p1', name: 'New Name', favorite: true, sectionIds: ['s1'] };
+    const expectedOutput = {
+      success: true,
+      value: { id: 'p1', name: 'New Name', favorite: true, sectionIds: ['s1'] },
+    };
 
     useCase.execute(input).subscribe((out) => expect(out).toEqual(expectedOutput));
 
@@ -45,12 +48,20 @@ describe('UpdateProjectUseCase', () => {
     expect(arg.favorite).toBe(true);
   });
 
-  it('throws when name violates ProjectName rules', () => {
-    expect(() =>
-      useCase.execute({ id: 'p1', name: '', favorite: false, sectionIds: [] }),
-    ).toThrow('Project name is required');
+  it('returns validation error result when name violates ProjectName rules', () => {
+    useCase.execute({ id: 'p1', name: '', favorite: false, sectionIds: [] }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'PROJECT_NAME_REQUIRED' } });
+    });
 
     expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it('maps repository failures to NETWORK_ERROR', () => {
+    (repo.update as ReturnType<typeof vi.fn>).mockReturnValue(throwError(() => new Error('boom')));
+
+    useCase.execute({ id: 'p1', name: 'New Name', favorite: true, sectionIds: [] }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'NETWORK_ERROR' } });
+    });
   });
 });
 
