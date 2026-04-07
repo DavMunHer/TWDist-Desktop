@@ -8,8 +8,17 @@ import { ProjectRepository } from '@features/projects/domain/repositories/projec
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
+function validProjectName(value: string): ProjectName {
+  const result = ProjectName.tryCreate(value);
+  if (!result.success) {
+    throw new Error('Invalid test project name');
+  }
+
+  return result.value;
+}
+
 const input = { name: 'NN', favorite: true };
-const created = new Project('new-id', ProjectName.create('NN'), true, []);
+const created = new Project('new-id', validProjectName('NN'), true, []);
 
 describe('CreateProjectUseCase', () => {
   let useCase: CreateProjectUseCase;

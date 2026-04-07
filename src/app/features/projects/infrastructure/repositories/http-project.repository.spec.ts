@@ -10,6 +10,15 @@ import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/respons
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
+function validProjectName(value: string): ProjectName {
+  const result = ProjectName.tryCreate(value);
+  if (!result.success) {
+    throw new Error('Invalid test project name');
+  }
+
+  return result.value;
+}
+
 describe('HttpProjectRepository', () => {
   let repository: HttpProjectRepository;
   let httpMock: HttpTestingController;
@@ -27,7 +36,7 @@ describe('HttpProjectRepository', () => {
   });
 
   it('create posts ProjectMapper body and maps response', () => {
-    const project = Project.create(ProjectName.create('NN'), false);
+    const project = Project.create(validProjectName('NN'), false);
     const response: ProjectResponseDto = { id: '1', name: 'NN', favorite: false, sections: [] };
     let result: unknown;
     repository.create(project).subscribe((p) => (result = p));

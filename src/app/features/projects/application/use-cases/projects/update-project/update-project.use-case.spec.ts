@@ -8,6 +8,15 @@ import { ProjectRepository } from '@features/projects/domain/repositories/projec
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
+function validProjectName(value: string): ProjectName {
+  const result = ProjectName.tryCreate(value);
+  if (!result.success) {
+    throw new Error('Invalid test project name');
+  }
+
+  return result.value;
+}
+
 describe('UpdateProjectUseCase', () => {
   let useCase: UpdateProjectUseCase;
   let repo: Partial<ProjectRepository>;
@@ -29,7 +38,7 @@ describe('UpdateProjectUseCase', () => {
   });
 
   it('validates name, builds Project and delegates to projectRepository.update', () => {
-    const saved = new Project('p1', ProjectName.create('New Name'), true, ['s1']);
+    const saved = new Project('p1', validProjectName('New Name'), true, ['s1']);
     (repo.update as ReturnType<typeof vi.fn>).mockReturnValue(of(saved));
 
     const input = { id: 'p1', name: 'New Name', favorite: true, sectionIds: ['s1'] };

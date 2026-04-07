@@ -27,8 +27,4 @@ describe('ProjectName', () => {
     const result = ProjectName.tryCreate('x'.repeat(51));
     expect(result).toEqual({ success: false, error: { code: 'PROJECT_NAME_TOO_LONG', max: 50 } });
   });
-
-  it('create keeps legacy throw behavior for compatibility', () => {
-    expect(() => ProjectName.create('')).toThrow('Project name is required');
-  });
 });

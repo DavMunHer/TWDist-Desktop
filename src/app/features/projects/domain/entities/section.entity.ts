@@ -1,5 +1,3 @@
-import { SectionName } from '@features/projects/domain/value-objects/section-name.value-object';
-
 export class Section {
   constructor(
     public readonly id: string,
@@ -9,10 +7,9 @@ export class Section {
   ) {}
 
   static create(name: string, projectId: string, id?: string): Section {
-    const sectionName = SectionName.create(name);
     return new Section(
       id || crypto.randomUUID(),
-      sectionName.value,
+      name.trim(),
       projectId,
       []
     );
@@ -41,10 +38,9 @@ export class Section {
   }
 
   updateName(name: string): Section {
-    const sectionName = SectionName.create(name);
     return new Section(
       this.id,
-      sectionName.value,
+      name.trim(),
       this.projectId,
       this.taskIds
     );

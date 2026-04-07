@@ -10,11 +10,25 @@ import { SectionMapper } from '@features/projects/infrastructure/mappers/section
 import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
 
 export class ProjectMapper {
+  private static toProjectName(rawName: string): ProjectName {
+    const result = ProjectName.tryCreate(rawName);
+    if (result.success) {
+      return result.value;
+    }
+
+    const fallback = ProjectName.tryCreate('Untitled');
+    if (fallback.success) {
+      return fallback.value;
+    }
+
+    throw new Error('Failed to map project name');
+  }
+
   static toDomain(dto: ProjectResponseDto): Project {
     const sectionIds = (dto.sections ?? []).map(s => String(s.id));
     return new Project(
       String(dto.id),
-      ProjectName.create(dto.name),
+      ProjectMapper.toProjectName(dto.name),
       dto.favorite,
       sectionIds
     );
@@ -46,7 +60,7 @@ export class ProjectMapper {
   static toSummary(dto: ProjectSummaryDto): ProjectSummary {
     const project = new Project(
       String(dto.id),
-      ProjectName.create(dto.name),
+      ProjectMapper.toProjectName(dto.name),
       dto.favorite,
       []
     );
