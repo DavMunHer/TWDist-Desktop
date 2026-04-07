@@ -82,7 +82,11 @@ describe('ProjectSectionComponent', () => {
     fixture.detectChanges();
 
     fixture.nativeElement.querySelector('.task-save-btn').click();
+    fixture.detectChanges();
 
     expect(emitSpy).toHaveBeenCalledWith({ sectionId: 's1', name: 'Task from section' });
+    expect(component['showTaskForm']()).toBe(false);
+    expect(component['newTaskNameCtrl'].value).toBeFalsy();
+    expect(component['showTaskNameErrors']()).toBe(false);
   });
 });
