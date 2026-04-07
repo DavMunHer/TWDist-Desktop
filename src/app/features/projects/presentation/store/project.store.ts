@@ -28,6 +28,7 @@ import { SectionDto } from '@features/projects/infrastructure/dto/section.dto';
 import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
 import { ProjectsError } from '@features/projects/application/errors/projects.error';
 import { toProjectsUiError } from '@features/projects/presentation/mappers/projects-ui-error.mapper';
+import { UiError } from '@features/projects/presentation/models/ui-error';
 
 /**
  * Store for **projects** only.
@@ -84,6 +85,9 @@ export class ProjectStore {
 
   /** Last error */
   readonly error = computed(() => this.state().error);
+
+  /** Last rich error details */
+  readonly errorDetails = computed(() => this.state().errorDetails);
 
   // ===================================================================
   // SELECTORS — denormalized view-model for the UI
@@ -143,6 +147,7 @@ export class ProjectStore {
       ...s,
       loading: true,
       error: null,
+      errorDetails: null,
     }));
   }
 
@@ -164,14 +169,14 @@ export class ProjectStore {
   }
 
   /** Record an error in the store and log it to the console. */
-  private setError(message: string, context: string, error: unknown): void {
-    this.state.update(s => ({ ...s, error: message }));
+  private setError(message: string, context: string, error: unknown, details: UiError | null = null): void {
+    this.state.update(s => ({ ...s, error: message, errorDetails: details }));
     console.error(`Failed to ${context}:`, error);
   }
 
   private setResultError(error: ProjectsError, context: string): void {
     const uiError = toProjectsUiError(error);
-    this.setError(uiError.message, context, error);
+    this.setError(uiError.message, context, error, uiError);
   }
 
   /**

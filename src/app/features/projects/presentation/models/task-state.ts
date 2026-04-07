@@ -1,4 +1,5 @@
 import { Task } from '@features/projects/domain/entities/task.entity';
+import { UiError } from '@features/projects/presentation/models/ui-error';
 
 /**
  * Normalized state for all tasks, keyed by ID.
@@ -10,10 +11,12 @@ export interface TaskState {
   tasks: Record<string, Task>;
   loading: boolean;
   error: string | null;
+  errorDetails: UiError | null;
 }
 
 export const initialTaskState: TaskState = {
   tasks: {},
   loading: false,
   error: null,
+  errorDetails: null,
 };

@@ -5,6 +5,9 @@ import { UpdateTaskUseCase } from '@features/projects/application/use-cases/task
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { initialTaskState, TaskState } from '@features/projects/presentation/models/task-state';
 import { Task } from '@features/projects/domain/entities/task.entity';
+import { toProjectsUiError } from '@features/projects/presentation/mappers/projects-ui-error.mapper';
+import { ProjectsError } from '@features/projects/application/errors/projects.error';
+import { UiError } from '@features/projects/presentation/models/ui-error';
 
 /**
  * Normalized store for **tasks** (and subtasks).
@@ -34,6 +37,19 @@ export class TaskStore {
 
   /** Last error */
   readonly error = computed(() => this.state().error);
+
+  /** Last rich error details */
+  readonly errorDetails = computed(() => this.state().errorDetails);
+
+  private setError(message: string, details: UiError | null, context: string, raw: unknown): void {
+    this.state.update(s => ({ ...s, error: message, errorDetails: details }));
+    console.error(`Failed to ${context}:`, raw);
+  }
+
+  private setResultError(error: ProjectsError, context: string): void {
+    const uiError = toProjectsUiError(error);
+    this.setError(uiError.message, uiError, context, error);
+  }
 
   /** Get a single task by ID */
   getTask(taskId: string): Task | undefined {
@@ -75,16 +91,18 @@ export class TaskStore {
     onCreated?: (task: Task) => void,
   ): void {
     this.createTaskUseCase.execute(projectId, sectionId, taskName).subscribe({
-      next: (task) => {
+      next: (result) => {
+        if (!result.success) {
+          this.setResultError(result.error, 'create task');
+          return;
+        }
+
+        const task = result.value;
         this.state.update(s => ({
           ...s,
           tasks: { ...s.tasks, [task.id]: task },
         }));
         onCreated?.(task);
-      },
-      error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
-        console.error('Failed to create task:', error);
       },
     });
   }
@@ -103,7 +121,13 @@ export class TaskStore {
     }
 
     this.createTaskUseCase.execute(projectId, sectionId, taskName).subscribe({
-      next: (subtask) => {
+      next: (result) => {
+        if (!result.success) {
+          this.setResultError(result.error, 'create subtask');
+          return;
+        }
+
+        const subtask = result.value;
         // Override the subtask with the correct parentTaskId
         const subtaskWithParent = new Task(
           subtask.id,
@@ -126,10 +150,6 @@ export class TaskStore {
             [parentTaskId]: (s.tasks[parentTaskId]).addSubtask(subtaskWithParent.id),
           },
         }));
-      },
-      error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
-        console.error('Failed to create subtask:', error);
       },
     });
   }
@@ -168,7 +188,13 @@ export class TaskStore {
     const requestTask = existing.updateName(updatedName);
 
     this.updateTaskUseCase.execute(projectId, requestTask).subscribe({
-      next: (updatedTask) => {
+      next: (result) => {
+        if (!result.success) {
+          this.setResultError(result.error, 'update task name');
+          return;
+        }
+
+        const updatedTask = result.value;
         this.state.update(s => ({
           ...s,
           tasks: {
@@ -176,10 +202,6 @@ export class TaskStore {
             [taskId]: requestTask.updateName(updatedTask.name),
           },
         }));
-      },
-      error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
-        console.error('Failed to update task name:', error);
       },
     });
   }
@@ -192,8 +214,7 @@ export class TaskStore {
         onDeleted?.();
       },
       error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
-        console.error('Failed to delete task:', error);
+        this.setError(error.message, null, 'delete task', error);
       },
     });
   }

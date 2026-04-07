@@ -6,6 +6,7 @@ import { initialSectionState, SectionState } from '@features/projects/presentati
 import { Section } from '@features/projects/domain/entities/section.entity';
 import { TaskStore } from '@features/projects/presentation/store/task.store';
 import { toProjectsUiError } from '@features/projects/presentation/mappers/projects-ui-error.mapper';
+import { UiError } from '@features/projects/presentation/models/ui-error';
 
 /**
  * Normalized store for **sections**.
@@ -34,6 +35,14 @@ export class SectionStore {
 
   /** Last error */
   readonly error = computed(() => this.state().error);
+
+  /** Last rich error details */
+  readonly errorDetails = computed(() => this.state().errorDetails);
+
+  private setError(message: string, details: UiError | null, context: string, raw: unknown): void {
+    this.state.update(s => ({ ...s, error: message, errorDetails: details }));
+    console.error(`Failed to ${context}:`, raw);
+  }
 
   /** Get a single section by ID */
   getSection(sectionId: string): Section | undefined {
@@ -71,8 +80,8 @@ export class SectionStore {
     this.createSectionUseCase.execute(projectId, sectionName).subscribe({
       next: (result) => {
         if (!result.success) {
-          this.state.update(s => ({ ...s, error: toProjectsUiError(result.error).message }));
-          console.error('Failed to create section:', result.error);
+          const uiError = toProjectsUiError(result.error);
+          this.setError(uiError.message, uiError, 'create section', result.error);
           return;
         }
 
@@ -128,10 +137,12 @@ export class SectionStore {
     this.updateSectionUseCase.execute(input).subscribe({
       next: (result) => {
         if (!result.success) {
+          const uiError = toProjectsUiError(result.error);
           this.state.update(s => ({
             ...s,
             sections: { ...s.sections, [sectionId]: existing },
-            error: toProjectsUiError(result.error).message,
+            error: uiError.message,
+            errorDetails: uiError,
           }));
           console.error('Failed to update section:', result.error);
           return;
@@ -176,7 +187,7 @@ export class SectionStore {
           ...s,
           sections: { ...s.sections, [sectionId]: existing },
         }));
-        console.error('Failed to delete section:', error);
+        this.setError(error.message, null, 'delete section', error);
       },
     });
   }
