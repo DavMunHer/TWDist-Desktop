@@ -5,6 +5,7 @@ import { DeleteSectionUseCase } from '@features/projects/application/use-cases/s
 import { initialSectionState, SectionState } from '@features/projects/presentation/models/section-state';
 import { Section } from '@features/projects/domain/entities/section.entity';
 import { TaskStore } from '@features/projects/presentation/store/task.store';
+import { toProjectsUiError } from '@features/projects/presentation/mappers/projects-ui-error.mapper';
 
 /**
  * Normalized store for **sections**.
@@ -68,16 +69,19 @@ export class SectionStore {
     onCreated?: (section: Section) => void,
   ): void {
     this.createSectionUseCase.execute(projectId, sectionName).subscribe({
-      next: (section) => {
+      next: (result) => {
+        if (!result.success) {
+          this.state.update(s => ({ ...s, error: toProjectsUiError(result.error).message }));
+          console.error('Failed to create section:', result.error);
+          return;
+        }
+
+        const section = result.value;
         this.state.update(s => ({
           ...s,
           sections: { ...s.sections, [section.id]: section },
         }));
         onCreated?.(section);
-      },
-      error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
-        console.error('Failed to create section:', error);
       },
     });
   }
@@ -122,7 +126,18 @@ export class SectionStore {
     };
 
     this.updateSectionUseCase.execute(input).subscribe({
-      next: (updated) => {
+      next: (result) => {
+        if (!result.success) {
+          this.state.update(s => ({
+            ...s,
+            sections: { ...s.sections, [sectionId]: existing },
+            error: toProjectsUiError(result.error).message,
+          }));
+          console.error('Failed to update section:', result.error);
+          return;
+        }
+
+        const updated = result.value;
         this.state.update(s => ({
           ...s,
           sections: {
@@ -130,13 +145,6 @@ export class SectionStore {
             [sectionId]: new Section(updated.id, updated.name, updated.projectId, existing.taskIds),
           },
         }));
-      },
-      error: (error) => {
-        this.state.update(s => ({
-          ...s,
-          sections: { ...s.sections, [sectionId]: existing },
-        }));
-        console.error('Failed to update section:', error);
       },
     });
   }

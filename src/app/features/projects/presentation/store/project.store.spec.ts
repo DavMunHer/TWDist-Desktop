@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { ProjectStore } from './project.store';
 import { LoadProjectUseCase } from '@features/projects/application/use-cases/projects/load-project/load-project.use-case';
@@ -44,7 +44,9 @@ describe('ProjectStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     loadAllExecute.mockReturnValue(of([]));
-    createProjectExecute.mockReturnValue(of({ id: 'new-id', name: 'New', favorite: false, sectionIds: [] }));
+    createProjectExecute.mockReturnValue(
+      of({ success: true, value: { id: 'new-id', name: 'New', favorite: false, sectionIds: [] } }),
+    );
     deleteProjectExecute.mockReturnValue(of(void 0));
     loadProjectExecute.mockReturnValue(
       of({
@@ -139,10 +141,10 @@ describe('ProjectStore', () => {
 
   it('createProject rolls back optimistic entry on error', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    createProjectExecute.mockReturnValue(throwError(() => new Error('boom')));
+    createProjectExecute.mockReturnValue(of({ success: false, error: { code: 'NETWORK_ERROR' } }));
     store.createProject({ name: 'New', favorite: false });
     expect(store.projects().some((p) => p.id.startsWith('temp-'))).toBe(false);
-    expect(store.error()).toBe('boom');
+    expect(store.error()).toBe('Network error. Please try again.');
     errorSpy.mockRestore();
   });
 
