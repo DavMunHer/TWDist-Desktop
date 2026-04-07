@@ -17,6 +17,11 @@ describe('Section', () => {
     expect(next.taskIds).toEqual(['t1', 't2']);
   });
 
+  it('addTask does not duplicate an existing task id', () => {
+    const next = base.addTask('t1');
+    expect(next.taskIds).toEqual(['t1']);
+  });
+
   it('removeTask filters task id', () => {
     const next = base.removeTask('t1');
     expect(next.taskIds).toEqual([]);

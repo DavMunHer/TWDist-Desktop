@@ -19,6 +19,10 @@ export class Section {
   }
 
   addTask(taskId: string): Section {
+    if (this.taskIds.includes(taskId)) {
+      return this;
+    }
+
     return new Section(
       this.id,
       this.name,
