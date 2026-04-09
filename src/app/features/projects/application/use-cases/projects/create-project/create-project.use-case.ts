@@ -1,10 +1,12 @@
 import { inject, Injectable } from "@angular/core";
 import { ProjectRepository } from "@features/projects/domain/repositories/project.repository";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Project } from "@features/projects/domain/entities/project.entity";
 import { ProjectName } from "@features/projects/domain/value-objects/project-name.value-object";
 import { toProjectOutput } from '@features/projects/application/mappers/project-output.mapper';
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
+import { Result, fail, ok } from '@shared/utils/result';
+import { ProjectsError } from '@features/projects/application/errors/projects.error';
 
 export interface CreateProjectInput {
   name: string;
@@ -20,14 +22,20 @@ export interface CreateProjectOutput {
 
 @Injectable()
 export class CreateProjectUseCase {
-  private projectRepository = inject(ProjectRepository);
+  private readonly projectRepository = inject(ProjectRepository);
 
-  execute(input: CreateProjectInput): Observable<CreateProjectOutput> {
-    const projectName = ProjectName.create(input.name);
+  execute(input: CreateProjectInput): Observable<Result<CreateProjectOutput, ProjectsError>> {
+    const projectNameResult = ProjectName.tryCreate(input.name);
+    if (!projectNameResult.success) {
+      return of(fail(projectNameResult.error));
+    }
+
+    const projectName = projectNameResult.value;
     const project = Project.create(projectName, input.favorite);
 
     return this.projectRepository.create(project).pipe(
-      map((saved) => toProjectOutput(saved, [])),
+      map((saved): Result<CreateProjectOutput, ProjectsError> => ok(toProjectOutput(saved, []))),
+      catchError(() => of(fail<ProjectsError>({ code: 'NETWORK_ERROR' }))),
     );
   }
 }

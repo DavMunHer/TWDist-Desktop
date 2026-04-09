@@ -1,4 +1,5 @@
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
+import { UiError } from '@features/projects/presentation/models/ui-error';
 
 /**
  * Normalized state for all projects, keyed by ID.
@@ -20,6 +21,8 @@ export interface ProjectState {
   loading: boolean;
   /** Last error message, if any */
   error: string | null;
+  /** Rich error details for UI rendering (field messages, retryability, kind). */
+  errorDetails: UiError | null;
 }
 
 /** Convenience factory for producing the initial (empty) state */
@@ -28,5 +31,6 @@ export const initialProjectState: ProjectState = {
   selectedProjectId: null,
   loading: false,
   error: null,
+  errorDetails: null,
 };
 

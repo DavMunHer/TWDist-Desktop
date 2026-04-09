@@ -1,11 +1,13 @@
 import { inject, Injectable } from "@angular/core";
 import { ProjectRepository } from "@features/projects/domain/repositories/project.repository";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Project } from "@features/projects/domain/entities/project.entity";
 import { ProjectName } from "@features/projects/domain/value-objects/project-name.value-object";
 import { toProjectOutput } from '@features/projects/application/mappers/project-output.mapper';
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { ProjectOutput } from "@features/projects/application/dtos/project-output";
+import { Result, fail, ok } from '@shared/utils/result';
+import { ProjectsError } from '@features/projects/application/errors/projects.error';
 
 export interface UpdateProjectInput {
   id: string;
@@ -16,17 +18,23 @@ export interface UpdateProjectInput {
 
 @Injectable()
 export class UpdateProjectUseCase {
-  private projectRepository = inject(ProjectRepository);
+  private readonly projectRepository = inject(ProjectRepository);
 
-  execute(input: UpdateProjectInput): Observable<ProjectOutput> {
-    const projectName = ProjectName.create(input.name);
+  execute(input: UpdateProjectInput): Observable<Result<ProjectOutput, ProjectsError>> {
+    const projectNameResult = ProjectName.tryCreate(input.name);
+    if (!projectNameResult.success) {
+      return of(fail(projectNameResult.error));
+    }
+
+    const projectName = projectNameResult.value;
     const project = new Project(input.id, projectName, input.favorite, input.sectionIds);
 
     return this.projectRepository.update(project).pipe(
-      map((saved) => ({
-        ...toProjectOutput(saved, []),
-        sectionIds: [...input.sectionIds],
-      })),
+      map((saved): Result<ProjectOutput, ProjectsError> => ok({
+          ...toProjectOutput(saved, []),
+          sectionIds: [...input.sectionIds],
+        })),
+      catchError(() => of(fail<ProjectsError>({ code: 'NETWORK_ERROR' }))),
     );
   }
 }

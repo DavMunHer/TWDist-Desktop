@@ -47,7 +47,7 @@ describe('ProjectSummaryStore', () => {
   it('pendingCountFor computes from section/task stores when not cached', () => {
     const start = new Date();
     sectionsState.set({
-      s1: new Section('s1', 'S', 'p1', ['t1', 't2']),
+      s1: new Section('s1', 'Sec', 'p1', ['t1', 't2']),
     });
     tasksState.set({
       t1: new Task('t1', 's1', 'Open', false, start, undefined, undefined, undefined, undefined, undefined, []),

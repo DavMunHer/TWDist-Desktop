@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { Task } from '@features/projects/domain/entities/task.entity';
 import { TaskRepository } from '@features/projects/domain/repositories/task.repository';
@@ -31,10 +31,32 @@ describe('UpdateTaskUseCase', () => {
   it('delegates to taskRepository.update', () => {
     const task = Task.create('Original', 'sec-1', new Date('2025-01-01'), 'task-1').updateName('Updated');
 
-    useCase.execute('p1', task).subscribe((updated) => {
-      expect(updated.name).toBe('Updated');
+    useCase.execute('p1', task).subscribe((result) => {
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.value.name).toBe('Updated');
+      }
     });
 
     expect(repo.update).toHaveBeenCalledWith('p1', task);
+  });
+
+  it('returns validation error result when task name is invalid', () => {
+    const task = Task.create('Original', 'sec-1', new Date('2025-01-01'), 'task-1').updateName('');
+
+    useCase.execute('p1', task).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'TASK_NAME_REQUIRED' } });
+    });
+
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it('maps repository failures to NETWORK_ERROR', () => {
+    const task = Task.create('Original', 'sec-1', new Date('2025-01-01'), 'task-1').updateName('Updated');
+    (repo.update as ReturnType<typeof vi.fn>).mockReturnValue(throwError(() => new Error('boom')));
+
+    useCase.execute('p1', task).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'NETWORK_ERROR' } });
+    });
   });
 });

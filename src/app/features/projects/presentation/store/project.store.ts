@@ -26,6 +26,9 @@ import { SectionMapper } from '@features/projects/infrastructure/mappers/section
 import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
 import { SectionDto } from '@features/projects/infrastructure/dto/section.dto';
 import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
+import { ProjectsError } from '@features/projects/application/errors/projects.error';
+import { toProjectsUiError } from '@features/projects/presentation/mappers/projects-ui-error.mapper';
+import { UiError } from '@features/projects/presentation/models/ui-error';
 
 /**
  * Store for **projects** only.
@@ -82,6 +85,9 @@ export class ProjectStore {
 
   /** Last error */
   readonly error = computed(() => this.state().error);
+
+  /** Last rich error details */
+  readonly errorDetails = computed(() => this.state().errorDetails);
 
   // ===================================================================
   // SELECTORS — denormalized view-model for the UI
@@ -141,6 +147,7 @@ export class ProjectStore {
       ...s,
       loading: true,
       error: null,
+      errorDetails: null,
     }));
   }
 
@@ -162,9 +169,14 @@ export class ProjectStore {
   }
 
   /** Record an error in the store and log it to the console. */
-  private setError(message: string, context: string, error: unknown): void {
-    this.state.update(s => ({ ...s, error: message }));
+  private setError(message: string, context: string, error: unknown, details: UiError | null = null): void {
+    this.state.update(s => ({ ...s, error: message, errorDetails: details }));
     console.error(`Failed to ${context}:`, error);
+  }
+
+  private setResultError(error: ProjectsError, context: string): void {
+    const uiError = toProjectsUiError(error);
+    this.setError(uiError.message, context, error, uiError);
   }
 
   /**
@@ -190,18 +202,21 @@ export class ProjectStore {
 
     // Fire the backend request in parallel
     this.createProjectUseCase.execute(input).subscribe({
-      next: (project) => {
+      next: (result) => {
+        if (!result.success) {
+          // Revert the optimistic update
+          this.removeProject(tempId);
+          this.projectSummaryStore.removePendingCount(tempId);
+          this.setResultError(result.error, 'create project');
+          return;
+        }
+
+        const project = result.value;
         // Replace the temp project with the real one from the backend
         this.removeProject(tempId);
         this.upsertProject(project.id, project);
         this.projectSummaryStore.removePendingCount(tempId);
         this.projectSummaryStore.mergePendingCounts({ [project.id]: 0 });
-      },
-      error: (error) => {
-        // Revert the optimistic update
-        this.removeProject(tempId);
-        this.projectSummaryStore.removePendingCount(tempId);
-        this.setError(error.message, 'create project', error);
       },
     });
   }
@@ -225,12 +240,15 @@ export class ProjectStore {
     this.upsertProject(input.id, optimistic);
 
     this.updateProjectUseCase.execute(input).subscribe({
-      next: (updated) => {
+      next: (result) => {
+        if (!result.success) {
+          this.upsertProject(input.id, existing);
+          this.setResultError(result.error, 'update project');
+          return;
+        }
+
+        const updated = result.value;
         this.upsertProject(updated.id, { ...existing, name: updated.name, favorite: input.favorite });
-      },
-      error: (error) => {
-        this.upsertProject(input.id, existing);
-        this.setError(error.message, 'update project', error);
       },
     });
   }
@@ -612,7 +630,7 @@ export class ProjectStore {
         this.sectionStore.removeSection(sectionId);
 
         const existing = this.state().projects[projectId];
-        if (existing && existing.sectionIds.includes(sectionId)) {
+        if (existing?.sectionIds.includes(sectionId)) {
           this.upsertProject(projectId, {
             ...existing,
             sectionIds: existing.sectionIds.filter((sId) => sId !== sectionId),
@@ -623,7 +641,10 @@ export class ProjectStore {
 
       case 'task_created': {
         const dto = event.data as TaskDto;
-        const sectionId = String((event.data as Record<string, unknown>)['sectionId'] ?? dto.id);
+        const rawSectionId = (event.data as Record<string, unknown>)['sectionId'];
+        const sectionId = typeof rawSectionId === 'string' || typeof rawSectionId === 'number'
+          ? String(rawSectionId)
+          : String(dto.id);
         const taskId = String(dto.id);
         const tasks = TaskMapper.flattenToDomain(dto, sectionId);
         this.taskStore.mergeTasks(tasks);

@@ -8,8 +8,17 @@ import { ProjectRepository, ProjectSummary } from '@features/projects/domain/rep
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
+function validProjectName(value: string): ProjectName {
+  const result = ProjectName.tryCreate(value);
+  if (!result.success) {
+    throw new Error('Invalid test project name');
+  }
+
+  return result.value;
+}
+
 const summaries: ProjectSummary[] = [
-  { project: new Project('1', ProjectName.create('AA'), false, []), pendingCount: 2 },
+  { project: new Project('1', validProjectName('AA'), false, []), pendingCount: 2 },
 ];
 
 describe('LoadAllProjectsUseCase', () => {

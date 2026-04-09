@@ -8,8 +8,17 @@ import { ProjectRepository, ProjectAggregate } from '@features/projects/domain/r
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
+function validProjectName(value: string): ProjectName {
+  const result = ProjectName.tryCreate(value);
+  if (!result.success) {
+    throw new Error('Invalid test project name');
+  }
+
+  return result.value;
+}
+
 const aggregate: ProjectAggregate = {
-  project: new Project('p1', ProjectName.create('PP'), false, []),
+  project: new Project('p1', validProjectName('PP'), false, []),
   sections: [],
   tasks: [],
 };

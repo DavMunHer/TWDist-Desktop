@@ -5,6 +5,8 @@ import { DeleteSectionUseCase } from '@features/projects/application/use-cases/s
 import { initialSectionState, SectionState } from '@features/projects/presentation/models/section-state';
 import { Section } from '@features/projects/domain/entities/section.entity';
 import { TaskStore } from '@features/projects/presentation/store/task.store';
+import { toProjectsUiError } from '@features/projects/presentation/mappers/projects-ui-error.mapper';
+import { UiError } from '@features/projects/presentation/models/ui-error';
 
 /**
  * Normalized store for **sections**.
@@ -33,6 +35,14 @@ export class SectionStore {
 
   /** Last error */
   readonly error = computed(() => this.state().error);
+
+  /** Last rich error details */
+  readonly errorDetails = computed(() => this.state().errorDetails);
+
+  private setError(message: string, details: UiError | null, context: string, raw: unknown): void {
+    this.state.update(s => ({ ...s, error: message, errorDetails: details }));
+    console.error(`Failed to ${context}:`, raw);
+  }
 
   /** Get a single section by ID */
   getSection(sectionId: string): Section | undefined {
@@ -68,16 +78,19 @@ export class SectionStore {
     onCreated?: (section: Section) => void,
   ): void {
     this.createSectionUseCase.execute(projectId, sectionName).subscribe({
-      next: (section) => {
+      next: (result) => {
+        if (!result.success) {
+          const uiError = toProjectsUiError(result.error);
+          this.setError(uiError.message, uiError, 'create section', result.error);
+          return;
+        }
+
+        const section = result.value;
         this.state.update(s => ({
           ...s,
           sections: { ...s.sections, [section.id]: section },
         }));
         onCreated?.(section);
-      },
-      error: (error) => {
-        this.state.update(s => ({ ...s, error: error.message }));
-        console.error('Failed to create section:', error);
       },
     });
   }
@@ -122,7 +135,20 @@ export class SectionStore {
     };
 
     this.updateSectionUseCase.execute(input).subscribe({
-      next: (updated) => {
+      next: (result) => {
+        if (!result.success) {
+          const uiError = toProjectsUiError(result.error);
+          this.state.update(s => ({
+            ...s,
+            sections: { ...s.sections, [sectionId]: existing },
+            error: uiError.message,
+            errorDetails: uiError,
+          }));
+          console.error('Failed to update section:', result.error);
+          return;
+        }
+
+        const updated = result.value;
         this.state.update(s => ({
           ...s,
           sections: {
@@ -130,13 +156,6 @@ export class SectionStore {
             [sectionId]: new Section(updated.id, updated.name, updated.projectId, existing.taskIds),
           },
         }));
-      },
-      error: (error) => {
-        this.state.update(s => ({
-          ...s,
-          sections: { ...s.sections, [sectionId]: existing },
-        }));
-        console.error('Failed to update section:', error);
       },
     });
   }
@@ -168,7 +187,7 @@ export class SectionStore {
           ...s,
           sections: { ...s.sections, [sectionId]: existing },
         }));
-        console.error('Failed to delete section:', error);
+        this.setError(error.message, null, 'delete section', error);
       },
     });
   }

@@ -45,6 +45,6 @@ describe('HttpSectionRepository', () => {
     repository.findById('p1', 's1').subscribe();
     const req = httpMock.expectOne('/projects/p1/section/s1/get');
     expect(req.request.method).toBe('GET');
-    req.flush({ id: 1, name: 'S', tasks: [] });
+    req.flush({ id: 1, name: 'Sec', tasks: [] });
   });
 });

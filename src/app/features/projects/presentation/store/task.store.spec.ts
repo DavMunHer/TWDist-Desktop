@@ -19,7 +19,7 @@ describe('TaskStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     toggleExecute.mockImplementation((t: Task) => of(t.complete()));
-    updateExecute.mockImplementation((_projectId: string, task: Task) => of(task));
+    updateExecute.mockImplementation((_projectId: string, task: Task) => of({ success: true, value: task }));
     deleteExecute.mockReturnValue(of(void 0));
 
     TestBed.configureTestingModule({

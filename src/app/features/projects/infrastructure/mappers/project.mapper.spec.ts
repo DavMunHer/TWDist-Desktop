@@ -6,6 +6,15 @@ import { ProjectSummaryDto } from '@features/projects/infrastructure/dto/respons
 import { Project } from '@features/projects/domain/entities/project.entity';
 import { ProjectName } from '@features/projects/domain/value-objects/project-name.value-object';
 
+function validProjectName(value: string): ProjectName {
+  const result = ProjectName.tryCreate(value);
+  if (!result.success) {
+    throw new Error('Invalid test project name');
+  }
+
+  return result.value;
+}
+
 describe('ProjectMapper', () => {
   const fullDto: ProjectResponseDto = {
     id: '10',
@@ -57,7 +66,7 @@ describe('ProjectMapper', () => {
   });
 
   it('toDto maps name and favorite', () => {
-    const p = new Project('1', ProjectName.create('NN'), true, []);
+    const p = new Project('1', validProjectName('NN'), true, []);
     expect(ProjectMapper.toDto(p)).toEqual({ name: 'NN', favorite: true });
   });
 });
