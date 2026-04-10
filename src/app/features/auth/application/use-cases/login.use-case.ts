@@ -7,7 +7,7 @@ import { catchError, map } from 'rxjs/operators';
 import { Credentials } from '@features/auth/domain/value-objects/credentials.value-object';
 import { Result, fail, ok } from '@shared/utils/result';
 import { AuthFlowError } from '@features/auth/application/errors/auth-flow.error';
-import { AuthError } from '@features/auth/domain/errors/auth.error';
+import { toAuthFlowError } from '@features/auth/application/errors/auth-flow-error.mapper';
 
 @Injectable()
 export class LoginUseCase {
@@ -26,15 +26,7 @@ export class LoginUseCase {
 
     return this.authRepository.login(normalizedCredentials).pipe(
       map((user): Result<User, AuthFlowError> => ok(user)),
-      catchError((error: unknown) => of(fail(this.mapAuthError(error)))),
+      catchError((error: unknown) => of(fail(toAuthFlowError(error)))),
     );
-  }
-
-  private mapAuthError(error: unknown): AuthFlowError {
-    if (error instanceof AuthError) {
-      return { code: error.code };
-    }
-
-    return { code: 'NETWORK_ERROR' };
   }
 }
