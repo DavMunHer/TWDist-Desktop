@@ -14,6 +14,22 @@ export function toAuthUiError(error: AuthFlowError): AuthUiError {
         },
         retryable: false,
       };
+    case 'INVALID_EMAIL_FORMAT':
+      return {
+        code: error.code,
+        kind: 'validation',
+        message: 'Please enter a valid email address',
+        fieldErrors: { email: 'Invalid email format' },
+        retryable: false,
+      };
+    case 'PASSWORD_TOO_SHORT':
+      return {
+        code: error.code,
+        kind: 'validation',
+        message: 'Password must be at least 3 characters long',
+        fieldErrors: { password: 'Password must be at least 3 characters' },
+        retryable: false,
+      };
     case 'USERNAME_REQUIRED':
       return {
         code: error.code,

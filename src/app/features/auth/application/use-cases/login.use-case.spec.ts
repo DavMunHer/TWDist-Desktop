@@ -61,6 +61,22 @@ describe('LoginUseCase', () => {
     expect(mockAuthRepository.login).not.toHaveBeenCalled();
   });
 
+  it('returns INVALID_EMAIL_FORMAT for malformed email', () => {
+    useCase.execute({ email: 'bad-email', password: 'password123' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'INVALID_EMAIL_FORMAT' } });
+    });
+
+    expect(mockAuthRepository.login).not.toHaveBeenCalled();
+  });
+
+  it('returns PASSWORD_TOO_SHORT for short password', () => {
+    useCase.execute({ email: 'test@test.com', password: 'ab' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'PASSWORD_TOO_SHORT' } });
+    });
+
+    expect(mockAuthRepository.login).not.toHaveBeenCalled();
+  });
+
   it('maps unknown repository failures to NETWORK_ERROR', () => {
     (mockAuthRepository.login as ReturnType<typeof vi.fn>).mockReturnValue(throwError(() => new Error('boom')));
 

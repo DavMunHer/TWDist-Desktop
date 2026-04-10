@@ -63,6 +63,22 @@ describe('CreateUserUseCase', () => {
     expect(authRepositoryMock.register).not.toHaveBeenCalled();
   });
 
+  it('returns validation error for malformed email', () => {
+    useCase.execute({ ...dto, email: 'bad-email' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'INVALID_EMAIL_FORMAT' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
+  it('returns validation error for short password', () => {
+    useCase.execute({ ...dto, password: 'ab' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'PASSWORD_TOO_SHORT' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
   it('returns validation error for blank username', () => {
     useCase.execute({ ...dto, username: '   ' }).subscribe((result) => {
       expect(result).toEqual({ success: false, error: { code: 'USERNAME_REQUIRED' } });

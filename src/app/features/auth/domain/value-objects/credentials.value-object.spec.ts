@@ -35,9 +35,18 @@ describe('Credentials', () => {
       });
     });
 
-    it('does NOT validate email format (known TODO - only emptiness is checked)', () => {
-      const result = Credentials.tryCreate('not-an-email', 'password123');
-      expect(result.success).toBe(true);
+    it('returns INVALID_EMAIL_FORMAT when email is not valid', () => {
+      expect(Credentials.tryCreate('not-an-email', 'password123')).toEqual({
+        success: false,
+        error: { code: 'INVALID_EMAIL_FORMAT' },
+      });
+    });
+
+    it('returns PASSWORD_TOO_SHORT when password has less than 3 characters', () => {
+      expect(Credentials.tryCreate('user@example.com', 'ab')).toEqual({
+        success: false,
+        error: { code: 'PASSWORD_TOO_SHORT' },
+      });
     });
   });
 });
