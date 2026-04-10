@@ -14,17 +14,15 @@ import { LoginCredentialsDto } from '@features/auth/infrastructure/dto/request/l
 const MOCK_USER = new User('1', 'test@test.com', 'testuser');
 const CREDENTIALS: LoginCredentialsDto = { email: 'test@test.com', password: 'password123' };
 
-// Lightweight mock use case objects — only stubbing the execute() we care about for login
 const mockLoginUseCase = { execute: vi.fn() };
 const mockLogoutUseCase = { execute: vi.fn().mockReturnValue(of(void 0)) };
 const mockGetCurrentUserUseCase = { execute: vi.fn().mockReturnValue(of(null)) };
 const mockCreateUserUseCase = { execute: vi.fn() };
 
-describe('AuthStore – login slice', () => {
+describe('AuthStore - login slice', () => {
   let store: AuthStore;
 
   beforeEach(() => {
-    // Reset mocks between tests
     vi.clearAllMocks();
 
     TestBed.configureTestingModule({
@@ -50,13 +48,13 @@ describe('AuthStore – login slice', () => {
     it('starts idle with no error', () => {
       expect(store.isLoading()).toBe(false);
       expect(store.error()).toBeNull();
+      expect(store.errorDetails()).toBeNull();
     });
   });
 
   describe('login()', () => {
-    it('sets isLoading = true while the HTTP call is in flight', () => {
-      // Subject lets us control when the observable resolves
-      const pending$ = new Subject<User>();
+    it('sets isLoading = true while the call is in flight', () => {
+      const pending$ = new Subject<{ success: true; value: User }>();
       mockLoginUseCase.execute.mockReturnValue(pending$.asObservable());
 
       store.login(CREDENTIALS);
@@ -64,21 +62,22 @@ describe('AuthStore – login slice', () => {
       expect(store.isLoading()).toBe(true);
     });
 
-    it('clears any previous error when a new login attempt begins', () => {
-      // First, simulate a failed login to set an error
-      mockLoginUseCase.execute.mockReturnValue(throwError(() => new Error('previous error')));
+    it('clears previous error when a new login attempt begins', () => {
+      mockLoginUseCase.execute.mockReturnValue(
+        of({ success: false, error: { code: 'INVALID_CREDENTIALS' } })
+      );
       store.login(CREDENTIALS);
 
-      // Then start a new attempt that stays in flight
-      const pending$ = new Subject<User>();
+      const pending$ = new Subject<{ success: true; value: User }>();
       mockLoginUseCase.execute.mockReturnValue(pending$.asObservable());
       store.login(CREDENTIALS);
 
       expect(store.error()).toBeNull();
+      expect(store.errorDetails()).toBeNull();
     });
 
-    it('updates user, sets isAuthenticated = true, clears isLoading on success', () => {
-      mockLoginUseCase.execute.mockReturnValue(of(MOCK_USER));
+    it('updates user and auth flags on success', () => {
+      mockLoginUseCase.execute.mockReturnValue(of({ success: true, value: MOCK_USER }));
 
       store.login(CREDENTIALS);
 
@@ -86,11 +85,12 @@ describe('AuthStore – login slice', () => {
       expect(store.isAuthenticated()).toBe(true);
       expect(store.isLoading()).toBe(false);
       expect(store.error()).toBeNull();
+      expect(store.errorDetails()).toBeNull();
     });
 
-    it('sets the error message and clears isLoading on failure (Error instance)', () => {
+    it('sets mapped error details on business failure', () => {
       mockLoginUseCase.execute.mockReturnValue(
-        throwError(() => new Error('Invalid email or password'))
+        of({ success: false, error: { code: 'INVALID_CREDENTIALS' } })
       );
 
       store.login(CREDENTIALS);
@@ -99,18 +99,23 @@ describe('AuthStore – login slice', () => {
       expect(store.isLoading()).toBe(false);
       expect(store.isAuthenticated()).toBe(false);
       expect(store.user()).toBeNull();
+      expect(store.errorDetails()).toMatchObject({
+        kind: 'auth',
+        code: 'INVALID_CREDENTIALS',
+      });
     });
 
-    it('uses a fallback message for non-Error throwables', () => {
+    it('uses fallback message for non-Error throwables', () => {
       mockLoginUseCase.execute.mockReturnValue(throwError(() => 'raw string error'));
 
       store.login(CREDENTIALS);
 
       expect(store.error()).toBe('Unable to login. Please try again.');
+      expect(store.errorDetails()).toBeNull();
     });
 
-    it('passes the received credentials directly to loginUseCase.execute()', () => {
-      mockLoginUseCase.execute.mockReturnValue(of(MOCK_USER));
+    it('passes credentials directly to loginUseCase.execute()', () => {
+      mockLoginUseCase.execute.mockReturnValue(of({ success: true, value: MOCK_USER }));
 
       store.login(CREDENTIALS);
 
