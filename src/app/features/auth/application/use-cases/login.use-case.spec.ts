@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { LoginUseCase } from './login.use-case';
 import { AuthRepository } from '@features/auth/domain/repositories/auth.repository';
@@ -45,10 +45,28 @@ describe('LoginUseCase', () => {
   });
 
   it('returns the observable emitted by the repository (no transformation)', () => {
-    let result: User | undefined;
-    useCase.execute(CREDENTIALS).subscribe((user) => (result = user));
+    useCase.execute(CREDENTIALS).subscribe((result) => {
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.value).toBe(MOCK_USER);
+      }
+    });
+  });
 
-    expect(result).toBe(MOCK_USER);
+  it('returns validation error for empty credentials', () => {
+    useCase.execute({ email: '', password: '' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'CREDENTIALS_REQUIRED' } });
+    });
+
+    expect(mockAuthRepository.login).not.toHaveBeenCalled();
+  });
+
+  it('maps unknown repository failures to NETWORK_ERROR', () => {
+    (mockAuthRepository.login as ReturnType<typeof vi.fn>).mockReturnValue(throwError(() => new Error('boom')));
+
+    useCase.execute(CREDENTIALS).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'NETWORK_ERROR' } });
+    });
   });
 
   it('does not call any other repository method', () => {

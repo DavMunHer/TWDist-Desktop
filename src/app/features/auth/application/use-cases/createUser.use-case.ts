@@ -1,16 +1,46 @@
 import { Injectable, inject } from "@angular/core";
 import { AuthRepository } from "@features/auth/domain/repositories/auth.repository";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { User } from "@features/auth/domain/entities/user.entity";
 import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
+import { catchError, map } from 'rxjs/operators';
+import { Credentials } from '@features/auth/domain/value-objects/credentials.value-object';
+import { Result, fail, ok } from '@shared/utils/result';
+import { AuthFlowError } from '@features/auth/application/errors/auth-flow.error';
+import { AuthError } from '@features/auth/domain/errors/auth.error';
 
 @Injectable()
 export class CreateUserUseCase {
-  private authRepository = inject(AuthRepository);
+  private readonly authRepository = inject(AuthRepository);
 
+  execute(dto: RegisterCredentialsDto): Observable<Result<User, AuthFlowError>> {
+    const credentialsResult = Credentials.tryCreate(dto.email, dto.password);
+    if (!credentialsResult.success) {
+      return of(fail(credentialsResult.error));
+    }
 
-  execute(dto: RegisterCredentialsDto): Observable<User | null> {
-    // Just return user, cookie is handled automatically
-    return this.authRepository.register(dto);
+    if (!dto.username.trim()) {
+      const usernameRequired: AuthFlowError = { code: 'USERNAME_REQUIRED' };
+      return of(fail(usernameRequired));
+    }
+
+    const normalizedDto: RegisterCredentialsDto = {
+      email: credentialsResult.value.email,
+      password: credentialsResult.value.password,
+      username: dto.username.trim(),
+    };
+
+    return this.authRepository.register(normalizedDto).pipe(
+      map((user): Result<User, AuthFlowError> => ok(user)),
+      catchError((error: unknown) => of(fail(this.mapAuthError(error)))),
+    );
+  }
+
+  private mapAuthError(error: unknown): AuthFlowError {
+    if (error instanceof AuthError) {
+      return { code: error.code };
+    }
+
+    return { code: 'NETWORK_ERROR' };
   }
 }
