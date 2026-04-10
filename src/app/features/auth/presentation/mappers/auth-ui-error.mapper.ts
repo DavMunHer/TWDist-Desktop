@@ -38,6 +38,14 @@ export function toAuthUiError(error: AuthFlowError): AuthUiError {
         fieldErrors: { username: 'Username is required' },
         retryable: false,
       };
+    case 'USERNAME_TOO_SHORT':
+      return {
+        code: error.code,
+        kind: 'validation',
+        message: 'Username must be at least 3 characters long',
+        fieldErrors: { username: 'Username must be at least 3 characters' },
+        retryable: false,
+      };
     case 'INVALID_CREDENTIALS':
       return {
         code: error.code,

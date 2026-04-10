@@ -3,6 +3,7 @@ export type AuthFlowError =
   | { code: 'INVALID_EMAIL_FORMAT' }
   | { code: 'PASSWORD_TOO_SHORT' }
   | { code: 'USERNAME_REQUIRED' }
+  | { code: 'USERNAME_TOO_SHORT' }
   | { code: 'INVALID_CREDENTIALS' }
   | { code: 'INVALID_LOGIN_RESPONSE' }
   | { code: 'INVALID_REGISTER_RESPONSE' }

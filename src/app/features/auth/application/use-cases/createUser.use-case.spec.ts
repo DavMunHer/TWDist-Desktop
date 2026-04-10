@@ -87,6 +87,14 @@ describe('CreateUserUseCase', () => {
     expect(authRepositoryMock.register).not.toHaveBeenCalled();
   });
 
+  it('returns validation error for username shorter than 3 characters', () => {
+    useCase.execute({ ...dto, username: 'ab' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'USERNAME_TOO_SHORT' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
   it('maps unknown repository failures to NETWORK_ERROR', () => {
     (authRepositoryMock.register as ReturnType<typeof vi.fn>).mockReturnValue(throwError(() => new Error('boom')));
 

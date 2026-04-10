@@ -4,7 +4,7 @@ import { Observable, of } from "rxjs";
 import { User } from "@features/auth/domain/entities/user.entity";
 import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
 import { catchError, map } from 'rxjs/operators';
-import { Credentials } from '@features/auth/domain/value-objects/credentials.value-object';
+import { RegisterCredentials } from '@features/auth/domain/value-objects/register-credentials.value-object';
 import { Result, fail, ok } from '@shared/utils/result';
 import { AuthFlowError } from '@features/auth/application/errors/auth-flow.error';
 import { AuthError } from '@features/auth/domain/errors/auth.error';
@@ -14,20 +14,19 @@ export class CreateUserUseCase {
   private readonly authRepository = inject(AuthRepository);
 
   execute(dto: RegisterCredentialsDto): Observable<Result<User, AuthFlowError>> {
-    const credentialsResult = Credentials.tryCreate(dto.email, dto.password);
-    if (!credentialsResult.success) {
-      return of(fail(credentialsResult.error));
-    }
-
-    if (!dto.username.trim()) {
-      const usernameRequired: AuthFlowError = { code: 'USERNAME_REQUIRED' };
-      return of(fail(usernameRequired));
+    const registerCredentialsResult = RegisterCredentials.tryCreate(
+      dto.email,
+      dto.password,
+      dto.username
+    );
+    if (!registerCredentialsResult.success) {
+      return of(fail(registerCredentialsResult.error));
     }
 
     const normalizedDto: RegisterCredentialsDto = {
-      email: credentialsResult.value.email,
-      password: credentialsResult.value.password,
-      username: dto.username.trim(),
+      email: registerCredentialsResult.value.email,
+      password: registerCredentialsResult.value.password,
+      username: registerCredentialsResult.value.username,
     };
 
     return this.authRepository.register(normalizedDto).pipe(
