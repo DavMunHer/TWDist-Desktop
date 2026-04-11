@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { of } from 'rxjs';
-import { vi } from 'vitest';
+import { of, throwError } from 'rxjs';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { CreateUserUseCase } from './createUser.use-case';
 import { AuthRepository } from '@features/auth/domain/repositories/auth.repository';
@@ -49,9 +49,57 @@ describe('CreateUserUseCase', () => {
     expect(authRepositoryMock.register).toHaveBeenCalledWith(dto);
   });
 
-  it('returns the observable emitted by the repository', () => {
+  it('returns success result emitted by the repository', () => {
     useCase.execute(dto).subscribe((result) => {
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({ success: true, value: mockUser });
+    });
+  });
+
+  it('returns validation error for missing credentials', () => {
+    useCase.execute({ ...dto, email: '' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'CREDENTIALS_REQUIRED' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
+  it('returns validation error for malformed email', () => {
+    useCase.execute({ ...dto, email: 'bad-email' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'INVALID_EMAIL_FORMAT' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
+  it('returns validation error for short password', () => {
+    useCase.execute({ ...dto, password: 'ab' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'PASSWORD_TOO_SHORT' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
+  it('returns validation error for blank username', () => {
+    useCase.execute({ ...dto, username: '   ' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'USERNAME_REQUIRED' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
+  it('returns validation error for username shorter than 3 characters', () => {
+    useCase.execute({ ...dto, username: 'ab' }).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'USERNAME_TOO_SHORT' } });
+    });
+
+    expect(authRepositoryMock.register).not.toHaveBeenCalled();
+  });
+
+  it('maps unknown repository failures to NETWORK_ERROR', () => {
+    (authRepositoryMock.register as ReturnType<typeof vi.fn>).mockReturnValue(throwError(() => new Error('boom')));
+
+    useCase.execute(dto).subscribe((result) => {
+      expect(result).toEqual({ success: false, error: { code: 'NETWORK_ERROR' } });
     });
   });
 });

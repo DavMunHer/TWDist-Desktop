@@ -8,35 +8,45 @@ describe('CredentialsMapper', () => {
     it('maps a LoginCredentialsDto to a Credentials value object', () => {
       const dto: LoginCredentialsDto = { email: 'test@test.com', password: 'password123' };
 
-      const creds = CredentialsMapper.toDomain(dto);
+      const result = CredentialsMapper.toDomain(dto);
+      expect(result.success).toBe(true);
+      if (!result.success) {
+        throw new Error('Expected success result');
+      }
 
-      expect(creds).toBeInstanceOf(Credentials);
-      expect(creds.email).toBe('test@test.com');
-      expect(creds.password).toBe('password123');
+      expect(result.value).toBeInstanceOf(Credentials);
+      expect(result.value.email).toBe('test@test.com');
+      expect(result.value.password).toBe('password123');
     });
 
-    it('throws if the DTO has an empty email (propagates VO validation)', () => {
+    it('returns error if the DTO has an empty email', () => {
       const dto: LoginCredentialsDto = { email: '', password: 'password123' };
 
-      expect(() => CredentialsMapper.toDomain(dto)).toThrow(
-        'Email and password are required'
-      );
+      expect(CredentialsMapper.toDomain(dto)).toEqual({
+        success: false,
+        error: { code: 'CREDENTIALS_REQUIRED' },
+      });
     });
 
-    it('throws if the DTO has an empty password (propagates VO validation)', () => {
+    it('returns error if the DTO has an empty password', () => {
       const dto: LoginCredentialsDto = { email: 'test@test.com', password: '' };
 
-      expect(() => CredentialsMapper.toDomain(dto)).toThrow(
-        'Email and password are required'
-      );
+      expect(CredentialsMapper.toDomain(dto)).toEqual({
+        success: false,
+        error: { code: 'CREDENTIALS_REQUIRED' },
+      });
     });
   });
 
   describe('toDto()', () => {
     it('maps a Credentials VO back to a LoginCredentialsDto', () => {
-      const creds = new Credentials('test@test.com', 'password123');
+      const credsResult = Credentials.tryCreate('test@test.com', 'password123');
+      expect(credsResult.success).toBe(true);
+      if (!credsResult.success) {
+        throw new Error('Expected success result');
+      }
 
-      const dto = CredentialsMapper.toDto(creds);
+      const dto = CredentialsMapper.toDto(credsResult.value);
 
       expect(dto.email).toBe('test@test.com');
       expect(dto.password).toBe('password123');
@@ -45,7 +55,13 @@ describe('CredentialsMapper', () => {
     it('round-trips correctly: toDomain → toDto preserves values', () => {
       const original: LoginCredentialsDto = { email: 'round@trip.com', password: 'roundtrip1' };
 
-      const dto = CredentialsMapper.toDto(CredentialsMapper.toDomain(original));
+      const result = CredentialsMapper.toDomain(original);
+      expect(result.success).toBe(true);
+      if (!result.success) {
+        throw new Error('Expected success result');
+      }
+
+      const dto = CredentialsMapper.toDto(result.value);
 
       expect(dto).toEqual(original);
     });
