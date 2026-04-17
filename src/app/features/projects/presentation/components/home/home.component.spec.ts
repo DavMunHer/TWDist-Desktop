@@ -15,6 +15,8 @@ import { UpcomingComponent } from '@features/upcoming/presentation/components/up
 import { TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { ProjectViewModel } from '@features/projects/presentation/models/project.view-model';
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -54,6 +56,10 @@ describe('HomeComponent', () => {
     pendingCountFor: vi.fn().mockReturnValue(0),
   };
 
+  const modalServiceMock = {
+    open: vi.fn(),
+  };
+
   function flushRoute(url: string): void {
     routerUrl = url;
     routerEvents$.next(new NavigationEnd(1, url, url));
@@ -68,6 +74,7 @@ describe('HomeComponent', () => {
     projectStoreMock.projects.set([]);
     projectStoreMock.selectedProjectId.set(null);
     activatedRouteMock.snapshot.paramMap = convertToParamMap({ id: 'p1' });
+    modalServiceMock.open.mockReset();
 
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
@@ -77,6 +84,7 @@ describe('HomeComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: ProjectStore, useValue: projectStoreMock },
         { provide: ProjectSummaryStore, useValue: projectSummaryStoreMock },
+        { provide: ModalService, useValue: modalServiceMock },
       ],
     }).compileComponents();
 
@@ -154,8 +162,32 @@ describe('HomeComponent', () => {
       expect(projectStoreMock.toggleProjectFavorite).toHaveBeenCalledWith('pid');
     });
 
-    it('delegates delete to project store', () => {
+    it('opens delete confirmation modal for a project', () => {
+      projectStoreMock.projects.set([{ id: 'pid', name: 'Inbox', favorite: false, sectionIds: [] }]);
+
       component['onSidebarDeleteClick']('pid');
+
+      expect(modalServiceMock.open).toHaveBeenCalledWith(
+        ConfirmComponent,
+        expect.objectContaining({
+          title: 'Delete Project',
+        }),
+      );
+      expect(projectStoreMock.deleteProject).not.toHaveBeenCalled();
+    });
+
+    it('delegates delete to project store only after confirmation', () => {
+      projectStoreMock.projects.set([{ id: 'pid', name: 'Inbox', favorite: false, sectionIds: [] }]);
+
+      component['onSidebarDeleteClick']('pid');
+
+      const [, config] = modalServiceMock.open.mock.calls[0] as [
+        typeof ConfirmComponent,
+        { onClose?: (result?: unknown) => void }
+      ];
+
+      config.onClose?.(true);
+
       expect(projectStoreMock.deleteProject).toHaveBeenCalledWith('pid');
     });
 

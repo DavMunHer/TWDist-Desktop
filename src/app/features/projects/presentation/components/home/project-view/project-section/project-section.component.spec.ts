@@ -4,10 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProjectSectionComponent } from '@features/projects/presentation/components/home/project-view/project-section/project-section.component';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { SectionViewModel } from '@features/projects/presentation/models/project.view-model';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 
 describe('ProjectSectionComponent', () => {
   let component: ProjectSectionComponent;
   let fixture: ComponentFixture<ProjectSectionComponent>;
+  let modalServiceMock: { open: ReturnType<typeof vi.fn> };
 
   const section: SectionViewModel = {
     id: 's1',
@@ -17,9 +20,16 @@ describe('ProjectSectionComponent', () => {
   };
 
   beforeEach(async () => {
+    modalServiceMock = {
+      open: vi.fn(),
+    };
+
     await TestBed.configureTestingModule({
       imports: [ProjectSectionComponent],
-      providers: [provideZonelessChangeDetection()],
+      providers: [
+        provideZonelessChangeDetection(),
+        { provide: ModalService, useValue: modalServiceMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProjectSectionComponent);
@@ -67,11 +77,36 @@ describe('ProjectSectionComponent', () => {
     expect(emitSpy).toHaveBeenCalledWith({ id: 's1', name: 'New Name' });
   });
 
-  it('emits sectionDelete with section id when Delete is clicked', () => {
+  it('opens confirmation modal when Delete is clicked', () => {
+    component['menuOpen'].set(true);
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('.section-menu-item--danger').click();
+
+    expect(modalServiceMock.open).toHaveBeenCalledWith(
+      ConfirmComponent,
+      expect.objectContaining({
+        title: 'Delete Section',
+      }),
+    );
+  });
+
+  it('emits sectionDelete only after confirmation', () => {
     const emitSpy = vi.spyOn(component.sectionDelete, 'emit');
     component['menuOpen'].set(true);
     fixture.detectChanges();
+
     fixture.nativeElement.querySelector('.section-menu-item--danger').click();
+
+    expect(emitSpy).not.toHaveBeenCalled();
+
+    const [, config] = modalServiceMock.open.mock.calls[0] as [
+      typeof ConfirmComponent,
+      { onClose?: (result?: unknown) => void }
+    ];
+
+    config.onClose?.(true);
+
     expect(emitSpy).toHaveBeenCalledWith({ id: 's1' });
   });
 

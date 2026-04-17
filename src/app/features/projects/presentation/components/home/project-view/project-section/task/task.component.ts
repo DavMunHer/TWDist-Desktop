@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, forwardRef, input, output, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -8,6 +8,8 @@ import {
   TaskViewModel,
 } from '@features/projects/presentation/models/project.view-model';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 
 @Component({
   selector: 'app-task',
@@ -17,6 +19,8 @@ import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
   styleUrl: './task.component.css',
 })
 export class TaskComponent {
+  private readonly modalService = inject(ModalService);
+
   public taskInfo = input.required<TaskViewModel>();
   public sectionId = input.required<string>();
 
@@ -93,7 +97,19 @@ export class TaskComponent {
   protected onDelete(event: Event): void {
     event.stopPropagation();
     this.menuOpen.set(false);
-    this.taskDelete.emit({ id: this.taskInfo().id, sectionId: this.sectionId() });
+
+    this.modalService.open(ConfirmComponent, {
+      title: 'Delete Task',
+      data: {
+        message: `Delete task "${this.taskInfo().name}"? This action cannot be undone.`,
+        confirmLabel: 'Delete task',
+        cancelLabel: 'Cancel',
+      },
+      onClose: (confirmed?: unknown) => {
+        if (confirmed !== true) return;
+        this.taskDelete.emit({ id: this.taskInfo().id, sectionId: this.sectionId() });
+      },
+    });
   }
 
   protected forwardTaskToggle(event: TaskToggleEvent): void {
