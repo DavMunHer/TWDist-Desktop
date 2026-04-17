@@ -23,8 +23,8 @@ export class ModalComponent {
   readonly activeModal = computed(() => this.modalService.activeModal());
   readonly title = computed(() => this.modalService.activeModal()?.config.title ?? '');
 
-  close(): void {
-    this.modalService.close();
+  close(result?: unknown): void {
+    this.modalService.close(result);
   }
 
   private renderContent(vcr: ViewContainerRef): void {
@@ -38,7 +38,7 @@ export class ModalComponent {
       providers: [
         {
           provide: ModalRef,
-          useValue: new ModalRef(() => this.close()),
+          useValue: new ModalRef((result: unknown) => this.close(result)),
         },
         {
           provide: MODAL_DATA,

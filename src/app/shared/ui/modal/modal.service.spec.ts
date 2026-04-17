@@ -1,6 +1,6 @@
 import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ModalService } from '@shared/ui/modal/modal.service';
 
 @Component({ selector: 'app-stub', template: '', standalone: true })
@@ -56,5 +56,14 @@ describe('ModalService', () => {
     service.close();
 
     expect(service.activeModal()).toBeNull();
+  });
+
+  it('invokes onClose callback with close result', () => {
+    const onClose = vi.fn();
+    service.open(StubComponent, { title: 'Confirm', onClose });
+
+    service.close(true);
+
+    expect(onClose).toHaveBeenCalledWith(true);
   });
 });
