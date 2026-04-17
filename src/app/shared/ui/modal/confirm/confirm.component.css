@@ -1,0 +1,39 @@
+.confirm-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.confirm-modal-message {
+  margin: 0;
+  color: #3d3d3d;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.confirm-modal-cancel,
+.confirm-modal-confirm {
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.confirm-modal-cancel {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.confirm-modal-confirm {
+  background: #dc2626;
+  color: #ffffff;
+}
