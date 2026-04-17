@@ -59,6 +59,7 @@ describe('ModalComponent', () => {
     backdrop.triggerEventHandler('click');
 
     expect(closeSpy).toHaveBeenCalledTimes(1);
+    expect(closeSpy).toHaveBeenCalledWith();
   });
 
   it('closes when header close button is clicked', () => {
@@ -70,6 +71,7 @@ describe('ModalComponent', () => {
     closeButton.triggerEventHandler('click');
 
     expect(closeSpy).toHaveBeenCalledTimes(1);
+    expect(closeSpy).toHaveBeenCalledWith();
   });
 
   it('clears backdrop after close', () => {

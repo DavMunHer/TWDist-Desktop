@@ -23,7 +23,11 @@ export class ModalComponent {
   readonly activeModal = computed(() => this.modalService.activeModal());
   readonly title = computed(() => this.modalService.activeModal()?.config.title ?? '');
 
-  close(result?: unknown): void {
+  dismiss(): void {
+    this.modalService.close();
+  }
+
+  private closeWithResult(result?: unknown): void {
     this.modalService.close(result);
   }
 
@@ -38,7 +42,7 @@ export class ModalComponent {
       providers: [
         {
           provide: ModalRef,
-          useValue: new ModalRef((result: unknown) => this.close(result)),
+          useValue: new ModalRef((result: unknown) => this.closeWithResult(result)),
         },
         {
           provide: MODAL_DATA,
