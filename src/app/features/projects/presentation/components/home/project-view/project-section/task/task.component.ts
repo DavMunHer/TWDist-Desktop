@@ -101,7 +101,7 @@ export class TaskComponent {
     this.modalService.open(ConfirmComponent, {
       title: 'Delete Task',
       data: {
-        message: `Delete task "${this.taskInfo().name}"? This action cannot be undone.`,
+        entityName: this.taskInfo().name,
         confirmLabel: 'Delete task',
         cancelLabel: 'Cancel',
       },

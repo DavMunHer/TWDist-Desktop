@@ -155,7 +155,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.modalService.open(ConfirmComponent, {
       title: 'Delete Project',
       data: {
-        message: `Delete project "${project.name}" and all its sections and tasks? This action cannot be undone.`,
+        entityName: project.name,
+        cascadeMessage: 'This will also delete all sections and tasks in this project.',
         confirmLabel: 'Delete project',
         cancelLabel: 'Cancel',
       },

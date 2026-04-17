@@ -19,7 +19,8 @@ describe('ConfirmComponent', () => {
         {
           provide: MODAL_DATA,
           useValue: {
-            message: 'Delete section "Inbox" and all its tasks? This action cannot be undone.',
+            entityName: 'Inbox',
+            cascadeMessage: 'This will also delete all tasks in this section.',
             confirmLabel: 'Delete',
             cancelLabel: 'Cancel',
           },
@@ -32,9 +33,14 @@ describe('ConfirmComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders confirmation message', () => {
+  it('renders confirmation message with bold entity name and permanent warning', () => {
     const message = fixture.nativeElement.querySelector('.confirm-modal-message') as HTMLElement;
-    expect(message.textContent?.trim()).toContain('Delete section "Inbox" and all its tasks?');
+    const strongElements = Array.from(message.querySelectorAll('strong')) as HTMLElement[];
+
+    expect(message.textContent).toContain('Are you sure you want to delete');
+    expect(message.textContent).toContain('This will also delete all tasks in this section.');
+    expect(strongElements[0]?.textContent).toBe('"Inbox"');
+    expect(strongElements[1]?.textContent).toBe('permanently');
   });
 
   it('closes with false when cancel is clicked', () => {

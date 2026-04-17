@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MODAL_DATA, ModalRef } from '@shared/ui/modal/modal-ref';
 
 interface ConfirmModalData {
-  message: string;
+  entityName: string;
+  cascadeMessage?: string;
   confirmLabel?: string;
   cancelLabel?: string;
 }
@@ -18,7 +19,8 @@ export class ConfirmComponent {
   private readonly modalRef = inject(ModalRef<boolean>);
   private readonly modalData = inject<ConfirmModalData>(MODAL_DATA);
 
-  protected readonly message = this.modalData.message;
+  protected readonly entityName = this.modalData.entityName;
+  protected readonly cascadeMessage = this.modalData.cascadeMessage;
   protected readonly confirmLabel = this.modalData.confirmLabel ?? 'Delete';
   protected readonly cancelLabel = this.modalData.cancelLabel ?? 'Cancel';
 

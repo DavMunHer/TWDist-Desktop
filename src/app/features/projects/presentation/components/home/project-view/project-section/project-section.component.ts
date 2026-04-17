@@ -113,7 +113,8 @@ export class ProjectSectionComponent {
     this.modalService.open(ConfirmComponent, {
       title: 'Delete Section',
       data: {
-        message: `Delete section "${this.sectionInfo().name}" and all its tasks? This action cannot be undone.`,
+        entityName: this.sectionInfo().name,
+        cascadeMessage: 'This will also delete all tasks in this section.',
         confirmLabel: 'Delete section',
         cancelLabel: 'Cancel',
       },
