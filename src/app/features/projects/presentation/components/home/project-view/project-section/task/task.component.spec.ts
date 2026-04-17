@@ -4,10 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskComponent } from '@features/projects/presentation/components/home/project-view/project-section/task/task.component';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TaskViewModel } from '@features/projects/presentation/models/project.view-model';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 
 describe('TaskComponent', () => {
   let component: TaskComponent;
   let fixture: ComponentFixture<TaskComponent>;
+  let modalServiceMock: { open: ReturnType<typeof vi.fn> };
 
   const task: TaskViewModel = {
     id: 't1',
@@ -18,9 +21,16 @@ describe('TaskComponent', () => {
   };
 
   beforeEach(async () => {
+    modalServiceMock = {
+      open: vi.fn(),
+    };
+
     await TestBed.configureTestingModule({
       imports: [TaskComponent],
-      providers: [provideZonelessChangeDetection()],
+      providers: [
+        provideZonelessChangeDetection(),
+        { provide: ModalService, useValue: modalServiceMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TaskComponent);
@@ -82,7 +92,22 @@ describe('TaskComponent', () => {
     expect(fixture.nativeElement.querySelector('.task-cancel-btn')).toBeNull();
   });
 
-  it('emits taskDelete when delete is clicked in menu', () => {
+  it('opens confirmation modal when delete is clicked in menu', () => {
+    fixture.nativeElement.querySelector('.task-menu-trigger').click();
+    fixture.detectChanges();
+
+    const deleteBtn: HTMLElement = fixture.nativeElement.querySelector('.task-menu-item--danger');
+    deleteBtn.click();
+
+    expect(modalServiceMock.open).toHaveBeenCalledWith(
+      ConfirmComponent,
+      expect.objectContaining({
+        title: 'Delete Task',
+      }),
+    );
+  });
+
+  it('emits taskDelete only after confirmation', () => {
     const emitSpy = vi.spyOn(component.taskDelete, 'emit');
 
     fixture.nativeElement.querySelector('.task-menu-trigger').click();
@@ -90,6 +115,15 @@ describe('TaskComponent', () => {
 
     const deleteBtn: HTMLElement = fixture.nativeElement.querySelector('.task-menu-item--danger');
     deleteBtn.click();
+
+    expect(emitSpy).not.toHaveBeenCalled();
+
+    const [, config] = modalServiceMock.open.mock.calls[0] as [
+      typeof ConfirmComponent,
+      { onClose?: (result?: unknown) => void }
+    ];
+
+    config.onClose?.(true);
 
     expect(emitSpy).toHaveBeenCalledWith({ id: 't1', sectionId: 's1' });
   });

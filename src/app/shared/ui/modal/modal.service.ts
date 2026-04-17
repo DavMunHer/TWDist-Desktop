@@ -3,6 +3,7 @@ import { Injectable, signal, Type } from '@angular/core';
 export interface ModalConfig {
   title: string;
   data?: Record<string, unknown>;
+  onClose?: (result?: unknown) => void;
 }
 
 export interface ActiveModal {
@@ -20,7 +21,9 @@ export class ModalService {
     this.activeModal.set({ component, config });
   }
 
-  close(): void {
+  close(result?: unknown): void {
+    const modal = this.activeModal();
     this.activeModal.set(null);
+    modal?.config.onClose?.(result);
   }
 }

@@ -27,6 +27,10 @@ export class ModalComponent {
     this.modalService.close();
   }
 
+  private closeWithResult(result?: unknown): void {
+    this.modalService.close(result);
+  }
+
   private renderContent(vcr: ViewContainerRef): void {
     const modal = this.activeModal();
     if (!modal) return;
@@ -38,7 +42,7 @@ export class ModalComponent {
       providers: [
         {
           provide: ModalRef,
-          useValue: new ModalRef(() => this.close()),
+          useValue: new ModalRef((result: unknown) => this.closeWithResult(result)),
         },
         {
           provide: MODAL_DATA,

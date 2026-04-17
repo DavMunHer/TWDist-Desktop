@@ -1,0 +1,13 @@
+<div class="confirm-modal">
+  <p class="confirm-modal-message">
+    Are you sure you want to delete <strong>"{{ entityName }}"</strong>?
+    This item will be deleted <strong>permanently</strong>.
+    @if (cascadeMessage) {
+      {{ cascadeMessage }}
+    }
+  </p>
+  <div class="confirm-modal-actions">
+    <button type="button" class="confirm-modal-cancel" (click)="cancel()">{{ cancelLabel }}</button>
+    <button type="button" class="confirm-modal-confirm" (click)="confirm()">{{ confirmLabel }}</button>
+  </div>
+</div>

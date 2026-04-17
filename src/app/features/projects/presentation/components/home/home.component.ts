@@ -11,6 +11,7 @@ import { ProjectSummaryStore } from '@features/projects/presentation/store/proje
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { CreateProjectComponent } from '@features/projects/presentation/components/create-project/create-project.component';
+import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 
 @Component({
   selector: 'app-home',
@@ -148,7 +149,22 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   protected onSidebarDeleteClick(projectId: string): void {
-    this.projectStore.deleteProject(projectId);
+    const project = this.projectStore.projects().find((p) => p.id === projectId);
+    if (!project) return;
+
+    this.modalService.open(ConfirmComponent, {
+      title: 'Delete Project',
+      data: {
+        entityName: project.name,
+        cascadeMessage: 'This will also delete all sections and tasks in this project.',
+        confirmLabel: 'Delete project',
+        cancelLabel: 'Cancel',
+      },
+      onClose: (confirmed?: unknown) => {
+        if (confirmed !== true) return;
+        this.projectStore.deleteProject(projectId);
+      },
+    });
   }
 
   protected openCreateProjectModal(): void {

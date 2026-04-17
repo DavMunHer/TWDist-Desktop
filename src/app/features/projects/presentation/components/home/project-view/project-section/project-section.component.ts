@@ -1,4 +1,4 @@
-import { Component, input, linkedSignal, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, linkedSignal, output, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import {
@@ -11,6 +11,8 @@ import {
   TaskToggleEvent,
 } from '@features/projects/presentation/models/project.view-model';
 import { TaskComponent } from '@features/projects/presentation/components/home/project-view/project-section/task/task.component';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 
 @Component({
   selector: 'app-project-section',
@@ -20,6 +22,8 @@ import { TaskComponent } from '@features/projects/presentation/components/home/p
   styleUrl: './project-section.component.css',
 })
 export class ProjectSectionComponent {
+  private readonly modalService = inject(ModalService);
+
   public sectionInfo = input.required<SectionViewModel>();
   public taskToggle = output<TaskToggleEvent>();
   public taskCreate = output<TaskCreateEvent>();
@@ -105,7 +109,20 @@ export class ProjectSectionComponent {
   protected onDelete(event: Event): void {
     event.stopPropagation();
     this.menuOpen.set(false);
-    this.sectionDelete.emit({ id: this.sectionInfo().id });
+
+    this.modalService.open(ConfirmComponent, {
+      title: 'Delete Section',
+      data: {
+        entityName: this.sectionInfo().name,
+        cascadeMessage: 'This will also delete all tasks in this section.',
+        confirmLabel: 'Delete section',
+        cancelLabel: 'Cancel',
+      },
+      onClose: (confirmed?: unknown) => {
+        if (confirmed !== true) return;
+        this.sectionDelete.emit({ id: this.sectionInfo().id });
+      },
+    });
   }
 
   protected openTaskForm(): void {
