@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
-import { ToggleTaskCompletionUseCase } from '@features/projects/application/use-cases/tasks/toggle-task-completion/toggle-task-completion.use-case';
+import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
 import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { initialTaskState, TaskState } from '@features/projects/presentation/models/task-state';
@@ -19,7 +19,7 @@ import { UiError } from '@features/projects/presentation/models/ui-error';
 @Injectable({ providedIn: 'root' })
 export class TaskStore {
   private readonly createTaskUseCase = inject(CreateTaskUseCase);
-  private readonly toggleTaskUseCase = inject(ToggleTaskCompletionUseCase);
+  private readonly completeTaskUseCase = inject(CompleteTaskUseCase);
   private readonly updateTaskUseCase = inject(UpdateTaskUseCase);
   private readonly deleteTaskUseCase = inject(DeleteTaskUseCase);
 
@@ -219,16 +219,44 @@ export class TaskStore {
     });
   }
 
-  /** Toggle a task's completed status */
-  toggleTaskCompletion(taskId: string): void {
+  /** Toggle a task's completed status in backend and local state */
+  toggleTaskCompletion(projectId: string, taskId: string): void {
     const existing = this.state().tasks[taskId];
     if (!existing) return;
 
-    this.toggleTaskUseCase.execute(existing).subscribe((updatedTask) => {
-      this.state.update(s => ({
-        ...s,
-        tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
-      }));
+    if (existing.completed) {
+      const requestTask = existing.uncomplete();
+
+      this.updateTaskUseCase.execute(projectId, requestTask).subscribe({
+        next: (result) => {
+          if (!result.success) {
+            this.setResultError(result.error, 'uncomplete task');
+            return;
+          }
+
+          const updatedTask = result.value;
+          this.state.update(s => ({
+            ...s,
+            tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
+          }));
+        },
+      });
+      return;
+    }
+
+    this.completeTaskUseCase.execute(projectId, existing).subscribe({
+      next: (result) => {
+        if (!result.success) {
+          this.setResultError(result.error, 'complete task');
+          return;
+        }
+
+        const updatedTask = result.value;
+        this.state.update(s => ({
+          ...s,
+          tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
+        }));
+      },
     });
   }
 

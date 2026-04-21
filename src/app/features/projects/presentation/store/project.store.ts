@@ -483,7 +483,13 @@ export class ProjectStore {
 
   /** Toggle a task's completed status */
   toggleTaskCompletion(taskId: string): void {
-    this.taskStore.toggleTaskCompletion(taskId);
+    const projectId = this.state().selectedProjectId;
+    if (!projectId) {
+      console.error('Cannot toggle task completion: no project selected');
+      return;
+    }
+
+    this.taskStore.toggleTaskCompletion(projectId, taskId);
   }
 
   /** Update a task name */

@@ -5,20 +5,20 @@ import { of } from 'rxjs';
 
 import { TaskStore } from './task.store';
 import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
-import { ToggleTaskCompletionUseCase } from '@features/projects/application/use-cases/tasks/toggle-task-completion/toggle-task-completion.use-case';
+import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
 import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { Task } from '@features/projects/domain/entities/task.entity';
 
 describe('TaskStore', () => {
   let store: TaskStore;
-  const toggleExecute = vi.fn();
+  const completeExecute = vi.fn();
   const updateExecute = vi.fn();
   const deleteExecute = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    toggleExecute.mockImplementation((t: Task) => of(t.complete()));
+    completeExecute.mockImplementation((_projectId: string, t: Task) => of({ success: true, value: t.complete() }));
     updateExecute.mockImplementation((_projectId: string, task: Task) => of({ success: true, value: task }));
     deleteExecute.mockReturnValue(of(void 0));
 
@@ -27,7 +27,7 @@ describe('TaskStore', () => {
         provideZonelessChangeDetection(),
         TaskStore,
         { provide: CreateTaskUseCase, useValue: { execute: vi.fn() } },
-        { provide: ToggleTaskCompletionUseCase, useValue: { execute: toggleExecute } },
+        { provide: CompleteTaskUseCase, useValue: { execute: completeExecute } },
         { provide: UpdateTaskUseCase, useValue: { execute: updateExecute } },
         { provide: DeleteTaskUseCase, useValue: { execute: deleteExecute } },
       ],
@@ -46,9 +46,20 @@ describe('TaskStore', () => {
     const start = new Date();
     const t = new Task('t1', 's', 'Name', false, start, undefined, undefined, undefined, undefined, undefined, []);
     store.mergeTasks([t]);
-    store.toggleTaskCompletion('t1');
-    expect(toggleExecute).toHaveBeenCalled();
+    store.toggleTaskCompletion('p1', 't1');
+    expect(completeExecute).toHaveBeenCalledWith('p1', expect.objectContaining({ id: 't1' }));
     expect(store.tasks()['t1']?.completed).toBe(true);
+  });
+
+  it('toggleTaskCompletion uncompletes through update use case when task is already completed', () => {
+    const t = new Task('t1', 's1', 'Done task', true, new Date(), undefined, undefined, undefined, new Date(), undefined, []);
+    store.mergeTasks([t]);
+
+    store.toggleTaskCompletion('p1', 't1');
+
+    expect(completeExecute).not.toHaveBeenCalled();
+    expect(updateExecute).toHaveBeenCalledWith('p1', expect.objectContaining({ id: 't1', completed: false }));
+    expect(store.tasks()['t1']?.completed).toBe(false);
   });
 
   it('updateTaskName updates task name when use case succeeds', () => {
