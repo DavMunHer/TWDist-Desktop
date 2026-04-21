@@ -57,6 +57,22 @@ describe('HttpTaskRepository', () => {
     });
   });
 
+  it('complete PATCHes to task complete URL with completedDate', () => {
+    const completedDate = '4/21/2026, 10:30:00 AM';
+    repository.complete('p1', 'sec', 't1', completedDate).subscribe();
+    const req = httpMock.expectOne('/projects/p1/section/sec/task/t1/complete');
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({ completedDate });
+    req.flush({
+      id: 1,
+      name: 'Job',
+      description: '',
+      start_date: start,
+      end_date: end,
+      completed: true,
+    });
+  });
+
   it('delete sends DELETE', () => {
     repository.delete('p1', 'sec', 't1').subscribe();
     const req = httpMock.expectOne('/projects/p1/section/sec/task/t1/delete');
