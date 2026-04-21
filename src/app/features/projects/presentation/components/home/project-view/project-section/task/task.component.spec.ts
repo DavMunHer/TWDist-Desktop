@@ -51,8 +51,9 @@ describe('TaskComponent', () => {
 
   it('emits taskToggle when completion control is activated', () => {
     const emitSpy = vi.spyOn(component.taskToggle, 'emit');
-    const label: HTMLElement = fixture.nativeElement.querySelector('.completed-button-label');
-    label?.click();
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.completed-button');
+    input.checked = true;
+    input.dispatchEvent(new Event('change'));
     expect(emitSpy).toHaveBeenCalledWith({ id: 't1' });
   });
 
