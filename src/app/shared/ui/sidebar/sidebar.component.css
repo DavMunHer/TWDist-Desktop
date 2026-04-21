@@ -29,9 +29,6 @@
 
         & .profile-dropdown {
           position: relative;
-          display: flex;
-          align-items: center;
-          padding: 5px;
 
           &.open {
             background-color: #eaeaea;
@@ -46,6 +43,17 @@
             height: 30px;
             margin-right: 10px;
             border-radius: 50%;
+          }
+
+          & .profile-dropdown-trigger {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border: none;
+            background: none;
+            font: inherit;
+            width: 100%;
+            text-align: left;
           }
 
           & .profile-name {
@@ -67,11 +75,18 @@
             padding-block: 5px;
             margin-top: 5px;
 
+            & .dropdown-action,
             & div {
               display: flex;
               align-items: center;
               padding-inline: 7px;
               margin-inline: 7px;
+
+              border: none;
+              background: none;
+              width: calc(100% - 14px);
+              text-align: left;
+
               & a {
                 font-size: small;
                 color: black;
@@ -105,6 +120,10 @@
           align-items: center;
           justify-content: center;
           padding: 5px;
+
+          border: none;
+          background: none;
+          font: inherit;
         }
       }
     }

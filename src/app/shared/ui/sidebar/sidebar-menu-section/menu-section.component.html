@@ -39,7 +39,7 @@
                 <span class="pending-tasks">{{item.pendingTasks}}</span>
                 @if (item.icon === 'project') {
                 <div class="project-menu-wrapper">
-                    <div class="project-menu-trigger" tabindex="0" (keydown.enter)="toggleProjectMenu(item.id, $event)" (click)="toggleProjectMenu(item.id, $event)">
+                    <button type="button" class="project-menu-trigger" (click)="toggleProjectMenu(item.id, $event)" aria-label="Open project menu">
                         <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -59,9 +59,9 @@
                                     stroke-linejoin="round"></path>
                             </g>
                         </svg>
-                    </div>
+                    </button>
                     @if (openMenuProjectId() === item.id) {
-                    <div class="project-menu-backdrop" tabindex="0" (keydown.enter)="closeMenu($event)" (click)="closeMenu($event)"></div>
+                    <button type="button" class="project-menu-backdrop" (click)="closeMenu($event)" aria-label="Close project menu"></button>
                     <div class="project-menu-dropdown">
                         <button type="button" class="project-menu-item"
                             (click)="onFavoriteClick(item.id, $event)">

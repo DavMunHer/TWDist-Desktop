@@ -1,6 +1,7 @@
 @if (activeModal()) {
-<div class="modal-backdrop" tabindex="0" (keydown.enter)="close()" (click)="close()">
-  <div class="modal-container" tabindex="0" (keydown.enter)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+<div class="modal-backdrop">
+  <button type="button" class="modal-backdrop-close" (click)="close()" aria-label="Close modal"></button>
+  <div class="modal-container">
     <div class="modal-header">
       <span class="modal-title">{{ title() }}</span>
       <button class="modal-close" (click)="close()">&#10005;</button>

@@ -96,6 +96,9 @@
                         justify-content: center;
                         padding: 3px;
                         border-radius: 5px;
+                        border: none;
+                        background: none;
+                        font: inherit;
                         cursor: pointer;
                         color: #555;
 
@@ -111,6 +114,9 @@
                         width: 100vw;
                         height: 100vh;
                         z-index: 99;
+                        border: none;
+                        background: transparent;
+                        padding: 0;
                     }
 
                     & .section-menu-dropdown {
@@ -270,6 +276,11 @@
                 align-items: center;
                 padding-inline: 8px;
                 padding-block: 8px;
+                width: 100%;
+                border: none;
+                background: none;
+                font: inherit;
+                text-align: left;
                 color: var(--main-color);
                 user-select: none;
                 border-radius: 6px;

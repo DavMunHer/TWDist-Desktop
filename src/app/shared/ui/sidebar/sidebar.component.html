@@ -2,22 +2,23 @@
   <div class="test">
     <div class="top-section">
       <div class="sidebar-profile ">
-        <div class="profile-dropdown sidebar-hover" [ngClass]="{'open' : toggleDropdownVal()}"
-          tabindex="0" (keydown.enter)="toggleDropdown()" (click)="toggleDropdown()">
-          <img class="profile-avatar" src="\Default_pfp.png" alt="Profile Picture">
-          <span class="profile-name">Oscar</span>
-          <svg id="arrow-down" width="20px" height="20px" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z"
-                fill="#0F0F0F"></path>
-            </g>
-          </svg>
+        <div class="profile-dropdown" [ngClass]="{'open' : toggleDropdownVal()}">
+          <button type="button" class="profile-dropdown-trigger sidebar-hover" (click)="toggleDropdown()" aria-label="Toggle profile menu">
+            <img class="profile-avatar" src="\Default_pfp.png" alt="Profile Picture">
+            <span class="profile-name">Oscar</span>
+            <svg id="arrow-down" width="20px" height="20px" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M5.70711 9.71069C5.31658 10.1012 5.31658 10.7344 5.70711 11.1249L10.5993 16.0123C11.3805 16.7927 12.6463 16.7924 13.4271 16.0117L18.3174 11.1213C18.708 10.7308 18.708 10.0976 18.3174 9.70708C17.9269 9.31655 17.2937 9.31655 16.9032 9.70708L12.7176 13.8927C12.3271 14.2833 11.6939 14.2832 11.3034 13.8927L7.12132 9.71069C6.7308 9.32016 6.09763 9.32016 5.70711 9.71069Z"
+                  fill="#0F0F0F"></path>
+              </g>
+            </svg>
+          </button>
           <div class="dropdown-content">
-            <div tabindex="0" (keydown.enter)="openProfileModal()" (click)="openProfileModal()">
+            <button type="button" class="dropdown-action" (click)="openProfileModal()">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                 stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="8" r="3.5" />
@@ -25,9 +26,9 @@
                 <path d="M6 20H18" />
               </svg>
               <a>Profile</a>
-            </div>
+            </button>
             <hr>
-            <div tabindex="0" (keydown.enter)="openConfigurationModal()" (click)="openConfigurationModal()">
+            <button type="button" class="dropdown-action" (click)="openConfigurationModal()">
               <svg width="24px" height="24px" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
                 stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                 <path
@@ -36,7 +37,7 @@
                   d="M0 13V15C0 16.5478 1.17261 17.822 2.67809 17.9826C2.80588 18.3459 2.95062 18.7011 3.11133 19.0473C2.12484 20.226 2.18536 21.984 3.29291 23.0916L4.70712 24.5058C5.78946 25.5881 7.49305 25.6706 8.67003 24.7531C9.1044 24.9688 9.55383 25.159 10.0163 25.3218C10.1769 26.8273 11.4511 28 12.9993 28H14.9993C16.5471 28 17.8211 26.8279 17.9821 25.3228C18.4024 25.175 18.8119 25.0046 19.2091 24.8129C20.3823 25.6664 22.0344 25.564 23.0926 24.5058L24.5068 23.0916C25.565 22.0334 25.6674 20.3813 24.814 19.2081C25.0054 18.8113 25.1757 18.4023 25.3234 17.9824C26.8282 17.8211 28 16.5472 28 14.9996V12.9996C28 11.452 26.8282 10.1782 25.3234 10.0169C25.1605 9.55375 24.9701 9.10374 24.7541 8.66883C25.6708 7.49189 25.5882 5.78888 24.5061 4.70681L23.0919 3.29259C21.9846 2.18531 20.2271 2.12455 19.0485 3.1103C18.7017 2.94935 18.3459 2.80441 17.982 2.67647C17.8207 1.17177 16.5468 0 14.9993 0H12.9993C11.4514 0 10.1773 1.17231 10.0164 2.6775C9.60779 2.8213 9.20936 2.98653 8.82251 3.17181C7.64444 2.12251 5.83764 2.16276 4.70782 3.29259L3.2936 4.7068C2.16377 5.83664 2.12352 7.64345 3.17285 8.82152C2.98737 9.20877 2.82199 9.60763 2.67809 10.0167C1.17261 10.1773 0 11.4515 0 12.9996Z" />
               </svg>
               <a>Configuration</a>
-            </div>
+            </button>
             <hr>
             <div>
               <svg id="log-out-ico" width="24px" height="24px" viewBox="0 0 24 24" fill="none"
@@ -66,13 +67,13 @@
             </g>
           </svg>
         </div>
-        <div class="icon-nt icon-view sidebar-hover" tabindex="0" (keydown.enter)="toggleSidebar()" (click)="toggleSidebar()">
+        <button type="button" class="icon-nt icon-view sidebar-hover" (click)="toggleSidebar()" aria-label="Toggle sidebar visibility">
           <svg width="20px" height="20px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none"
             stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="1" width="14" height="14" rx="2" ry="2" />
             <line x1="5" y1="1" x2="5" y2="15" />
           </svg>
-        </div>
+        </button>
       </div>
     </div>
 

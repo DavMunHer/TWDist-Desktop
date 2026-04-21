@@ -78,6 +78,9 @@
                     justify-content: center;
                     padding: 2px;
                     border-radius: 5px;
+                    border: none;
+                    background: none;
+                    font: inherit;
                     opacity: 0;
                     visibility: hidden;
                     cursor: pointer;
@@ -95,6 +98,9 @@
                     width: 100vw;
                     height: 100vh;
                     z-index: 99;
+                    border: none;
+                    background: transparent;
+                    padding: 0;
                 }
 
                 & .project-menu-dropdown {
