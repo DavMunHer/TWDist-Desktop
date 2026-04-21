@@ -12,6 +12,14 @@
   padding: 16px;
   box-sizing: border-box;
 
+  & .modal-backdrop-close {
+    position: absolute;
+    inset: 0;
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
   & .modal-container {
     /* Shared design tokens — cascade into all dynamically rendered content components */
     --modal-subtitle-size: 14px;
@@ -34,6 +42,8 @@
     animation: modalFadeIn 0.2s ease-out;
     max-height: min(90vh, 90dvh);
     overflow: hidden;
+    position: relative;
+    z-index: 1;
 
     & .modal-header {
       display: flex;

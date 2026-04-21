@@ -55,7 +55,7 @@ describe('ModalComponent', () => {
     fixture.detectChanges();
 
     const closeSpy = vi.spyOn(modalService, 'close');
-    const backdrop = fixture.debugElement.query(By.css('.modal-backdrop'));
+    const backdrop = fixture.debugElement.query(By.css('.modal-backdrop-close'));
     backdrop.triggerEventHandler('click');
 
     expect(closeSpy).toHaveBeenCalledTimes(1);

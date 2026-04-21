@@ -78,7 +78,7 @@ describe('SidebarComponent', () => {
 
   it('opens profile modal when profile option is clicked', () => {
     const openSpy = vi.spyOn(modalService, 'open');
-    const profileOptionDE = fixture.debugElement.query(By.css('.dropdown-content div'));
+    const profileOptionDE = fixture.debugElement.query(By.css('.dropdown-content .dropdown-action'));
 
     profileOptionDE.triggerEventHandler('click');
 

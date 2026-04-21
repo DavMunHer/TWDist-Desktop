@@ -122,6 +122,9 @@
             align-items: center;
             justify-content: center;
             border-radius: 4px;
+            border: none;
+            background: none;
+            font: inherit;
             cursor: pointer;
             color: #555;
             padding: 2px;
@@ -135,6 +138,9 @@
             position: fixed;
             inset: 0;
             z-index: 99;
+            border: none;
+            background: transparent;
+            padding: 0;
         }
 
         & .task-menu-dropdown {

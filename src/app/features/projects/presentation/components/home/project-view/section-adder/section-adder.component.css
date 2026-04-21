@@ -94,6 +94,11 @@
         display: flex;
         align-items: center;
         padding-block: 10px;
+        width: 100%;
+        border: none;
+        background: none;
+        font: inherit;
+        text-align: left;
         color: var(--main-color);
         user-select: none;
 
