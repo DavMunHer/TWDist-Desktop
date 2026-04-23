@@ -55,11 +55,57 @@
   & .breadcrumb-right-section {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     padding-inline: 10px;
     width: 50%;
 
     & .breadcrumb-ico {
       margin: 2px 2px 0px 2px;
+    }
+
+    & .breadcrumb-filter-menu {
+      position: relative;
+
+      & .breadcrumb-filter-button {
+        display: flex;
+        border: none;
+        background: none;
+        font: inherit;
+        padding: 0;
+      }
+
+      & .task-filter-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 190px;
+        padding: 12px;
+        border: 1px solid #d9d9d9;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        z-index: 10;
+
+        & .task-filter-title {
+          margin: 0 0 10px 0;
+          font-size: 13px;
+          font-weight: 600;
+          color: #222;
+        }
+
+        & .task-filter-option {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: #444;
+          margin-bottom: 8px;
+        }
+
+        & .task-filter-option:last-child {
+          margin-bottom: 0;
+        }
+      }
     }
   }
 }

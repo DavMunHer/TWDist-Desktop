@@ -58,4 +58,39 @@ describe('BreadcrumbComponent', () => {
     expect(rightIcons[0].getAttribute('aria-label')).toBe('Filter items');
     expect(rightIcons[1].getAttribute('aria-label')).toBeNull();
   });
+
+  it('shows task filter options when clicking the filter icon', () => {
+    const filterButton: HTMLButtonElement | null =
+      fixture.nativeElement.querySelector('.breadcrumb-filter-button');
+
+    filterButton?.click();
+    fixture.detectChanges();
+
+    const panel: HTMLElement | null = fixture.nativeElement.querySelector('#task-filter-panel');
+    const optionLabels = Array.from(
+      fixture.nativeElement.querySelectorAll('.task-filter-option span') as NodeListOf<HTMLElement>
+    ).map(el => el.textContent?.trim());
+
+    expect(panel).not.toBeNull();
+    expect(panel?.tagName).toBe('DIALOG');
+    expect(optionLabels).toEqual([
+      'All tasks',
+      'Uncompleted tasks',
+      'Completed tasks',
+    ]);
+  });
+
+  it('hides task filter options when clicking the filter icon twice', () => {
+    const filterButton: HTMLButtonElement | null =
+      fixture.nativeElement.querySelector('.breadcrumb-filter-button');
+
+    filterButton?.click();
+    fixture.detectChanges();
+    filterButton?.click();
+    fixture.detectChanges();
+
+    const panel: HTMLElement | null = fixture.nativeElement.querySelector('#task-filter-panel');
+
+    expect(panel).toBeNull();
+  });
 });
