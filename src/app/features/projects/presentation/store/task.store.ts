@@ -226,28 +226,26 @@ export class TaskStore {
     const existing = this.state().tasks[taskId];
     if (!existing) return;
 
-    if (existing.completed) {
-      this.uncompleteTaskUseCase.execute(projectId, existing).subscribe({
-        next: (result) => {
-          if (!result.success) {
-            this.setResultError(result.error, 'uncomplete task');
-            return;
-          }
+    const optimisticTask = existing.completed ? existing.uncomplete() : existing.complete();
+    this.state.update(s => ({
+      ...s,
+      tasks: { ...s.tasks, [taskId]: optimisticTask },
+    }));
 
-          const updatedTask = result.value;
-          this.state.update(s => ({
-            ...s,
-            tasks: { ...s.tasks, [updatedTask.id]: updatedTask },
-          }));
-        },
-      });
-      return;
-    }
+    const request$ = existing.completed
+      ? this.uncompleteTaskUseCase.execute(projectId, existing)
+      : this.completeTaskUseCase.execute(projectId, existing);
+    const context = existing.completed ? 'uncomplete task' : 'complete task';
 
-    this.completeTaskUseCase.execute(projectId, existing).subscribe({
+    request$.subscribe({
       next: (result) => {
         if (!result.success) {
-          this.setResultError(result.error, 'complete task');
+          // Roll back the optimistic update when persistence fails.
+          this.state.update(s => ({
+            ...s,
+            tasks: { ...s.tasks, [taskId]: existing },
+          }));
+          this.setResultError(result.error, context);
           return;
         }
 

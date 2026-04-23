@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { TaskStore } from './task.store';
 import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
@@ -49,10 +49,22 @@ describe('TaskStore', () => {
   it('toggleTaskCompletion replaces task from use case result', () => {
     const start = new Date();
     const t = new Task('t1', 's', 'Name', false, start, undefined, undefined, undefined, undefined, undefined, []);
+    const responseTask = new Task('t1', 's', 'Name', true, start, undefined, undefined, undefined, new Date(), undefined, []);
+    const pendingResult = new Subject<{ success: true; value: Task }>();
+    completeExecute.mockReturnValue(pendingResult.asObservable());
+
     store.mergeTasks([t]);
     store.toggleTaskCompletion('p1', 't1');
+
+    // UI should reflect completion immediately, before backend response.
+    expect(store.tasks()['t1']?.completed).toBe(true);
+
+    pendingResult.next({ success: true, value: responseTask });
+    pendingResult.complete();
+
     expect(completeExecute).toHaveBeenCalledWith('p1', expect.objectContaining({ id: 't1' }));
     expect(store.tasks()['t1']?.completed).toBe(true);
+    expect(store.tasks()['t1']?.completedDate).toBe(responseTask.completedDate);
   });
 
   it('toggleTaskCompletion uncompletes through update use case when task is already completed', () => {
@@ -64,6 +76,18 @@ describe('TaskStore', () => {
     expect(completeExecute).not.toHaveBeenCalled();
     expect(uncompleteExecute).toHaveBeenCalledWith('p1', expect.objectContaining({ id: 't1', completed: true }));
     expect(updateExecute).not.toHaveBeenCalled();
+    expect(store.tasks()['t1']?.completed).toBe(false);
+  });
+
+  it('toggleTaskCompletion rolls back optimistic completion when complete use case fails', () => {
+    const start = new Date();
+    const t = new Task('t1', 's', 'Name', false, start, undefined, undefined, undefined, undefined, undefined, []);
+    completeExecute.mockReturnValue(of({ success: false, error: { code: 'NETWORK_ERROR' as const } }));
+
+    store.mergeTasks([t]);
+    store.toggleTaskCompletion('p1', 't1');
+
+    expect(completeExecute).toHaveBeenCalledWith('p1', expect.objectContaining({ id: 't1' }));
     expect(store.tasks()['t1']?.completed).toBe(false);
   });
 
