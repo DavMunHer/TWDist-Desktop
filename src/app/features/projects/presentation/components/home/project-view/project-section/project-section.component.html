@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="section-end-area">
-                    <span class="section-task-count">{{ sectionInfo().taskCount }}</span>
+                    <span class="section-task-count">{{ visibleTaskCount() }}</span>
                 </div>
                 <div class="section-menu-wrapper">
                     <button
@@ -77,7 +77,7 @@
             }
         </header>
         <main class="tasks-container">
-            @for (task of sectionInfo().tasks; track task.id) {
+            @for (task of filteredTasks(); track task.id) {
                 <app-task
                     [taskInfo]="task"
                     [sectionId]="sectionInfo().id"

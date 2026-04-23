@@ -1,6 +1,10 @@
 <section class="project-section">
   <nav>
-    <app-breadcrumb [showIcon]="showIcon()" (iconClick)="handleIconChange()"/>
+    <app-breadcrumb
+      [showIcon]="showIcon()"
+      (iconClick)="handleIconChange()"
+      (taskFilterChange)="onTaskFilterChange($event)"
+    />
   </nav>
   <header class="project-header">
     @if (projectInfo()?.name; as name) {
@@ -12,6 +16,7 @@
     @for (section of projectInfo()?.sections; track section.id) {
     <app-project-section
       [sectionInfo]="section"
+      [taskFilter]="taskFilter()"
       (taskToggle)="updateTaskToCompleted($event)"
       (taskCreate)="onTaskCreate($event)"
       (taskRename)="onTaskRename($event)"

@@ -1,0 +1,1 @@
+export type TaskFilter = 'all' | 'uncompleted' | 'completed';

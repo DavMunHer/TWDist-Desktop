@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, input, output, ChangeDetectionStrategy, signal } from '@angular/core';
 import { ProjectSectionComponent } from '@features/projects/presentation/components/home/project-view/project-section/project-section.component';
 import { SectionAdderComponent } from '@features/projects/presentation/components/home/project-view/section-adder/section-adder.component';
 import { ProjectNameEditorComponent } from '@features/projects/presentation/components/home/project-view/project-name-editor/project-name-editor.component';
@@ -12,6 +12,7 @@ import {
   TaskToggleEvent,
 } from '@features/projects/presentation/models/project.view-model';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
+import { TaskFilter } from '@shared/types/task-filter.type';
 
 @Component({
   selector: 'app-project-view',
@@ -22,6 +23,7 @@ import { ProjectStore } from '@features/projects/presentation/store/project.stor
 })
 export class ProjectViewComponent {
   private readonly projectStore = inject(ProjectStore);
+  protected taskFilter = signal<TaskFilter>('uncompleted');
 
   // Tunnel for hiding icon when sidebar is visible
   public showIconChange = output<boolean>();
@@ -29,6 +31,10 @@ export class ProjectViewComponent {
 
   handleIconChange() {
     this.showIconChange.emit(true);
+  }
+
+  protected onTaskFilterChange(filter: TaskFilter): void {
+    this.taskFilter.set(filter);
   }
 
   /** Denormalized project view-model, ready for the template */

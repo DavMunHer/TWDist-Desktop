@@ -1,4 +1,4 @@
-import { Component, input, linkedSignal, output, signal, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, computed, input, linkedSignal, output, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import {
@@ -13,6 +13,7 @@ import {
 import { TaskComponent } from '@features/projects/presentation/components/home/project-view/project-section/task/task.component';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
+import { TaskFilter } from '@shared/types/task-filter.type';
 
 @Component({
   selector: 'app-project-section',
@@ -25,6 +26,7 @@ export class ProjectSectionComponent {
   private readonly modalService = inject(ModalService);
 
   public sectionInfo = input.required<SectionViewModel>();
+  public taskFilter = input<TaskFilter>('uncompleted');
   public taskToggle = output<TaskToggleEvent>();
   public taskCreate = output<TaskCreateEvent>();
   public taskRename = output<TaskRenameEvent>();
@@ -69,6 +71,21 @@ export class ProjectSectionComponent {
     if (errors['maxlength']) return 'Must be at most 50 characters';
     return null;
   }
+
+  protected filteredTasks = computed(() => {
+    const tasks = this.sectionInfo().tasks;
+
+    switch (this.taskFilter()) {
+      case 'completed':
+        return tasks.filter(task => task.completed);
+      case 'uncompleted':
+        return tasks.filter(task => !task.completed);
+      default:
+        return tasks;
+    }
+  });
+
+  protected visibleTaskCount = computed(() => this.filteredTasks().length);
 
   protected toggleMenu(event: Event): void {
     event.stopPropagation();
