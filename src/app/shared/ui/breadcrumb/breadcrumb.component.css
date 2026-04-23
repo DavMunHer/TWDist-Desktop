@@ -66,12 +66,21 @@
     & .breadcrumb-filter-menu {
       position: relative;
 
+      & .breadcrumb-filter-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+      }
+
       & .breadcrumb-filter-button {
         display: flex;
         border: none;
         background: none;
+        appearance: none;
         font: inherit;
         padding: 0;
+        line-height: 0;
       }
 
       & .task-filter-panel {
