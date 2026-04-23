@@ -53,15 +53,19 @@ describe('BreadcrumbComponent', () => {
 
   it('renders filter icon before the options icon in the right section', () => {
     const rightIcons = fixture.nativeElement.querySelectorAll('.breadcrumb-right-section .breadcrumb-ico');
+    const filterButton: HTMLButtonElement | null =
+      fixture.nativeElement.querySelector('.breadcrumb-filter-button');
 
     expect(rightIcons.length).toBe(2);
-    expect(rightIcons[0].getAttribute('aria-label')).toBe('Filter items');
+    expect(filterButton?.getAttribute('aria-label')).toBe('Filter items');
     expect(rightIcons[1].getAttribute('aria-label')).toBeNull();
   });
 
   it('shows task filter options when clicking the filter icon', () => {
     const filterButton: HTMLButtonElement | null =
       fixture.nativeElement.querySelector('.breadcrumb-filter-button');
+    const filterTrigger: HTMLElement | null =
+      fixture.nativeElement.querySelector('.breadcrumb-filter-trigger');
 
     filterButton?.click();
     fixture.detectChanges();
@@ -73,6 +77,7 @@ describe('BreadcrumbComponent', () => {
 
     expect(panel).not.toBeNull();
     expect(panel?.tagName).toBe('DIALOG');
+    expect(filterTrigger?.classList.contains('active')).toBe(true);
     expect(optionLabels).toEqual([
       'All tasks',
       'Uncompleted tasks',
@@ -83,6 +88,8 @@ describe('BreadcrumbComponent', () => {
   it('hides task filter options when clicking the filter icon twice', () => {
     const filterButton: HTMLButtonElement | null =
       fixture.nativeElement.querySelector('.breadcrumb-filter-button');
+    const filterTrigger: HTMLElement | null =
+      fixture.nativeElement.querySelector('.breadcrumb-filter-trigger');
 
     filterButton?.click();
     fixture.detectChanges();
@@ -92,5 +99,6 @@ describe('BreadcrumbComponent', () => {
     const panel: HTMLElement | null = fixture.nativeElement.querySelector('#task-filter-panel');
 
     expect(panel).toBeNull();
+    expect(filterTrigger?.classList.contains('active')).toBe(false);
   });
 });

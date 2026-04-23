@@ -148,3 +148,9 @@
   cursor: pointer;
 }
 
+.breadcrumb-hover.active {
+  background-color: #eaeaea;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
