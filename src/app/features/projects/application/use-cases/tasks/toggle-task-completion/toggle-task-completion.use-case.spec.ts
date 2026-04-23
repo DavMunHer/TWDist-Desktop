@@ -1,16 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 
 import { ToggleTaskCompletionUseCase } from './toggle-task-completion.use-case';
 import { Task } from '@features/projects/domain/entities/task.entity';
-import { TaskRepository } from '@features/projects/domain/repositories/task.repository';
+import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
+import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/uncomplete-task/uncomplete-task.use-case';
 
 describe('ToggleTaskCompletionUseCase', () => {
   let useCase: ToggleTaskCompletionUseCase;
-  const complete = vi.fn();
-  const uncomplete = vi.fn();
+  const completeExecute = vi.fn();
+  const uncompleteExecute = vi.fn();
 
   const start = new Date('2025-01-01');
   const open = Task.create('T', 's', start, 't1');
@@ -18,54 +19,45 @@ describe('ToggleTaskCompletionUseCase', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    complete.mockImplementation(() => of(done));
-    uncomplete.mockImplementation(() => of(open));
+    completeExecute.mockImplementation(() => of({ success: true, value: done }));
+    uncompleteExecute.mockImplementation(() => of({ success: true, value: open }));
 
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
         ToggleTaskCompletionUseCase,
-        {
-          provide: TaskRepository,
-          useValue: {
-            create: vi.fn(),
-            update: vi.fn(),
-            complete,
-            uncomplete,
-            delete: vi.fn(),
-            findById: vi.fn(),
-          },
-        },
+        { provide: CompleteTaskUseCase, useValue: { execute: completeExecute } },
+        { provide: UncompleteTaskUseCase, useValue: { execute: uncompleteExecute } },
       ],
     });
 
     useCase = TestBed.inject(ToggleTaskCompletionUseCase);
   });
 
-  it('returns completed task when input was incomplete', () => {
+  it('delegates incomplete task to CompleteTaskUseCase', () => {
     useCase.execute('p1', open).subscribe((result) => {
       expect(result.success).toBe(true);
       if (!result.success) return;
 
       expect(result.value.completed).toBe(true);
-      expect(complete).toHaveBeenCalledWith('p1', 's', 't1', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/));
-      expect(uncomplete).not.toHaveBeenCalled();
+      expect(completeExecute).toHaveBeenCalledWith('p1', open);
+      expect(uncompleteExecute).not.toHaveBeenCalled();
     });
   });
 
-  it('returns uncompleted task when input was complete', () => {
+  it('delegates completed task to UncompleteTaskUseCase', () => {
     useCase.execute('p1', done).subscribe((result) => {
       expect(result.success).toBe(true);
       if (!result.success) return;
 
       expect(result.value.completed).toBe(false);
-      expect(uncomplete).toHaveBeenCalledWith('p1', 's', 't1');
-      expect(complete).not.toHaveBeenCalled();
+      expect(uncompleteExecute).toHaveBeenCalledWith('p1', done);
+      expect(completeExecute).not.toHaveBeenCalled();
     });
   });
 
-  it('returns network error when repository update fails', () => {
-    complete.mockReturnValue(throwError(() => new Error('Network fail')));
+  it('returns delegated error from complete use case', () => {
+    completeExecute.mockReturnValue(of({ success: false, error: { code: 'NETWORK_ERROR' as const } }));
 
     useCase.execute('p1', open).subscribe((result) => {
       expect(result.success).toBe(false);

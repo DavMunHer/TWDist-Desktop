@@ -1,29 +1,21 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { Task } from '@features/projects/domain/entities/task.entity';
-import { TaskRepository } from '@features/projects/domain/repositories/task.repository';
 import { ProjectsError } from '@features/projects/application/errors/projects.error';
-import { Result, fail, ok } from '@shared/utils/result';
-import { formatDateToISO } from '@shared/utils/date.util';
+import { Result } from '@shared/utils/result';
+import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
+import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/uncomplete-task/uncomplete-task.use-case';
 
 @Injectable()
 export class ToggleTaskCompletionUseCase {
-  private readonly taskRepository = inject(TaskRepository);
+  private readonly completeTaskUseCase = inject(CompleteTaskUseCase);
+  private readonly uncompleteTaskUseCase = inject(UncompleteTaskUseCase);
 
   execute(projectId: string, task: Task): Observable<Result<Task, ProjectsError>> {
     if (task.completed) {
-      return this.taskRepository.uncomplete(projectId, task.sectionId, task.id).pipe(
-        map((updated): Result<Task, ProjectsError> => ok(updated)),
-        catchError(() => of(fail<ProjectsError>({ code: 'NETWORK_ERROR' }))),
-      );
+      return this.uncompleteTaskUseCase.execute(projectId, task);
     }
 
-    const completedDate = formatDateToISO(new Date());
-
-    return this.taskRepository.complete(projectId, task.sectionId, task.id, completedDate).pipe(
-      map((updated): Result<Task, ProjectsError> => ok(updated)),
-      catchError(() => of(fail<ProjectsError>({ code: 'NETWORK_ERROR' }))),
-    );
+    return this.completeTaskUseCase.execute(projectId, task);
   }
 }
