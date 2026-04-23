@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
 import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
+import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/uncomplete-task/uncomplete-task.use-case';
 import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { initialTaskState, TaskState } from '@features/projects/presentation/models/task-state';
@@ -20,6 +21,7 @@ import { UiError } from '@features/projects/presentation/models/ui-error';
 export class TaskStore {
   private readonly createTaskUseCase = inject(CreateTaskUseCase);
   private readonly completeTaskUseCase = inject(CompleteTaskUseCase);
+  private readonly uncompleteTaskUseCase = inject(UncompleteTaskUseCase);
   private readonly updateTaskUseCase = inject(UpdateTaskUseCase);
   private readonly deleteTaskUseCase = inject(DeleteTaskUseCase);
 
@@ -225,9 +227,7 @@ export class TaskStore {
     if (!existing) return;
 
     if (existing.completed) {
-      const requestTask = existing.uncomplete();
-
-      this.updateTaskUseCase.execute(projectId, requestTask).subscribe({
+      this.uncompleteTaskUseCase.execute(projectId, existing).subscribe({
         next: (result) => {
           if (!result.success) {
             this.setResultError(result.error, 'uncomplete task');

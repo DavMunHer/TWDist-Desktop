@@ -35,6 +35,12 @@ export class HttpTaskRepository extends TaskRepository {
       .pipe(map(responseDto => TaskMapper.toDomain(responseDto, sectionId)));
   }
 
+  uncomplete(projectId: string, sectionId: string, taskId: string): Observable<Task> {
+    return this.http
+      .patch<TaskDto>(`/projects/${projectId}/section/${sectionId}/task/${taskId}/uncomplete`, {}, requiresAuthContext())
+      .pipe(map(responseDto => TaskMapper.toDomain(responseDto, sectionId)));
+  }
+
   delete(projectId: string, sectionId: string, taskId: string): Observable<void> {
     return this.http.delete<void>(`/projects/${projectId}/section/${sectionId}/task/${taskId}/delete`, requiresAuthContext());
   }
