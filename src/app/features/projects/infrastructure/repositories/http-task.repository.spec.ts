@@ -73,6 +73,21 @@ describe('HttpTaskRepository', () => {
     });
   });
 
+  it('uncomplete PATCHes to task uncomplete URL', () => {
+    repository.uncomplete('p1', 'sec', 't1').subscribe();
+    const req = httpMock.expectOne('/projects/p1/section/sec/task/t1/uncomplete');
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({});
+    req.flush({
+      id: 1,
+      name: 'Job',
+      description: '',
+      start_date: start,
+      end_date: end,
+      completed: false,
+    });
+  });
+
   it('delete sends DELETE', () => {
     repository.delete('p1', 'sec', 't1').subscribe();
     const req = httpMock.expectOne('/projects/p1/section/sec/task/t1/delete');

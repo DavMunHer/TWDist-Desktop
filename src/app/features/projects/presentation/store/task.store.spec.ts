@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { TaskStore } from './task.store';
 import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
 import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
+import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/uncomplete-task/uncomplete-task.use-case';
 import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { Task } from '@features/projects/domain/entities/task.entity';
@@ -13,12 +14,14 @@ import { Task } from '@features/projects/domain/entities/task.entity';
 describe('TaskStore', () => {
   let store: TaskStore;
   const completeExecute = vi.fn();
+  const uncompleteExecute = vi.fn();
   const updateExecute = vi.fn();
   const deleteExecute = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
     completeExecute.mockImplementation((_projectId: string, t: Task) => of({ success: true, value: t.complete() }));
+    uncompleteExecute.mockImplementation((_projectId: string, t: Task) => of({ success: true, value: t.uncomplete() }));
     updateExecute.mockImplementation((_projectId: string, task: Task) => of({ success: true, value: task }));
     deleteExecute.mockReturnValue(of(void 0));
 
@@ -28,6 +31,7 @@ describe('TaskStore', () => {
         TaskStore,
         { provide: CreateTaskUseCase, useValue: { execute: vi.fn() } },
         { provide: CompleteTaskUseCase, useValue: { execute: completeExecute } },
+        { provide: UncompleteTaskUseCase, useValue: { execute: uncompleteExecute } },
         { provide: UpdateTaskUseCase, useValue: { execute: updateExecute } },
         { provide: DeleteTaskUseCase, useValue: { execute: deleteExecute } },
       ],
@@ -58,7 +62,8 @@ describe('TaskStore', () => {
     store.toggleTaskCompletion('p1', 't1');
 
     expect(completeExecute).not.toHaveBeenCalled();
-    expect(updateExecute).toHaveBeenCalledWith('p1', expect.objectContaining({ id: 't1', completed: false }));
+    expect(uncompleteExecute).toHaveBeenCalledWith('p1', expect.objectContaining({ id: 't1', completed: true }));
+    expect(updateExecute).not.toHaveBeenCalled();
     expect(store.tasks()['t1']?.completed).toBe(false);
   });
 

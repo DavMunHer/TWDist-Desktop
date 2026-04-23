@@ -9,7 +9,8 @@ import { TaskRepository } from '@features/projects/domain/repositories/task.repo
 
 describe('ToggleTaskCompletionUseCase', () => {
   let useCase: ToggleTaskCompletionUseCase;
-  const update = vi.fn();
+  const complete = vi.fn();
+  const uncomplete = vi.fn();
 
   const start = new Date('2025-01-01');
   const open = Task.create('T', 's', start, 't1');
@@ -17,7 +18,8 @@ describe('ToggleTaskCompletionUseCase', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    update.mockImplementation((_projectId: string, task: Task) => of(task));
+    complete.mockImplementation(() => of(done));
+    uncomplete.mockImplementation(() => of(open));
 
     TestBed.configureTestingModule({
       providers: [
@@ -27,7 +29,9 @@ describe('ToggleTaskCompletionUseCase', () => {
           provide: TaskRepository,
           useValue: {
             create: vi.fn(),
-            update,
+            update: vi.fn(),
+            complete,
+            uncomplete,
             delete: vi.fn(),
             findById: vi.fn(),
           },
@@ -44,7 +48,8 @@ describe('ToggleTaskCompletionUseCase', () => {
       if (!result.success) return;
 
       expect(result.value.completed).toBe(true);
-      expect(update).toHaveBeenCalledWith('p1', expect.objectContaining({ completed: true }));
+      expect(complete).toHaveBeenCalledWith('p1', 's', 't1', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/));
+      expect(uncomplete).not.toHaveBeenCalled();
     });
   });
 
@@ -54,12 +59,13 @@ describe('ToggleTaskCompletionUseCase', () => {
       if (!result.success) return;
 
       expect(result.value.completed).toBe(false);
-      expect(update).toHaveBeenCalledWith('p1', expect.objectContaining({ completed: false }));
+      expect(uncomplete).toHaveBeenCalledWith('p1', 's', 't1');
+      expect(complete).not.toHaveBeenCalled();
     });
   });
 
   it('returns network error when repository update fails', () => {
-    update.mockReturnValue(throwError(() => new Error('Network fail')));
+    complete.mockReturnValue(throwError(() => new Error('Network fail')));
 
     useCase.execute('p1', open).subscribe((result) => {
       expect(result.success).toBe(false);
