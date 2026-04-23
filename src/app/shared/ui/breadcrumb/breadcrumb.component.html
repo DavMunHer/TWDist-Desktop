@@ -16,6 +16,61 @@
     </div>
   </div>
   <div class="breadcrumb-right-section">
+    <div class="breadcrumb-filter-menu" appClickOutside (clickOutside)="closeTaskFilterMenu()">
+      <div class="breadcrumb-hover breadcrumb-ico breadcrumb-filter-trigger" [class.active]="showTaskFilterMenu()">
+        <button
+          type="button"
+          class="breadcrumb-filter-button"
+          aria-label="Filter items"
+          aria-controls="task-filter-panel"
+          [attr.aria-expanded]="showTaskFilterMenu()"
+          (click)="toggleTaskFilterMenu()"
+        >
+          <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M4 6H20L14 13V19L10 21V13L4 6Z"
+              stroke="#000000"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      @if (showTaskFilterMenu()) {
+        <dialog id="task-filter-panel" class="task-filter-panel" aria-label="Task filter" open>
+          <p class="task-filter-title">Show tasks</p>
+          <label class="task-filter-option">
+            <input
+              type="radio"
+              name="task-filter"
+              [checked]="selectedTaskFilter() === 'all'"
+              (change)="selectTaskFilter('all')"
+            />
+            <span>All tasks</span>
+          </label>
+          <label class="task-filter-option">
+            <input
+              type="radio"
+              name="task-filter"
+              [checked]="selectedTaskFilter() === 'uncompleted'"
+              (change)="selectTaskFilter('uncompleted')"
+            />
+            <span>Uncompleted tasks</span>
+          </label>
+          <label class="task-filter-option">
+            <input
+              type="radio"
+              name="task-filter"
+              [checked]="selectedTaskFilter() === 'completed'"
+              (change)="selectTaskFilter('completed')"
+            />
+            <span>Completed tasks</span>
+          </label>
+        </dialog>
+      }
+    </div>
     <div class="breadcrumb-hover breadcrumb-ico">
       <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>

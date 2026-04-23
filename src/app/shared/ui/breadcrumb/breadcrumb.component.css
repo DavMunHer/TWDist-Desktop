@@ -55,16 +55,100 @@
   & .breadcrumb-right-section {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     padding-inline: 10px;
     width: 50%;
 
     & .breadcrumb-ico {
       margin: 2px 2px 0px 2px;
     }
+
+    & .breadcrumb-filter-menu {
+      position: relative;
+
+      & .breadcrumb-filter-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+      }
+
+      & .breadcrumb-filter-button {
+        display: flex;
+        border: none;
+        background: none;
+        appearance: none;
+        font: inherit;
+        padding: 0;
+        line-height: 0;
+      }
+
+      & .task-filter-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        left: auto;
+        margin: 0;
+        width: max-content;
+        min-width: 220px;
+        max-width: calc(100vw - 24px);
+        padding: 14px 16px 12px;
+        border: 1px solid #d6d6d6;
+        border-radius: 16px;
+        background-color: #fff;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+        z-index: 10;
+        overflow: hidden;
+        transform: translateY(-2px);
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 22px;
+          right: -7px;
+          width: 14px;
+          height: 14px;
+          background-color: #fff;
+          border-top: 1px solid #d6d6d6;
+          border-right: 1px solid #d6d6d6;
+          transform: rotate(45deg);
+        }
+
+        & .task-filter-title {
+          margin: 0 0 12px 0;
+          font-size: 14px;
+          font-weight: 700;
+          color: #1f1f1f;
+        }
+
+        & .task-filter-option {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 14px;
+          color: #3f3f3f;
+          margin-bottom: 10px;
+
+          & input {
+            accent-color: #111;
+          }
+        }
+
+        & .task-filter-option:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
   }
 }
 
 .breadcrumb-hover:hover {
+  background-color: #eaeaea;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.breadcrumb-hover.active {
   background-color: #eaeaea;
   border-radius: 8px;
   cursor: pointer;
