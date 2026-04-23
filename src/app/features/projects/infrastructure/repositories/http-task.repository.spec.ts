@@ -73,10 +73,10 @@ describe('HttpTaskRepository', () => {
     });
   });
 
-  it('uncomplete PATCHes to task uncomplete URL', () => {
+  it('uncomplete POSTs to task uncomplete URL', () => {
     repository.uncomplete('p1', 'sec', 't1').subscribe();
     const req = httpMock.expectOne('/projects/p1/section/sec/task/t1/uncomplete');
-    expect(req.request.method).toBe('PATCH');
+    expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({});
     req.flush({
       id: 1,
