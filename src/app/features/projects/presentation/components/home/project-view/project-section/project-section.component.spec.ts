@@ -15,8 +15,23 @@ describe('ProjectSectionComponent', () => {
   const section: SectionViewModel = {
     id: 's1',
     name: 'Inbox',
-    taskCount: 0,
-    tasks: [],
+    taskCount: 2,
+    tasks: [
+      {
+        id: 't1',
+        name: 'Open task',
+        completed: false,
+        startDate: new Date('2026-01-01'),
+        subtasks: [],
+      },
+      {
+        id: 't2',
+        name: 'Done task',
+        completed: true,
+        startDate: new Date('2026-01-02'),
+        subtasks: [],
+      },
+    ],
   };
 
   beforeEach(async () => {
@@ -49,7 +64,35 @@ describe('ProjectSectionComponent', () => {
 
   it('renders the task count', () => {
     const count: HTMLElement = fixture.nativeElement.querySelector('.section-task-count');
-    expect(count.textContent?.trim()).toBe('0');
+    expect(count.textContent?.trim()).toBe('1');
+  });
+
+  it('renders only uncompleted tasks by default', () => {
+    const tasks = fixture.nativeElement.querySelectorAll('.task-container');
+
+    expect(tasks.length).toBe(1);
+  });
+
+  it('shows only completed tasks when filter is completed', () => {
+    fixture.componentRef.setInput('taskFilter', 'completed');
+    fixture.detectChanges();
+
+    const tasks = fixture.nativeElement.querySelectorAll('.task-container');
+    const count: HTMLElement = fixture.nativeElement.querySelector('.section-task-count');
+
+    expect(tasks.length).toBe(1);
+    expect(count.textContent?.trim()).toBe('1');
+  });
+
+  it('shows only uncompleted tasks when filter is uncompleted', () => {
+    fixture.componentRef.setInput('taskFilter', 'uncompleted');
+    fixture.detectChanges();
+
+    const tasks = fixture.nativeElement.querySelectorAll('.task-container');
+    const count: HTMLElement = fixture.nativeElement.querySelector('.section-task-count');
+
+    expect(tasks.length).toBe(1);
+    expect(count.textContent?.trim()).toBe('1');
   });
 
   it('shows Save and Cancel buttons when editing is active', () => {

@@ -116,4 +116,18 @@ describe('BreadcrumbComponent', () => {
 
     expect(panel).toBeNull();
   });
+
+  it('emits selected task filter when choosing an option', () => {
+    const emitSpy = vi.spyOn(component.taskFilterChange, 'emit');
+    const filterButton: HTMLButtonElement | null =
+      fixture.nativeElement.querySelector('.breadcrumb-filter-button');
+
+    filterButton?.click();
+    fixture.detectChanges();
+
+    const filterOptions = fixture.nativeElement.querySelectorAll('input[name="task-filter"]') as NodeListOf<HTMLInputElement>;
+    filterOptions[1]?.dispatchEvent(new Event('change'));
+
+    expect(emitSpy).toHaveBeenCalledWith('uncompleted');
+  });
 });
