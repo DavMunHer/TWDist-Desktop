@@ -101,4 +101,19 @@ describe('BreadcrumbComponent', () => {
     expect(panel).toBeNull();
     expect(filterTrigger?.classList.contains('active')).toBe(false);
   });
+
+  it('closes task filter options when clicking outside the menu', () => {
+    const filterButton: HTMLButtonElement | null =
+      fixture.nativeElement.querySelector('.breadcrumb-filter-button');
+
+    filterButton?.click();
+    fixture.detectChanges();
+
+    document.body.click();
+    fixture.detectChanges();
+
+    const panel: HTMLElement | null = fixture.nativeElement.querySelector('#task-filter-panel');
+
+    expect(panel).toBeNull();
+  });
 });

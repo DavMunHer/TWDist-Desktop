@@ -16,7 +16,7 @@
     </div>
   </div>
   <div class="breadcrumb-right-section">
-    <div class="breadcrumb-filter-menu">
+    <div class="breadcrumb-filter-menu" appClickOutside (clickOutside)="closeTaskFilterMenu()">
       <div class="breadcrumb-hover breadcrumb-ico breadcrumb-filter-trigger" [class.active]="showTaskFilterMenu()">
         <button
           type="button"

@@ -1,10 +1,11 @@
 import { NgClass } from '@angular/common';
 import { Component, input, output, ChangeDetectionStrategy, signal } from '@angular/core';
+import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-breadcrumb',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass],
+  imports: [NgClass, ClickOutsideDirective],
   templateUrl: './breadcrumb.component.html',
   styleUrl: './breadcrumb.component.css',
 })
@@ -22,6 +23,10 @@ export class BreadcrumbComponent {
 
   protected toggleTaskFilterMenu(): void {
     this.showTaskFilterMenu.update(isOpen => !isOpen);
+  }
+
+  protected closeTaskFilterMenu(): void {
+    this.showTaskFilterMenu.set(false);
   }
 
   protected selectTaskFilter(option: 'all' | 'uncompleted' | 'completed'): void {
