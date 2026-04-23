@@ -1,8 +1,9 @@
 <div class="task-container">
     <div class="completed-button-container">
-        <label tabindex="0" class="completed-button-label" (click)="sendTaskCompletedChange()" (keydown.enter)="sendTaskCompletedChange()">
-            <input class="completed-button" [checked]="taskInfo().completed" type="checkbox" name="completed-task" />
-            <span class="radio-mark"></span>
+        <label class="completed-button-label">
+            <input class="completed-button" [checked]="taskInfo().completed" (change)="sendTaskCompletedChange()" type="checkbox" name="completed-task" />
+            <span class="radio-mark" aria-hidden="true"></span>
+            <span class="sr-only">{{ (taskInfo().completed ? 'Mark task as not completed' : 'Mark task as completed') + ': ' + taskInfo().name }}</span>
         </label>
     </div>
 

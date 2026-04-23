@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { Task } from '@features/projects/domain/entities/task.entity';
 import { TaskRepository } from '@features/projects/domain/repositories/task.repository';
 import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
+import { CompleteTaskDto } from '@features/projects/infrastructure/dto/complete-task.dto';
 import { TaskMapper } from '@features/projects/infrastructure/mappers/task.mapper';
 import { requiresAuthContext } from '@shared/interceptors/auth-context.token';
 
@@ -25,6 +26,19 @@ export class HttpTaskRepository extends TaskRepository {
     return this.http
       .put<TaskDto>(`/projects/${projectId}/section/${task.sectionId}/task/${task.id}/update`, dto, requiresAuthContext())
       .pipe(map(responseDto => TaskMapper.toDomain(responseDto, task.sectionId, task.parentTaskId)));
+  }
+
+  complete(projectId: string, sectionId: string, taskId: string, completedDate: string): Observable<Task> {
+    const dto: CompleteTaskDto = { completedDate };
+    return this.http
+      .patch<TaskDto>(`/projects/${projectId}/section/${sectionId}/task/${taskId}/complete`, dto, requiresAuthContext())
+      .pipe(map(responseDto => TaskMapper.toDomain(responseDto, sectionId)));
+  }
+
+  uncomplete(projectId: string, sectionId: string, taskId: string): Observable<Task> {
+    return this.http
+      .patch<TaskDto>(`/projects/${projectId}/section/${sectionId}/task/${taskId}/uncomplete`, {}, requiresAuthContext())
+      .pipe(map(responseDto => TaskMapper.toDomain(responseDto, sectionId)));
   }
 
   delete(projectId: string, sectionId: string, taskId: string): Observable<void> {

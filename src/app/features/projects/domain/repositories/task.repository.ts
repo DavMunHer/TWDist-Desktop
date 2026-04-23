@@ -9,6 +9,8 @@ export abstract class TaskRepository {
    */
   abstract create(projectId: string, task: Task): Observable<Task>;
   abstract update(projectId: string, task: Task): Observable<Task>;
+  abstract complete(projectId: string, sectionId: string, taskId: string, completedDate: string): Observable<Task>;
+  abstract uncomplete(projectId: string, sectionId: string, taskId: string): Observable<Task>;
 
   /**
    * For `delete` and `findById` we DO accept `sectionId` because at that point we do NOT have a

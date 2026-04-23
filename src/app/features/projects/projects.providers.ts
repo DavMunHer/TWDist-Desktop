@@ -15,7 +15,8 @@ import { CreateSectionUseCase } from '@features/projects/application/use-cases/s
 import { UpdateSectionUseCase } from '@features/projects/application/use-cases/sections/update-section/update-section.use-case';
 import { DeleteSectionUseCase } from '@features/projects/application/use-cases/sections/delete-section/delete-section.use-case';
 import { CreateTaskUseCase } from '@features/projects/application/use-cases/tasks/create-task/create-task.use-case';
-import { ToggleTaskCompletionUseCase } from '@features/projects/application/use-cases/tasks/toggle-task-completion/toggle-task-completion.use-case';
+import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
+import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/uncomplete-task/uncomplete-task.use-case';
 import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
@@ -39,7 +40,8 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   UpdateSectionUseCase,
   DeleteSectionUseCase,
   CreateTaskUseCase,
-  ToggleTaskCompletionUseCase,
+  CompleteTaskUseCase,
+  UncompleteTaskUseCase,
   UpdateTaskUseCase,
   DeleteTaskUseCase,
   ToggleFavoriteUseCase,

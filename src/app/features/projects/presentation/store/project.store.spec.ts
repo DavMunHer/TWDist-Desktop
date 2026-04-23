@@ -187,6 +187,14 @@ describe('ProjectStore', () => {
     expect(addTaskToSection).toHaveBeenCalledWith('s1', 't1');
   });
 
+  it('toggleTaskCompletion delegates to TaskStore using selected project id', () => {
+    store.loadProject('p1');
+
+    store.toggleTaskCompletion('t1');
+
+    expect(toggleTaskCompletion).toHaveBeenCalledWith('p1', 't1');
+  });
+
   it('disconnectFromEvents unsubscribes project and user streams', () => {
     const closeProject = vi.fn();
     const closeUser = vi.fn();
