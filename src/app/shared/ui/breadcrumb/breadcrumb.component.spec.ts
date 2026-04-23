@@ -50,4 +50,12 @@ describe('BreadcrumbComponent', () => {
     expect(emitSpy).toHaveBeenCalledWith(true);
     expect(emitSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('renders filter icon before the options icon in the right section', () => {
+    const rightIcons = fixture.nativeElement.querySelectorAll('.breadcrumb-right-section .breadcrumb-ico');
+
+    expect(rightIcons.length).toBe(2);
+    expect(rightIcons[0].getAttribute('aria-label')).toBe('Filter items');
+    expect(rightIcons[1].getAttribute('aria-label')).toBeNull();
+  });
 });
