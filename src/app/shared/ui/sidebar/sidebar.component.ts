@@ -33,10 +33,12 @@ export class SidebarComponent {
   public createProjectClick = output<void>();
 
   openProfileModal(): void {
+    this.closeDropdown();
     this.modalService.open(ProfileComponent, { title: 'Profile' });
   }
 
   openConfigurationModal(): void {
+    this.closeDropdown();
     this.modalService.open(ConfigurationComponent, { title: 'Configuration' });
   }
 
