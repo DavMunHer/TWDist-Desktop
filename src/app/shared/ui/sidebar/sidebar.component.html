@@ -2,7 +2,7 @@
   <div class="test">
     <div class="top-section">
       <div class="sidebar-profile ">
-        <div class="profile-dropdown" [ngClass]="{'open' : toggleDropdownVal()}">
+        <div class="profile-dropdown" [ngClass]="{'open' : toggleDropdownVal()}" appClickOutside (clickOutside)="closeDropdown()">
           <button type="button" class="profile-dropdown-trigger sidebar-hover" (click)="toggleDropdown()" aria-label="Toggle profile menu">
             <img class="profile-avatar" src="\Default_pfp.png" alt="Profile Picture">
             <span class="profile-name">Oscar</span>
