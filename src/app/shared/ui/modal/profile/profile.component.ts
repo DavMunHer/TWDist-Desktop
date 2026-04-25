@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthStore } from '@features/auth/presentation/store/auth.store';
 
 @Component({
   selector: 'app-profile-modal',
@@ -9,11 +10,20 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
+  private readonly authStore = inject(AuthStore);
 
-  name = 'Oscar';
-  email = 'oscar@gmail.com';
+  readonly username = computed(() => this.authStore.user()?.username ?? '');
+  editableUsername = '';
+  readonly email = computed(() => this.authStore.user()?.email ?? '');
+
   oldPassword = '';
   newPassword = '';
+
+  constructor() {
+    effect(() => {
+      this.editableUsername = this.username();
+    });
+  }
 
   changePicture() {
     console.log('Change picture clicked');
@@ -24,11 +34,7 @@ export class ProfileComponent {
   }
 
   updateName() {
-    console.log('Updated name:', this.name);
-  }
-
-  updateEmail() {
-    console.log('Updated email:', this.email);
+    console.log('Updated name:', this.editableUsername);
   }
 
   updatePassword() {

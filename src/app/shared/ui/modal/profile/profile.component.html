@@ -10,24 +10,23 @@
   <section>
     <h3>Name</h3>
     <div>
-      <input type="text" [(ngModel)]="name">
+      <input type="text" [(ngModel)]="editableUsername">
       <button class="btn default" (click)="updateName()">Update</button>
     </div>
   </section>
   <section>
     <h3>Email</h3>
     <div>
-      <input type="text" [(ngModel)]="email">
-      <button class="btn default" (click)="updateEmail()">Update</button>
+      <input class="readonly-field" type="text" [value]="email()" readonly aria-readonly="true" title="Email cannot be edited yet">
     </div>
   </section>
   <section>
     <h3>Password</h3>
     <div>
       <label for="oldPassword">Old Password</label>
-      <input id="oldPassword" type="text" [(ngModel)]="oldPassword">
+      <input id="oldPassword" type="password" [(ngModel)]="oldPassword">
       <label for="newPassword">New Password</label>
-      <input id="newPassword" type="text" [(ngModel)]="newPassword">
+      <input id="newPassword" type="password" [(ngModel)]="newPassword">
       <button class="btn default" (click)="updatePassword()">Update</button>
     </div>
   </section>

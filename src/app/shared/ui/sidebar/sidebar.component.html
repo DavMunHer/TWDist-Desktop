@@ -5,7 +5,7 @@
         <div class="profile-dropdown" [ngClass]="{'open' : toggleDropdownVal()}" appClickOutside (clickOutside)="closeDropdown()">
           <button type="button" class="profile-dropdown-trigger sidebar-hover" (click)="toggleDropdown()" aria-label="Toggle profile menu">
             <img class="profile-avatar" src="\Default_pfp.png" alt="Profile Picture">
-            <span class="profile-name">Oscar</span>
+            <span class="profile-name">{{ user()?.username }}</span>
             <svg id="arrow-down" width="20px" height="20px" viewBox="0 0 24 24" fill="none"
               xmlns="http://www.w3.org/2000/svg">
               <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
