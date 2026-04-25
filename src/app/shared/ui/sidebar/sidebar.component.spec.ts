@@ -7,7 +7,12 @@ import { TWDSidebarMenu } from '@shared/ui/sidebar/sidebar-menu';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SidebarComponent } from '@shared/ui/sidebar/sidebar.component';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { AuthStore } from '@features/auth/presentation/store/auth.store';
+import { User } from '@features/auth/domain/entities/user.entity';
+
+const mockUser = new User('1', 'test@example.com', 'TestUser');
+const mockAuthStore = { user: signal<User | null>(mockUser) };
 
 
 describe('SidebarComponent', () => {
@@ -38,7 +43,10 @@ describe('SidebarComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SidebarComponent],
-      providers: [provideZonelessChangeDetection()],
+      providers: [
+        provideZonelessChangeDetection(),
+        { provide: AuthStore, useValue: mockAuthStore },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SidebarComponent);

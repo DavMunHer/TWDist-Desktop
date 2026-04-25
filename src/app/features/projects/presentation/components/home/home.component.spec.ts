@@ -17,6 +17,10 @@ import { ProjectViewModel } from '@features/projects/presentation/models/project
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
+import { AuthStore } from '@features/auth/presentation/store/auth.store';
+import { User } from '@features/auth/domain/entities/user.entity';
+
+const mockAuthStore = { user: signal<User | null>(new User('1', 'test@example.com', 'TestUser')) };
 
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -85,6 +89,7 @@ describe('HomeComponent', () => {
         { provide: ProjectStore, useValue: projectStoreMock },
         { provide: ProjectSummaryStore, useValue: projectSummaryStoreMock },
         { provide: ModalService, useValue: modalServiceMock },
+        { provide: AuthStore, useValue: mockAuthStore },
       ],
     }).compileComponents();
 
