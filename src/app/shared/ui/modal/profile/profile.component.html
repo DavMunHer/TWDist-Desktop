@@ -10,14 +10,14 @@
   <section>
     <h3>Name</h3>
     <div>
-      <input type="text" [(ngModel)]="name">
+      <input type="text" [value]="username()" readonly>
       <button class="btn default" (click)="updateName()">Update</button>
     </div>
   </section>
   <section>
     <h3>Email</h3>
     <div>
-      <input type="text" [(ngModel)]="email">
+      <input type="text" [value]="email()" readonly>
       <button class="btn default" (click)="updateEmail()">Update</button>
     </div>
   </section>

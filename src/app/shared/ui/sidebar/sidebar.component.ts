@@ -6,6 +6,7 @@ import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/menu-section.component';
 import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
+import { AuthStore } from '@features/auth/presentation/store/auth.store';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,6 +17,9 @@ import { ClickOutsideDirective } from '@shared/directives/click-outside.directiv
 })
 export class SidebarComponent {
   private readonly modalService = inject(ModalService);
+  private readonly authStore = inject(AuthStore);
+
+  readonly user = computed(() => this.authStore.user());
 
   protected toggleDropdownVal = signal<boolean>(false);
 
