@@ -30,10 +30,6 @@ export class ProfileComponent {
     console.log('Updated name:', this.username);
   }
 
-  updateEmail() {
-    console.log('Updated email:', this.email());
-  }
-
   updatePassword() {
     console.log('Old:', this.oldPassword, 'New:', this.newPassword);
   }
