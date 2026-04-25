@@ -5,11 +5,12 @@ import { ConfigurationComponent } from '@shared/ui/modal/configuration/configura
 import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/menu-section.component';
+import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-sidebar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, MenuSectionComponent],
+  imports: [NgClass, MenuSectionComponent, ClickOutsideDirective],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
 })
@@ -32,10 +33,12 @@ export class SidebarComponent {
   public createProjectClick = output<void>();
 
   openProfileModal(): void {
+    this.closeDropdown();
     this.modalService.open(ProfileComponent, { title: 'Profile' });
   }
 
   openConfigurationModal(): void {
+    this.closeDropdown();
     this.modalService.open(ConfigurationComponent, { title: 'Configuration' });
   }
 
@@ -49,6 +52,10 @@ export class SidebarComponent {
 
   toggleDropdown() {
     this.toggleDropdownVal.set(!this.toggleDropdownVal());
+  }
+
+  closeDropdown(): void {
+    this.toggleDropdownVal.set(false);
   }
 
   protected favoriteSectionHasItems = computed(() => this.favoriteMenuSectionInfo().items.length > 0);

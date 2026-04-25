@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ModalService } from '@shared/ui/modal/modal.service';
+import { ConfigurationComponent } from '@shared/ui/modal/configuration/configuration.component';
 import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
 import { TWDSidebarMenu } from '@shared/ui/sidebar/sidebar-menu';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -73,16 +74,66 @@ describe('SidebarComponent', () => {
     expect(emitSpy).toHaveBeenCalledTimes(1);
   });
 
-  // TODO: Enable this test when profile dropdown toggle behavior is fully implemented.
-  it.todo('toggles dropdown open class when profile area is clicked');
+  it('toggles dropdown open class when profile trigger is clicked', () => {
+    const triggerButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('.profile-dropdown-trigger');
+    const dropdown: HTMLElement | null = fixture.nativeElement.querySelector('.profile-dropdown');
+
+    triggerButton?.click();
+    fixture.detectChanges();
+    expect(dropdown?.classList.contains('open')).toBe(true);
+
+    triggerButton?.click();
+    fixture.detectChanges();
+    expect(dropdown?.classList.contains('open')).toBe(false);
+  });
+
+  it('closes dropdown when clicking outside', () => {
+    const triggerButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('.profile-dropdown-trigger');
+    const dropdown: HTMLElement | null = fixture.nativeElement.querySelector('.profile-dropdown');
+
+    triggerButton?.click();
+    fixture.detectChanges();
+    expect(dropdown?.classList.contains('open')).toBe(true);
+
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(dropdown?.classList.contains('open')).toBe(false);
+  });
 
   it('opens profile modal when profile option is clicked', () => {
     const openSpy = vi.spyOn(modalService, 'open');
     const profileOptionDE = fixture.debugElement.query(By.css('.dropdown-content .dropdown-action'));
+    const triggerButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('.profile-dropdown-trigger');
+    const dropdown: HTMLElement | null = fixture.nativeElement.querySelector('.profile-dropdown');
+
+    triggerButton?.click();
+    fixture.detectChanges();
+    expect(dropdown?.classList.contains('open')).toBe(true);
 
     profileOptionDE.triggerEventHandler('click');
+    fixture.detectChanges();
 
     expect(openSpy).toHaveBeenCalledWith(ProfileComponent, { title: 'Profile' });
+    expect(dropdown?.classList.contains('open')).toBe(false);
+  });
+
+  it('opens configuration modal and closes dropdown when configuration option is clicked', () => {
+    const openSpy = vi.spyOn(modalService, 'open');
+    const optionsDE = fixture.debugElement.queryAll(By.css('.dropdown-content .dropdown-action'));
+    const configurationOptionDE = optionsDE[1];
+    const triggerButton: HTMLButtonElement | null = fixture.nativeElement.querySelector('.profile-dropdown-trigger');
+    const dropdown: HTMLElement | null = fixture.nativeElement.querySelector('.profile-dropdown');
+
+    triggerButton?.click();
+    fixture.detectChanges();
+    expect(dropdown?.classList.contains('open')).toBe(true);
+
+    configurationOptionDE.triggerEventHandler('click');
+    fixture.detectChanges();
+
+    expect(openSpy).toHaveBeenCalledWith(ConfigurationComponent, { title: 'Configuration' });
+    expect(dropdown?.classList.contains('open')).toBe(false);
   });
 
   it('emits createProjectClick when plus icon in projects section is clicked', () => {
