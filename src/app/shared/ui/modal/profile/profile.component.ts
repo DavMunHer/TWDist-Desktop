@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthStore } from '@features/auth/presentation/store/auth.store';
 
@@ -12,11 +12,18 @@ import { AuthStore } from '@features/auth/presentation/store/auth.store';
 export class ProfileComponent {
   private readonly authStore = inject(AuthStore);
 
-  username = this.authStore.user()?.username ?? '';
+  readonly username = computed(() => this.authStore.user()?.username ?? '');
+  editableUsername = '';
   readonly email = computed(() => this.authStore.user()?.email ?? '');
 
   oldPassword = '';
   newPassword = '';
+
+  constructor() {
+    effect(() => {
+      this.editableUsername = this.username();
+    });
+  }
 
   changePicture() {
     console.log('Change picture clicked');
@@ -27,7 +34,7 @@ export class ProfileComponent {
   }
 
   updateName() {
-    console.log('Updated name:', this.username);
+    console.log('Updated name:', this.editableUsername);
   }
 
   updatePassword() {
