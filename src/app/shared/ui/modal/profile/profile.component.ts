@@ -12,7 +12,7 @@ import { AuthStore } from '@features/auth/presentation/store/auth.store';
 export class ProfileComponent {
   private readonly authStore = inject(AuthStore);
 
-  readonly username = computed(() => this.authStore.user()?.username ?? '');
+  username = this.authStore.user()?.username ?? '';
   readonly email = computed(() => this.authStore.user()?.email ?? '');
 
   oldPassword = '';
@@ -27,7 +27,7 @@ export class ProfileComponent {
   }
 
   updateName() {
-    console.log('Updated name:', this.username());
+    console.log('Updated name:', this.username);
   }
 
   updateEmail() {
