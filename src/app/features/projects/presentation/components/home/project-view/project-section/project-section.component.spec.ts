@@ -66,10 +66,24 @@ describe('ProjectSectionComponent', () => {
     fixture.nativeElement.querySelector('.section-name-input').click();
     fixture.detectChanges();
 
-    const input: HTMLInputElement = fixture.nativeElement.querySelector('.section-name-input.editing');
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.section-name-input');
     expect(input).toBeTruthy();
     expect(component['editing']()).toBe(true);
     expect(component['sectionNameCtrl'].value).toBe('Inbox');
+  });
+
+  it('cancels editing when clicking outside the section input', () => {
+    fixture.nativeElement.querySelector('.section-name-input').click();
+    fixture.detectChanges();
+
+    component['sectionNameCtrl'].setValue('Changed section name');
+    document.body.click();
+    fixture.detectChanges();
+
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.section-name-input');
+    expect(component['editing']()).toBe(false);
+    expect(input.readOnly).toBe(true);
+    expect(input.value).toBe('Inbox');
   });
 
   it('renders the task count', () => {

@@ -3,27 +3,26 @@
         <header class="section-header">
             <div class="section-header-row">
                 <div class="section-title-area">
-                    <div class="section-name-wrapper">
+                    <div class="section-name-wrapper" appClickOutside (clickOutside)="onSectionNameOutsideClick()">
+                        <input
+                            class="section-name-input"
+                            [class.editing]="editing()"
+                            [class.invalid]="sectionNameCtrl.touched && sectionNameCtrl.invalid"
+                            [formControl]="sectionNameCtrl"
+                            (click)="onSectionNameClick($event)"
+                            (keydown.enter)="onSave()"
+                            (keydown.escape)="onCancel()"
+                            [readonly]="!editing()"
+                            type="text"
+                        />
+                        @if (editing() && sectionNameCtrl.touched && sectionNameError) {
+                            <span class="field-error">{{ sectionNameError }}</span>
+                        }
                         @if (editing()) {
-                            <input
-                                class="section-name-input editing"
-                                [class.invalid]="sectionNameCtrl.touched && sectionNameCtrl.invalid"
-                                [formControl]="sectionNameCtrl"
-                                (keydown.enter)="onSave()"
-                                (keydown.escape)="onCancel()"
-                                type="text"
-                            />
-                            @if (sectionNameCtrl.touched && sectionNameError) {
-                                <span class="field-error">{{ sectionNameError }}</span>
-                            }
-                        } @else {
-                            <input
-                                class="section-name-input"
-                                [value]="sectionName()"
-                                (click)="onSectionNameClick($event)"
-                                readonly
-                                type="text"
-                            />
+                            <div class="section-edit-actions">
+                                <button type="button" class="section-save-btn" (click)="onSave()">Save</button>
+                                <button type="button" class="section-cancel-btn" (click)="onCancel()">Cancel</button>
+                            </div>
                         }
                     </div>
                 </div>
@@ -70,12 +69,6 @@
                     }
                 </div>
             </div>
-            @if (editing()) {
-                <div class="section-edit-actions">
-                    <button type="button" class="section-save-btn" (click)="onSave()">Save</button>
-                    <button type="button" class="section-cancel-btn" (click)="onCancel()">Cancel</button>
-                </div>
-            }
         </header>
         <main class="tasks-container">
             @for (task of filteredTasks(); track task.id) {

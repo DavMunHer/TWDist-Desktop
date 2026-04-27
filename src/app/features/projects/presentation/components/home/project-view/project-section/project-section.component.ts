@@ -1,6 +1,7 @@
-import { Component, computed, input, linkedSignal, output, signal, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, computed, effect, input, linkedSignal, output, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
+import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
 import {
   SectionDeleteEvent,
   SectionUpdateEvent,
@@ -18,7 +19,7 @@ import { TaskFilter } from '@shared/types/task-filter.type';
 @Component({
   selector: 'app-project-section',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, AutoFocusDirective, TaskComponent],
+  imports: [ReactiveFormsModule, AutoFocusDirective, ClickOutsideDirective, TaskComponent],
   templateUrl: './project-section.component.html',
   styleUrl: './project-section.component.css',
 })
@@ -47,6 +48,12 @@ export class ProjectSectionComponent {
   protected sectionNameCtrl = new FormControl('', {
     nonNullable: true,
     validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
+  });
+
+  private readonly syncSectionNameCtrl = effect(() => {
+    if (this.editing()) return;
+
+    this.sectionNameCtrl.setValue(this.sectionName(), { emitEvent: false });
   });
 
   protected newTaskNameCtrl = new FormControl('', {
@@ -96,6 +103,12 @@ export class ProjectSectionComponent {
     if (this.editing()) return;
 
     this.onEdit(event);
+  }
+
+  protected onSectionNameOutsideClick(): void {
+    if (!this.editing()) return;
+
+    this.onCancel();
   }
 
   protected closeMenu(event: Event): void {
