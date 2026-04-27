@@ -92,6 +92,12 @@ export class ProjectSectionComponent {
     this.menuOpen.update(v => !v);
   }
 
+  protected onSectionNameClick(event: Event): void {
+    if (this.editing()) return;
+
+    this.onEdit(event);
+  }
+
   protected closeMenu(event: Event): void {
     event.stopPropagation();
     this.menuOpen.set(false);

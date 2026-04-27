@@ -62,6 +62,16 @@ describe('ProjectSectionComponent', () => {
     expect(input.value).toBe('Inbox');
   });
 
+  it('starts editing when the section name is clicked', () => {
+    fixture.nativeElement.querySelector('.section-name-input').click();
+    fixture.detectChanges();
+
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.section-name-input.editing');
+    expect(input).toBeTruthy();
+    expect(component['editing']()).toBe(true);
+    expect(component['sectionNameCtrl'].value).toBe('Inbox');
+  });
+
   it('renders the task count', () => {
     const count: HTMLElement = fixture.nativeElement.querySelector('.section-task-count');
     expect(count.textContent?.trim()).toBe('1');
