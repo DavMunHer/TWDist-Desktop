@@ -34,7 +34,7 @@
 
     background: #fff;
     border-radius: 8px;
-    width: min(90vw, 480px);
+    width: min(90vw, 560px);
     padding: 0;
     display: flex;
     flex-direction: column;
