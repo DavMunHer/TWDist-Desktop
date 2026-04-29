@@ -1,5 +1,16 @@
 :host {
   display: block;
+  --checkbox-input-color: #5559;
+  --hover-tick-color: #444d;
+  --text-color: #222;
+  --text-muted-color: #333;
+  --input-border-color: #ccc;
+  --brand-blue-color: #2196f3;
+  --focus-blue-color: #007bff;
+  --focus-outline-color: #1f6feb;
+  --focus-ring-color: rgb(0 123 255 / 12%);
+  --contrast-white-color: #fff;
+  --action-save-bg-color: #222;
 
   .task-edit-modal {
     padding: var(--modal-content-padding, 1.25rem 1.5rem);
@@ -41,7 +52,7 @@
           width: 20px;
           height: 20px;
           border-radius: 50%;
-          border: 1px solid #5559;
+          border: 1px solid var(--checkbox-input-color);
           position: relative;
           transition: border-color 0.15s, background-color 0.15s, transform 0.12s;
           display: inline-flex;
@@ -50,7 +61,7 @@
         }
 
         .completed-button:focus-visible + .radio-mark {
-          outline: 2px solid #1f6feb;
+          outline: 2px solid var(--focus-outline-color);
           outline-offset: 2px;
         }
 
@@ -68,7 +79,7 @@
 
         .completed-button:hover + .radio-mark::after {
           content: "✓";
-          color: #444d;
+          color: var(--hover-tick-color);
           position: absolute;
           top: 50%;
           left: 50%;
@@ -77,13 +88,13 @@
         }
 
         .completed-button:checked + .radio-mark {
-          background-color: #2196f3;
-          border-color: #2196f3;
+          background-color: var(--brand-blue-color);
+          border-color: var(--brand-blue-color);
         }
 
         .completed-button:checked + .radio-mark::after {
           content: "✓";
-          color: #fff;
+          color: var(--contrast-white-color);
           position: absolute;
           top: 50%;
           left: 50%;
@@ -111,8 +122,8 @@
 
       input:focus {
         outline: none;
-        border: 1px solid #007bff;
-        background: #fff;
+        border: 1px solid var(--focus-blue-color);
+        background: var(--contrast-white-color);
       }
     }
 
@@ -124,7 +135,7 @@
       label {
         font-size: var(--modal-subtitle-size, 14px);
         font-weight: 600;
-        color: #333;
+        color: var(--text-muted-color);
       }
 
       input:not([type="checkbox"]),
@@ -133,19 +144,19 @@
         box-sizing: border-box;
         padding: var(--modal-input-padding, 6px 8px);
         font-size: var(--modal-input-font-size, 14px);
-        border: var(--modal-input-border, 1px solid #ccc);
+        border: var(--modal-input-border, 1px solid var(--input-border-color));
         border-radius: var(--modal-input-radius, 4px);
-        background: #fff;
-        color: #222;
+        background: var(--contrast-white-color);
+        color: var(--text-color);
         font: inherit;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
 
       input:focus,
       textarea:focus {
-        border-color: #007bff;
+        border-color: var(--focus-blue-color);
         outline: none;
-        box-shadow: 0 0 0 3px rgb(0 123 255 / 12%);
+        box-shadow: 0 0 0 3px var(--focus-ring-color);
       }
     }
 
@@ -169,14 +180,14 @@
       .cancel {
         background: transparent;
         border: none;
-        color: #333;
+        color: var(--text-muted-color);
         padding: 8px 12px;
         cursor: pointer;
       }
 
       .save {
-        background: #222;
-        color: #fff;
+        background: var(--action-save-bg-color);
+        color: var(--contrast-white-color);
         border: none;
         padding: 8px 14px;
         border-radius: 6px;
