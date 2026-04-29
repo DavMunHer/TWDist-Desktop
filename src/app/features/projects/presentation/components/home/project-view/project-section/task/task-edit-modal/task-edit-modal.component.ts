@@ -30,7 +30,7 @@ export class TaskEditModalComponent {
     }),
     startDate: new FormControl(this.toDateInputValue(this.modalData?.startDate), {
       nonNullable: true,
-      validators: [Validators.required, this.minTodayDateValidator()],
+      validators: [this.minTodayDateValidator()],
     }),
     endDate: new FormControl(this.toDateInputValue(this.modalData?.endDate), {
       nonNullable: true,
@@ -53,9 +53,20 @@ export class TaskEditModalComponent {
   protected get startDateError(): string | null {
     const errors = this.taskForm.controls.startDate.errors;
     if (!errors) return null;
-    if (errors['required']) return 'Start date is required';
     if (errors['minToday']) return 'Start date cannot be before today';
     return null;
+  }
+
+  protected clearStartDate(): void {
+    this.taskForm.controls.startDate.setValue('');
+    this.taskForm.controls.startDate.markAsTouched();
+    this.taskForm.controls.startDate.updateValueAndValidity();
+  }
+
+  protected clearEndDate(): void {
+    this.taskForm.controls.endDate.setValue('');
+    this.taskForm.controls.endDate.markAsTouched();
+    this.taskForm.controls.endDate.updateValueAndValidity();
   }
 
   protected save(): void {

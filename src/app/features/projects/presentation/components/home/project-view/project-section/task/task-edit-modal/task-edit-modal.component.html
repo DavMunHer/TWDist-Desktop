@@ -45,6 +45,7 @@
       <div class="form-group">
         <label for="startDate">Start date</label>
         <input id="startDate" type="date" formControlName="startDate" [min]="todayDateInput" />
+        <button id="clearStartDate" type="button" class="clear-date-button" (click)="clearStartDate()">Clear start date</button>
         @if (taskForm.controls.startDate.touched && startDateError) {
           <span class="field-error">{{ startDateError }}</span>
         }
@@ -53,6 +54,7 @@
       <div class="form-group">
         <label for="endDate">End date</label>
         <input id="endDate" type="date" formControlName="endDate" />
+        <button id="clearEndDate" type="button" class="clear-date-button" (click)="clearEndDate()">Clear end date</button>
       </div>
     </div>
 

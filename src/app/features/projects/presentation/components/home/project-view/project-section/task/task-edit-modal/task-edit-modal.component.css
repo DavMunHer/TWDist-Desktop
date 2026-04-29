@@ -164,6 +164,17 @@
         font-size: 11px;
         color: var(--error-color);
       }
+
+      .clear-date-button {
+        align-self: flex-start;
+        border: none;
+        background: transparent;
+        color: var(--focus-blue-color);
+        font-size: 11px;
+        padding: 0;
+        cursor: pointer;
+        text-decoration: underline;
+      }
     }
 
     .date-grid {

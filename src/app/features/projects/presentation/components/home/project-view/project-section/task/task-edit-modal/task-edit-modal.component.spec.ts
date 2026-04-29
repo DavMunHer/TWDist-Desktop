@@ -70,4 +70,34 @@ describe('TaskEditModalComponent', () => {
     expect(modalRef.close).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain('Start date cannot be before today');
   });
+
+  it('allows saving after clearing start date', () => {
+    const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+    const clearStartDateButton: HTMLButtonElement = fixture.nativeElement.querySelector('#clearStartDate');
+
+    clearStartDateButton.click();
+    fixture.detectChanges();
+
+    expect(startDateInput.value).toBe('');
+
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+
+    expect(modalRef.close).toHaveBeenCalled();
+  });
+
+  it('clears end date when clear end date is clicked', () => {
+    const endDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#endDate');
+    const clearEndDateButton: HTMLButtonElement = fixture.nativeElement.querySelector('#clearEndDate');
+
+    endDateInput.value = '2099-01-01';
+    endDateInput.dispatchEvent(new Event('input'));
+    endDateInput.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    clearEndDateButton.click();
+    fixture.detectChanges();
+
+    expect(endDateInput.value).toBe('');
+  });
 });
