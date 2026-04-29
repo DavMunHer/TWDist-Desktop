@@ -39,10 +39,22 @@ export interface TaskDeleteEvent {
   sectionId: string;
 }
 
+export interface TaskEditEvent {
+  id: string;
+  sectionId: string;
+  name: string;
+  description?: string;
+  startDate?: Date;
+  endDate?: Date;
+  completedChanged: boolean;
+}
+
 export interface TaskViewModel {
   id: string;
   name: string;
   completed: boolean;
-  startDate: Date;
+  startDate: Date | undefined;
+  description?: string;
+  endDate?: Date;
   subtasks: TaskViewModel[];
 }
