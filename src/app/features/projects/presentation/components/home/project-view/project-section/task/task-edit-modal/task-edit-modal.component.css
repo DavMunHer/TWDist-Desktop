@@ -11,6 +11,7 @@
   --focus-ring-color: rgb(0 123 255 / 12%);
   --contrast-white-color: #fff;
   --action-save-bg-color: #222;
+  --error-color: #d33;
 
   .task-edit-modal {
     padding: var(--modal-content-padding, 1.25rem 1.5rem);
@@ -157,6 +158,11 @@
         border-color: var(--focus-blue-color);
         outline: none;
         box-shadow: 0 0 0 3px var(--focus-ring-color);
+      }
+
+      .field-error {
+        font-size: 11px;
+        color: var(--error-color);
       }
     }
 
