@@ -104,4 +104,25 @@ describe('TaskEditModalComponent', () => {
 
     expect(endDateInput.value).toBe('');
   });
+
+  it('does not close when end date is before start date', () => {
+    const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+    const endDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#endDate');
+
+    startDateInput.value = '2099-01-10';
+    startDateInput.dispatchEvent(new Event('input'));
+    startDateInput.dispatchEvent(new Event('change'));
+
+    endDateInput.value = '2099-01-01';
+    endDateInput.dispatchEvent(new Event('input'));
+    endDateInput.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(modalRef.close).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('End date cannot be before start date');
+  });
 });

@@ -35,7 +35,7 @@ export class TaskEditModalComponent {
     endDate: new FormControl(this.toDateInputValue(this.modalData?.endDate), {
       nonNullable: true,
     }),
-  });
+  }, { validators: [this.endDateAfterStartDateValidator()] });
 
   protected get nameError(): string | null {
     const errors = this.taskForm.controls.name.errors;
@@ -54,6 +54,13 @@ export class TaskEditModalComponent {
     const errors = this.taskForm.controls.startDate.errors;
     if (!errors) return null;
     if (errors['minToday']) return 'Start date cannot be before today';
+    return null;
+  }
+
+  protected get endDateError(): string | null {
+    if (this.taskForm.hasError('endBeforeStartDate')) {
+      return 'End date cannot be before start date';
+    }
     return null;
   }
 
@@ -111,6 +118,25 @@ export class TaskEditModalComponent {
       if (Number.isNaN(selectedDate.getTime())) return null;
 
       return selectedDate < today ? { minToday: true } : null;
+    };
+  }
+
+  private endDateAfterStartDateValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const group = control as FormGroup<{
+        startDate: FormControl<string>;
+        endDate: FormControl<string>;
+      }>;
+
+      const startValue = group.controls.startDate.value;
+      const endValue = group.controls.endDate.value;
+      if (!startValue || !endValue) return null;
+
+      const startDate = new Date(`${startValue}T00:00:00`);
+      const endDate = new Date(`${endValue}T00:00:00`);
+      if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return null;
+
+      return endDate < startDate ? { endBeforeStartDate: true } : null;
     };
   }
 }

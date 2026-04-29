@@ -53,8 +53,11 @@
 
       <div class="form-group">
         <label for="endDate">End date</label>
-        <input id="endDate" type="date" formControlName="endDate" />
+        <input id="endDate" type="date" formControlName="endDate" [min]="taskForm.controls.startDate.value || undefined" />
         <button id="clearEndDate" type="button" class="clear-date-button" (click)="clearEndDate()">Clear end date</button>
+        @if ((taskForm.controls.endDate.touched || taskForm.controls.startDate.touched) && endDateError) {
+          <span class="field-error">{{ endDateError }}</span>
+        }
       </div>
     </div>
 
