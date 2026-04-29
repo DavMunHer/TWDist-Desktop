@@ -48,4 +48,26 @@ describe('TaskEditModalComponent', () => {
     form.dispatchEvent(new Event('submit'));
     expect(modalRef.close).toHaveBeenCalled();
   });
+
+  it('does not close the modal when start date is before today', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const year = yesterday.getFullYear();
+    const month = `${yesterday.getMonth() + 1}`.padStart(2, '0');
+    const day = `${yesterday.getDate()}`.padStart(2, '0');
+    const yesterdayInputValue = `${year}-${month}-${day}`;
+
+    const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+    startDateInput.value = yesterdayInputValue;
+    startDateInput.dispatchEvent(new Event('input'));
+    startDateInput.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(modalRef.close).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('Start date cannot be before today');
+  });
 });

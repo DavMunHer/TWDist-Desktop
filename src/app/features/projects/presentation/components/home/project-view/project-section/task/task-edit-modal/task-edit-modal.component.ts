@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import { MODAL_DATA, ModalRef } from '@shared/ui/modal/modal-ref';
 import { TaskEditModalState } from '@features/projects/presentation/models/task-edit-modal.state';
@@ -17,6 +17,7 @@ export class TaskEditModalComponent {
   private readonly modalData = inject<TaskEditModalState | null>(MODAL_DATA, { optional: true });
 
   protected readonly completed = signal(this.modalData?.completed ?? false);
+  protected readonly todayDateInput = this.toDateInputValue(new Date());
 
   protected readonly taskForm = new FormGroup({
     name: new FormControl(this.modalData?.name ?? '', {
@@ -29,7 +30,7 @@ export class TaskEditModalComponent {
     }),
     startDate: new FormControl(this.toDateInputValue(this.modalData?.startDate), {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, this.minTodayDateValidator()],
     }),
     endDate: new FormControl(this.toDateInputValue(this.modalData?.endDate), {
       nonNullable: true,
@@ -47,6 +48,14 @@ export class TaskEditModalComponent {
 
   protected toggleCompletion(): void {
     this.completed.update((v) => !v);
+  }
+
+  protected get startDateError(): string | null {
+    const errors = this.taskForm.controls.startDate.errors;
+    if (!errors) return null;
+    if (errors['required']) return 'Start date is required';
+    if (errors['minToday']) return 'Start date cannot be before today';
+    return null;
   }
 
   protected save(): void {
@@ -70,5 +79,20 @@ export class TaskEditModalComponent {
     const day = `${date.getDate()}`.padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+  }
+
+  private minTodayDateValidator(): ValidatorFn {
+    return (control: AbstractControl<string>): ValidationErrors | null => {
+      const value = control.value;
+      if (!value) return null;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const selectedDate = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(selectedDate.getTime())) return null;
+
+      return selectedDate < today ? { minToday: true } : null;
+    };
   }
 }
