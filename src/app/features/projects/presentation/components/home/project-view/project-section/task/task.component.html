@@ -22,9 +22,9 @@
                 class="task-name-input"
                 [class.invalid]="taskNameCtrl.touched && taskNameCtrl.invalid"
                 [formControl]="taskNameCtrl"
-                (keydown.enter)="onSave()"
-                (keydown.escape)="onCancel()"
-                (blur)="onSave()"
+                (keydown.enter)="onSave($event)"
+                (keydown.escape)="onCancel($event)"
+                (blur)="onSave($event)"
                 type="text"
             />
             @if (taskNameCtrl.touched && taskNameError) {

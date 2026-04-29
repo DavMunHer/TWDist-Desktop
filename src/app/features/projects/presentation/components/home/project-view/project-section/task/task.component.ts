@@ -117,7 +117,12 @@ export class TaskComponent {
     this.editing.set(true);
   }
 
-  protected onSave(): void {
+  protected onSave(event?: Event): void {
+    event?.stopPropagation();
+    if (event instanceof KeyboardEvent) {
+      event.preventDefault();
+    }
+
     if (this.cancellingEdit) {
       this.cancellingEdit = false;
       return;
@@ -136,7 +141,12 @@ export class TaskComponent {
     this.editing.set(false);
   }
 
-  protected onCancel(): void {
+  protected onCancel(event?: Event): void {
+    event?.stopPropagation();
+    if (event instanceof KeyboardEvent) {
+      event.preventDefault();
+    }
+
     this.cancellingEdit = true;
     this.taskNameCtrl.markAsUntouched();
     this.editing.set(false);
