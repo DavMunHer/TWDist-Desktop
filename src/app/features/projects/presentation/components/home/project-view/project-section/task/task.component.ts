@@ -94,10 +94,6 @@ export class TaskComponent {
           endDate,
           completedChanged,
         });
-
-        if (completedChanged) {
-          this.taskToggle.emit({ id: this.taskInfo().id });
-        }
       },
     });
   }
