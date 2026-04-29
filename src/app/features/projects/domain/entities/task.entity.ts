@@ -4,7 +4,7 @@ export class Task {
     public readonly sectionId: string,
     public readonly name: string,
     public readonly completed: boolean,
-    public readonly startDate: Date,
+    public readonly startDate: Date | undefined,
     public readonly description?: string,
     public readonly label?: string,
     public readonly endDate?: Date,
@@ -16,7 +16,7 @@ export class Task {
   static create(
     name: string,
     sectionId: string,
-    startDate: Date = new Date(),
+    startDate?: Date,
     id?: string,
     parentTaskId?: string
   ): Task {
@@ -98,6 +98,22 @@ export class Task {
     );
   }
 
+  setStartDate(startDate: Date | undefined): Task {
+    return new Task(
+      this.id,
+      this.sectionId,
+      this.name,
+      this.completed,
+      startDate,
+      this.description,
+      this.label,
+      this.endDate,
+      this.completedDate,
+      this.parentTaskId,
+      this.subtaskIds,
+    );
+  }
+
   setLabel(label: string): Task {
     return new Task(
       this.id,
@@ -114,7 +130,7 @@ export class Task {
     );
   }
 
-  setEndDate(endDate: Date): Task {
+  setEndDate(endDate: Date | undefined): Task {
     return new Task(
       this.id,
       this.sectionId,
