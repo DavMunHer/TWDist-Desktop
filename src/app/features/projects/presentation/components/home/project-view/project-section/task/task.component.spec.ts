@@ -1,11 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TaskComponent } from '@features/projects/presentation/components/home/project-view/project-section/task/task.component';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { TaskComponent } from '@features/projects/presentation/components/home/project-view/project-section/task/task.component';
+import { TaskEditModalComponent } from './task-edit-modal/task-edit-modal.component';
 import { TaskViewModel } from '@features/projects/presentation/models/project.view-model';
-import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
+import { ModalService } from '@shared/ui/modal/modal.service';
 
 describe('TaskComponent', () => {
   let component: TaskComponent;
@@ -47,6 +48,29 @@ describe('TaskComponent', () => {
   it('renders task name', () => {
     const nameEl: HTMLElement = fixture.nativeElement.querySelector('.task-name-container');
     expect(nameEl?.textContent?.trim()).toBe('Write tests');
+  });
+
+  it('opens the task edit modal when the card is clicked', () => {
+    fixture.nativeElement.querySelector('.task-container').click();
+
+    expect(modalServiceMock.open).toHaveBeenCalledWith(
+      TaskEditModalComponent,
+      expect.objectContaining({
+        title: 'Edit Task',
+      }),
+    );
+  });
+
+  it('does not open the task edit modal from the completion control', () => {
+    fixture.nativeElement.querySelector('.completed-button-container').click();
+
+    expect(modalServiceMock.open).not.toHaveBeenCalled();
+  });
+
+  it('does not open the task edit modal from the menu trigger', () => {
+    fixture.nativeElement.querySelector('.task-menu-trigger').click();
+
+    expect(modalServiceMock.open).not.toHaveBeenCalled();
   });
 
   it('emits taskToggle when completion control is activated', () => {

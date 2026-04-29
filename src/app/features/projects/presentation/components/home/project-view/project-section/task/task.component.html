@@ -1,4 +1,12 @@
-<div class="task-container">
+<div
+    class="task-container"
+    role="button"
+    tabindex="0"
+    aria-label="Open task details for {{ taskInfo().name }}"
+    (click)="openTaskDetails($event)"
+    (keydown.enter)="openTaskDetails($event)"
+    (keydown.space)="openTaskDetails($event)"
+>
     <div class="completed-button-container">
         <label class="completed-button-label">
             <input class="completed-button" [checked]="taskInfo().completed" (change)="sendTaskCompletedChange()" type="checkbox" name="completed-task" />

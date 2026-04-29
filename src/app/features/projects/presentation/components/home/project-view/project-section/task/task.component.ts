@@ -8,8 +8,9 @@ import {
   TaskViewModel,
 } from '@features/projects/presentation/models/project.view-model';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
-import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
+import { ModalService } from '@shared/ui/modal/modal.service';
+import { TaskEditModalComponent } from './task-edit-modal/task-edit-modal.component';
 
 @Component({
   selector: 'app-task',
@@ -48,6 +49,31 @@ export class TaskComponent {
 
   protected sendTaskCompletedChange() {
     this.taskToggle.emit({ id: this.taskInfo().id });
+  }
+
+  protected openTaskDetails(event: Event): void {
+    const target = event.target;
+    if (target instanceof HTMLElement && target.closest('.completed-button-container, .task-menu-wrapper')) return;
+
+    event.stopPropagation();
+
+    if (event instanceof KeyboardEvent) {
+      event.preventDefault();
+    }
+
+    if (this.editing()) return;
+
+    this.menuOpen.set(false);
+    this.modalService.open(TaskEditModalComponent, {
+      title: 'Edit Task',
+      data: {
+        id: this.taskInfo().id,
+        name: this.taskInfo().name,
+        completed: this.taskInfo().completed,
+        description: '', // FIXME: TaskViewModel should include description and endDate
+        startDate: this.taskInfo().startDate,
+      },
+    });
   }
 
   protected toggleMenu(event: Event): void {

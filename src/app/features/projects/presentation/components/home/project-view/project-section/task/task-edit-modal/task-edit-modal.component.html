@@ -1,0 +1,61 @@
+<div class="task-edit-modal">
+  <form class="task-edit-form" [formGroup]="taskForm" (submit)="save()">
+    <div class="task-edit-title-row">
+      <div class="completed-button-container">
+        <label class="completed-button-label">
+          <input
+            class="completed-button"
+            [checked]="completed()"
+            (change)="toggleCompletion()"
+            type="checkbox"
+            name="completed-task"
+          />
+          <span class="radio-mark" aria-hidden="true"></span>
+          <span class="sr-only">{{ (completed() ? 'Mark task as not completed' : 'Mark task as completed') + ': ' + taskForm.controls.name.value }}</span>
+        </label>
+      </div>
+
+      <div class="form-group form-group--title">
+        <input
+          appAutoFocus
+          id="taskName"
+          type="text"
+          formControlName="name"
+          maxlength="50"
+          placeholder="Write release notes"
+          [class.completed]="completed()"
+        />
+        @if (taskForm.controls.name.touched && nameError) {
+          <span class="field-error">{{ nameError }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        rows="4"
+        formControlName="description"
+        placeholder="Add context, scope, or acceptance criteria"
+      ></textarea>
+    </div>
+
+    <div class="date-grid">
+      <div class="form-group">
+        <label for="startDate">Start date</label>
+        <input id="startDate" type="date" formControlName="startDate" />
+      </div>
+
+      <div class="form-group">
+        <label for="endDate">End date</label>
+        <input id="endDate" type="date" formControlName="endDate" />
+      </div>
+    </div>
+
+    <div class="task-edit-actions">
+      <button type="button" class="cancel" (click)="cancel()">Cancel</button>
+      <button type="submit" class="save">Save task</button>
+    </div>
+  </form>
+</div>

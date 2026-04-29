@@ -14,10 +14,13 @@
     border: 1px solid var(--task-border-color);
     border-radius: 10px;
     font-size: 0.9em;
-    transition: box-shadow 0.2s;
+    background: #fff;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
 
     &:hover {
         box-shadow: 1px 1px 1px 1px color-mix(in srgb, var(--task-border-color) 80%, #fff 20%);
+        border-color: color-mix(in srgb, var(--task-border-color) 68%, #fff 32%);
+        transform: translateY(-1px);
         cursor: pointer;
     }
 
