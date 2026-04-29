@@ -8,6 +8,7 @@ import {
   SectionViewModel,
   TaskCreateEvent,
   TaskDeleteEvent,
+  TaskEditEvent,
   TaskRenameEvent,
   TaskToggleEvent,
 } from '@features/projects/presentation/models/project.view-model';
@@ -32,6 +33,7 @@ export class ProjectSectionComponent {
   public taskCreate = output<TaskCreateEvent>();
   public taskRename = output<TaskRenameEvent>();
   public taskDelete = output<TaskDeleteEvent>();
+  public taskEdit = output<TaskEditEvent>();
   public sectionUpdate = output<SectionUpdateEvent>();
   public sectionDelete = output<SectionDeleteEvent>();
 
@@ -199,5 +201,9 @@ export class ProjectSectionComponent {
 
   protected onTaskDelete(event: TaskDeleteEvent): void {
     this.taskDelete.emit(event);
+  }
+
+  protected onTaskEdit(event: TaskEditEvent): void {
+    this.taskEdit.emit(event);
   }
 }

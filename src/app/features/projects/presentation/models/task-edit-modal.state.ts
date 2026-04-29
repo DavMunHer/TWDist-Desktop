@@ -6,3 +6,11 @@ export interface TaskEditModalState {
   startDate?: Date;
   endDate?: Date;
 }
+
+export interface TaskEditModalResult {
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  completed: boolean;
+}

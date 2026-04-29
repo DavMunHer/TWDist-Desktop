@@ -75,7 +75,14 @@ export class TaskEditModalComponent {
       return;
     }
 
-    this.modalRef.close();
+    const { name, description, startDate, endDate } = this.taskForm.getRawValue();
+    this.modalRef.close({
+      name,
+      description,
+      startDate,
+      endDate,
+      completed: this.completed(),
+    });
   }
 
   protected cancel(): void {

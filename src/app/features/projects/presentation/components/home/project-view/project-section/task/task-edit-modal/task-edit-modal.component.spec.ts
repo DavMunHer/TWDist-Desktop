@@ -46,7 +46,11 @@ describe('TaskEditModalComponent', () => {
   it('closes the modal when save is submitted', () => {
     const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
     form.dispatchEvent(new Event('submit'));
-    expect(modalRef.close).toHaveBeenCalled();
+    expect(modalRef.close).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'Write release notes',
+      description: 'Details',
+      completed: false,
+    }));
   });
 
   it('does not close the modal when start date is before today', () => {
