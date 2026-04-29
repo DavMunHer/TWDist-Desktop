@@ -47,6 +47,14 @@ describe('HttpTaskRepository', () => {
     repository.update('p1', task).subscribe();
     const req = httpMock.expectOne('/projects/p1/section/sec/task/t1/update');
     expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({
+      name: 'Job',
+      description: undefined,
+      startDate: '2025-01-01',
+      endDate: '2025-01-02',
+      completed: true,
+      label: undefined,
+    });
     req.flush({
       id: 1,
       name: 'Job',

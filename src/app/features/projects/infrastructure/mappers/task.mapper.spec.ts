@@ -34,6 +34,24 @@ describe('TaskMapper', () => {
     expect(t.subtaskIds).toEqual(['2']);
   });
 
+  it('toDomain maps camelCase date fields from API response', () => {
+    const t = TaskMapper.toDomain(
+      {
+        id: 14,
+        name: 'Task 2',
+        description: '',
+        startDate: '2026-04-29',
+        endDate: '2026-05-08',
+        completed: false,
+        subtasks: [],
+      },
+      '36',
+    );
+
+    expect(t.startDate).toEqual(new Date('2026-04-29'));
+    expect(t.endDate).toEqual(new Date('2026-05-08'));
+  });
+
   it('flattenToDomain returns parent and nested tasks', () => {
     const flat = TaskMapper.flattenToDomain(dto, 'sec-1');
     expect(flat.map((x) => x.id)).toContain('1');
@@ -51,5 +69,19 @@ describe('TaskMapper', () => {
     expect(create.start_date).toEqual(start);
     expect(create.end_date).toEqual(end);
     expect(create.completed).toBe(false);
+  });
+
+  it('toDto maps update payload using camelCase date fields', () => {
+    const task = TaskMapper.toDomain(
+      { id: 1, name: 'N', description: 'd', start_date: start, end_date: end, completed: false },
+      's',
+    );
+
+    const update = TaskMapper.toDto(task);
+    expect(update.name).toBe('N');
+    expect(update.description).toBe('d');
+    expect(update.startDate).toBe('2025-03-01');
+    expect(update.endDate).toBe('2025-03-31');
+    expect(update.completed).toBe(false);
   });
 });
