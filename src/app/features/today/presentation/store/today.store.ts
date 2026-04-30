@@ -29,6 +29,46 @@ export class TodayStore {
   // TODO: Remove this temporary preview data once Today is backed by real API-driven data.
   private readonly previewMockGroups: TodayGroupViewModel[] = [
     {
+      label: this.dayLabelForDate(this.offsetDaysFromToday(-2), this.todayStart()),
+      tasks: [
+        {
+          id: 'mock-older-1',
+          sectionId: 'mock-section-4',
+          name: 'Finalize analytics event map',
+          completed: false,
+          startDate: this.offsetDaysFromToday(-2),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+      ],
+    },
+    {
+      label: 'Yesterday',
+      tasks: [
+        {
+          id: 'mock-yesterday-1',
+          sectionId: 'mock-section-3',
+          name: 'Refine onboarding copy',
+          completed: false,
+          startDate: this.offsetDaysFromToday(-1),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+        {
+          id: 'mock-yesterday-2',
+          sectionId: 'mock-section-3',
+          name: 'Plan follow-up user interviews',
+          completed: false,
+          startDate: this.offsetDaysFromToday(-1),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+      ],
+    },
+    {
       label: 'Today',
       tasks: [
         {
@@ -63,46 +103,6 @@ export class TodayStore {
         },
       ],
     },
-    {
-      label: 'Tomorrow',
-      tasks: [
-        {
-          id: 'mock-tomorrow-1',
-          sectionId: 'mock-section-3',
-          name: 'Refine onboarding copy',
-          completed: false,
-          startDate: this.offsetDaysFromToday(1),
-          description: 'Temporary mock item for UI preview.',
-          endDate: undefined,
-          subtasks: [],
-        },
-        {
-          id: 'mock-tomorrow-2',
-          sectionId: 'mock-section-3',
-          name: 'Plan follow-up user interviews',
-          completed: false,
-          startDate: this.offsetDaysFromToday(1),
-          description: 'Temporary mock item for UI preview.',
-          endDate: undefined,
-          subtasks: [],
-        },
-      ],
-    },
-    {
-      label: this.dayLabelForDate(this.offsetDaysFromToday(2), this.todayStart()),
-      tasks: [
-        {
-          id: 'mock-future-1',
-          sectionId: 'mock-section-4',
-          name: 'Finalize analytics event map',
-          completed: false,
-          startDate: this.offsetDaysFromToday(2),
-          description: 'Temporary mock item for UI preview.',
-          endDate: undefined,
-          subtasks: [],
-        },
-      ],
-    },
   ];
 
   // ===================================================================
@@ -117,7 +117,7 @@ export class TodayStore {
     const today = this.todayStart();
 
     const tasks = this.taskStore.tasks();
-    const dayGroups = new Map<string, TodayTaskViewModel[]>();
+    const dayGroups = new Map<number, { label: string; tasks: TodayTaskViewModel[] }>();
 
     for (const task of Object.values(tasks)) {
       // Only root tasks with an explicit start date.
@@ -127,6 +127,10 @@ export class TodayStore {
       const startDate = new Date(task.startDate);
       startDate.setHours(0, 0, 0, 0);
 
+      // "Today" view shows only tasks starting today or in the past.
+      if (startDate > today) continue;
+
+      const groupKey = startDate.getTime();
       const label = this.dayLabelForDate(startDate, today);
 
       const taskVM: TodayTaskViewModel = {
@@ -140,18 +144,20 @@ export class TodayStore {
         subtasks: this.buildSubtaskTree(task.subtaskIds, tasks),
       };
 
-      const existing = dayGroups.get(label);
+      const existing = dayGroups.get(groupKey);
       if (existing) {
-        existing.push(taskVM);
+        existing.tasks.push(taskVM);
       } else {
-        dayGroups.set(label, [taskVM]);
+        dayGroups.set(groupKey, { label, tasks: [taskVM] });
       }
     }
 
-    const realGroups = Array.from(dayGroups.entries()).map(([dayLabel, groupedTasks]) => ({
-      label: dayLabel,
-      tasks: groupedTasks,
-    }));
+    const realGroups = Array.from(dayGroups.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([, group]) => ({
+        label: group.label,
+        tasks: group.tasks,
+      }));
     return realGroups.length > 0 ? realGroups : this.previewMockGroups;
   });
 
