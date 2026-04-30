@@ -12,7 +12,7 @@ import {
   TaskRenameEvent,
   TaskToggleEvent,
 } from '@features/projects/presentation/models/project.view-model';
-import { TaskComponent } from '@features/projects/presentation/components/home/project-view/project-section/task/task.component';
+import { TaskComponent } from '@shared/ui/task/task.component';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 import { TaskFilter } from '@shared/types/task-filter.type';

@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { provideZonelessChangeDetection } from '@angular/core';
-import { TaskComponent } from '@features/projects/presentation/components/home/project-view/project-section/task/task.component';
-import { TaskEditModalComponent } from './task-edit-modal/task-edit-modal.component';
+import { TaskComponent } from '@shared/ui/task/task.component';
+import { TaskEditModalComponent } from '@shared/ui/task/task-edit-modal/task-edit-modal.component';
 import { TaskViewModel } from '@features/projects/presentation/models/project.view-model';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 import { ModalService } from '@shared/ui/modal/modal.service';

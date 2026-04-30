@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import { MODAL_DATA, ModalRef } from '@shared/ui/modal/modal-ref';
-import { TaskEditModalState } from '@features/projects/presentation/models/task-edit-modal.state';
+import { TaskEditModalState, TaskEditModalResult } from '@features/projects/presentation/models/task-edit-modal.state';
 
 @Component({
   selector: 'app-task-edit-modal',
@@ -89,7 +89,7 @@ export class TaskEditModalComponent {
       startDate,
       endDate,
       completed: this.completed(),
-    });
+    } satisfies TaskEditModalResult);
   }
 
   protected cancel(): void {

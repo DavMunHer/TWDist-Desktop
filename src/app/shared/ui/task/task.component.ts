@@ -12,7 +12,7 @@ import { TaskEditModalResult } from '@features/projects/presentation/models/task
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 import { ModalService } from '@shared/ui/modal/modal.service';
-import { TaskEditModalComponent } from './task-edit-modal/task-edit-modal.component';
+import { TaskEditModalComponent } from '@shared/ui/task/task-edit-modal/task-edit-modal.component';
 
 @Component({
   selector: 'app-task',
