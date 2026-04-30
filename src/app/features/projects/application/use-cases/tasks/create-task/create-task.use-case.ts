@@ -16,7 +16,7 @@ export class CreateTaskUseCase {
     projectId: string,
     sectionId: string,
     taskName: string,
-    startDate: Date = new Date(),
+    startDate?: Date,
   ): Observable<Result<Task, ProjectsError>> {
     const taskNameResult = TaskName.tryCreate(taskName);
     if (!taskNameResult.success) {

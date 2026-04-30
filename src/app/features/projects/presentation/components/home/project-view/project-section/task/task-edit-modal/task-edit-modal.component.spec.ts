@@ -46,6 +46,83 @@ describe('TaskEditModalComponent', () => {
   it('closes the modal when save is submitted', () => {
     const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
     form.dispatchEvent(new Event('submit'));
+    expect(modalRef.close).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'Write release notes',
+      description: 'Details',
+      completed: false,
+    }));
+  });
+
+  it('does not close the modal when start date is before today', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const year = yesterday.getFullYear();
+    const month = `${yesterday.getMonth() + 1}`.padStart(2, '0');
+    const day = `${yesterday.getDate()}`.padStart(2, '0');
+    const yesterdayInputValue = `${year}-${month}-${day}`;
+
+    const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+    startDateInput.value = yesterdayInputValue;
+    startDateInput.dispatchEvent(new Event('input'));
+    startDateInput.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(modalRef.close).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('Start date cannot be before today');
+  });
+
+  it('allows saving after clearing start date', () => {
+    const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+    const clearStartDateButton: HTMLButtonElement = fixture.nativeElement.querySelector('#clearStartDate');
+
+    clearStartDateButton.click();
+    fixture.detectChanges();
+
+    expect(startDateInput.value).toBe('');
+
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+
     expect(modalRef.close).toHaveBeenCalled();
+  });
+
+  it('clears end date when clear end date is clicked', () => {
+    const endDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#endDate');
+    const clearEndDateButton: HTMLButtonElement = fixture.nativeElement.querySelector('#clearEndDate');
+
+    endDateInput.value = '2099-01-01';
+    endDateInput.dispatchEvent(new Event('input'));
+    endDateInput.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    clearEndDateButton.click();
+    fixture.detectChanges();
+
+    expect(endDateInput.value).toBe('');
+  });
+
+  it('does not close when end date is before start date', () => {
+    const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+    const endDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#endDate');
+
+    startDateInput.value = '2099-01-10';
+    startDateInput.dispatchEvent(new Event('input'));
+    startDateInput.dispatchEvent(new Event('change'));
+
+    endDateInput.value = '2099-01-01';
+    endDateInput.dispatchEvent(new Event('input'));
+    endDateInput.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(modalRef.close).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('End date cannot be before start date');
   });
 });

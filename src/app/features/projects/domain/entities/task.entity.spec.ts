@@ -30,4 +30,20 @@ describe('Task', () => {
     expect(next.name).toBe('Renamed');
     expect(base.name).toBe('Write docs');
   });
+
+  it('setStartDate sets provided date and supports clearing', () => {
+    const newStart = new Date('2025-07-01');
+    const withStart = base.setStartDate(newStart);
+    const withoutStart = withStart.setStartDate(undefined);
+
+    expect(withStart.startDate).toEqual(newStart);
+    expect(withoutStart.startDate).toBeUndefined();
+  });
+
+  it('setEndDate supports clearing end date', () => {
+    const withEndDate = base.setEndDate(new Date('2025-07-15'));
+    const withoutEndDate = withEndDate.setEndDate(undefined);
+
+    expect(withoutEndDate.endDate).toBeUndefined();
+  });
 });

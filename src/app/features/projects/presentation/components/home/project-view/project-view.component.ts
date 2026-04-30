@@ -8,6 +8,7 @@ import {
   SectionUpdateEvent,
   TaskCreateEvent,
   TaskDeleteEvent,
+  TaskEditEvent,
   TaskRenameEvent,
   TaskToggleEvent,
 } from '@features/projects/presentation/models/project.view-model';
@@ -67,6 +68,13 @@ export class ProjectViewComponent {
 
   protected onTaskDelete(event: TaskDeleteEvent): void {
     this.projectStore.deleteTask(event.sectionId, event.id);
+  }
+
+  protected onTaskEdit(event: TaskEditEvent): void {
+    this.projectStore.editTask(event.id, event.name, event.description, event.startDate, event.endDate);
+    if (event.completedChanged) {
+      this.projectStore.toggleTaskCompletion(event.id);
+    }
   }
 
   protected onSectionUpdate(event: SectionUpdateEvent): void {

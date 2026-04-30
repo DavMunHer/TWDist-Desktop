@@ -2,11 +2,13 @@ import { Component, forwardRef, input, output, signal, ChangeDetectionStrategy, 
 import { NgClass } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
+  TaskEditEvent,
   TaskDeleteEvent,
   TaskRenameEvent,
   TaskToggleEvent,
   TaskViewModel,
 } from '@features/projects/presentation/models/project.view-model';
+import { TaskEditModalResult } from '@features/projects/presentation/models/task-edit-modal.state';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 import { ModalService } from '@shared/ui/modal/modal.service';
@@ -28,6 +30,7 @@ export class TaskComponent {
   public taskToggle = output<TaskToggleEvent>();
   public taskRename = output<TaskRenameEvent>();
   public taskDelete = output<TaskDeleteEvent>();
+  public taskEdit = output<TaskEditEvent>();
 
   protected menuOpen = signal(false);
   protected editing = signal(false);
@@ -63,6 +66,8 @@ export class TaskComponent {
 
     if (this.editing()) return;
 
+    const initialCompleted = this.taskInfo().completed;
+
     this.menuOpen.set(false);
     this.modalService.open(TaskEditModalComponent, {
       title: 'Edit Task',
@@ -70,8 +75,27 @@ export class TaskComponent {
         id: this.taskInfo().id,
         name: this.taskInfo().name,
         completed: this.taskInfo().completed,
-        description: '', // FIXME: TaskViewModel should include description and endDate
+        description: this.taskInfo().description ?? '',
         startDate: this.taskInfo().startDate,
+        endDate: this.taskInfo().endDate,
+      },
+      onClose: (result?: unknown) => {
+        if (!result || typeof result !== 'object') return;
+
+        const modalResult = result as TaskEditModalResult;
+        const startDate = this.parseDateInputValue(modalResult.startDate);
+        const endDate = this.parseDateInputValue(modalResult.endDate);
+        const completedChanged = modalResult.completed !== initialCompleted;
+
+        this.taskEdit.emit({
+          id: this.taskInfo().id,
+          sectionId: this.sectionId(),
+          name: modalResult.name,
+          description: modalResult.description.trim() || undefined,
+          startDate,
+          endDate,
+          completedChanged,
+        });
       },
     });
   }
@@ -95,7 +119,12 @@ export class TaskComponent {
     this.editing.set(true);
   }
 
-  protected onSave(): void {
+  protected onSave(event?: Event): void {
+    event?.stopPropagation();
+    if (event instanceof KeyboardEvent) {
+      event.preventDefault();
+    }
+
     if (this.cancellingEdit) {
       this.cancellingEdit = false;
       return;
@@ -114,7 +143,12 @@ export class TaskComponent {
     this.editing.set(false);
   }
 
-  protected onCancel(): void {
+  protected onCancel(event?: Event): void {
+    event?.stopPropagation();
+    if (event instanceof KeyboardEvent) {
+      event.preventDefault();
+    }
+
     this.cancellingEdit = true;
     this.taskNameCtrl.markAsUntouched();
     this.editing.set(false);
@@ -148,5 +182,16 @@ export class TaskComponent {
 
   protected forwardTaskDelete(event: TaskDeleteEvent): void {
     this.taskDelete.emit(event);
+  }
+
+  protected forwardTaskEdit(event: TaskEditEvent): void {
+    this.taskEdit.emit(event);
+  }
+
+  private parseDateInputValue(value: string): Date | undefined {
+    if (!value) return undefined;
+
+    const parsed = new Date(`${value}T00:00:00`);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
   }
 }

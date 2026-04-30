@@ -101,6 +101,50 @@ describe('TaskStore', () => {
     expect(store.tasks()['t1']?.name).toBe('New Name');
   });
 
+  it('editTask updates multiple fields when use case succeeds', () => {
+    const start = new Date('2026-01-01');
+    const end = new Date('2026-01-02');
+    const t = new Task('t1', 's1', 'Old Name', false, start, 'Old description', undefined, end, undefined, undefined, []);
+    store.mergeTasks([t]);
+
+    const nextStart = new Date('2026-01-10');
+    const nextEnd = new Date('2026-01-20');
+    store.editTask('p1', 't1', 'New Name', 'New description', nextStart, nextEnd);
+
+    expect(updateExecute).toHaveBeenCalled();
+    expect(store.tasks()['t1']?.name).toBe('New Name');
+    expect(store.tasks()['t1']?.description).toBe('New description');
+    expect(store.tasks()['t1']?.startDate).toEqual(nextStart);
+    expect(store.tasks()['t1']?.endDate).toEqual(nextEnd);
+  });
+
+  it('editTask rolls back optimistic update when use case fails', () => {
+    const start = new Date('2026-01-01');
+    const t = new Task('t1', 's1', 'Old Name', false, start, 'Old description', undefined, undefined, undefined, undefined, []);
+    store.mergeTasks([t]);
+    updateExecute.mockReturnValue(of({ success: false, error: { code: 'NETWORK_ERROR' as const } }));
+
+    store.editTask('p1', 't1', 'New Name', 'New description', undefined, undefined);
+
+    expect(updateExecute).toHaveBeenCalled();
+    expect(store.tasks()['t1']?.name).toBe('Old Name');
+    expect(store.tasks()['t1']?.description).toBe('Old description');
+    expect(store.tasks()['t1']?.startDate).toEqual(start);
+  });
+
+  it('editTask rolls back optimistic update when validation fails', () => {
+    const start = new Date('2026-01-01');
+    const t = new Task('t1', 's1', 'Old Name', false, start, 'Old description', undefined, undefined, undefined, undefined, []);
+    store.mergeTasks([t]);
+    updateExecute.mockReturnValue(of({ success: false, error: { code: 'TASK_NAME_REQUIRED' as const } }));
+
+    store.editTask('p1', 't1', '', 'New description', undefined, undefined);
+
+    expect(updateExecute).toHaveBeenCalled();
+    expect(store.tasks()['t1']?.name).toBe('Old Name');
+    expect(store.tasks()['t1']?.description).toBe('Old description');
+  });
+
   it('deleteTask removes task and descendants on success', () => {
     const child = new Task('c1', 's1', 'Child', false, new Date(), undefined, undefined, undefined, undefined, 'p1', []);
     const parent = new Task('p1', 's1', 'Parent', false, new Date(), undefined, undefined, undefined, undefined, undefined, ['c1']);

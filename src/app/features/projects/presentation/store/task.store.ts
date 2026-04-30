@@ -184,15 +184,55 @@ export class TaskStore {
     const existing = this.state().tasks[taskId];
     if (!existing) return;
 
-    const updatedName = newName.trim();
-    if (!updatedName || updatedName === existing.name) return;
+    this.editTask(
+      projectId,
+      taskId,
+      newName,
+      existing.description,
+      existing.startDate,
+      existing.endDate,
+    );
+  }
 
-    const requestTask = existing.updateName(updatedName);
+  /** Update a task's editable fields in backend and local state */
+  editTask(
+    projectId: string,
+    taskId: string,
+    name: string,
+    description?: string,
+    startDate?: Date,
+    endDate?: Date,
+  ): void {
+    const existing = this.state().tasks[taskId];
+    if (!existing) return;
 
-    this.updateTaskUseCase.execute(projectId, requestTask).subscribe({
+    const updatedName = name.trim();
+    const normalizedDescription = description?.trim() ? description.trim() : undefined;
+    const nextTask = existing
+      .updateName(updatedName)
+      .updateDescription(normalizedDescription ?? '')
+      .setStartDate(startDate)
+      .setEndDate(endDate);
+
+    const hasChanges = nextTask.name !== existing.name
+      || nextTask.description !== existing.description
+      || nextTask.startDate?.getTime() !== existing.startDate?.getTime()
+      || nextTask.endDate?.getTime() !== existing.endDate?.getTime();
+    if (!hasChanges) return;
+
+    this.state.update(s => ({
+      ...s,
+      tasks: { ...s.tasks, [taskId]: nextTask },
+    }));
+
+    this.updateTaskUseCase.execute(projectId, nextTask).subscribe({
       next: (result) => {
         if (!result.success) {
-          this.setResultError(result.error, 'update task name');
+          this.state.update(s => ({
+            ...s,
+            tasks: { ...s.tasks, [taskId]: existing },
+          }));
+          this.setResultError(result.error, 'update task');
           return;
         }
 
@@ -201,7 +241,7 @@ export class TaskStore {
           ...s,
           tasks: {
             ...s.tasks,
-            [taskId]: requestTask.updateName(updatedTask.name),
+            [taskId]: updatedTask,
           },
         }));
       },

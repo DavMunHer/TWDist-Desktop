@@ -1,6 +1,8 @@
 import { Task } from '@features/projects/domain/entities/task.entity';
 import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
 import { CreateTaskDto } from '@features/projects/infrastructure/dto/create-task.dto';
+import { UpdateTaskDto } from '@features/projects/infrastructure/dto/update-task.dto';
+import { formatDateToISO } from '@shared/utils/date.util';
 
 export class TaskMapper {
   /**
@@ -9,15 +11,17 @@ export class TaskMapper {
    */
   static toDomain(dto: TaskDto, sectionId: string, parentTaskId?: string): Task {
     const subtaskIds = (dto.subtasks ?? []).map(s => String(s.id));
+    const startDate = TaskMapper.parseDate(dto.startDate ?? dto.start_date);
+    const endDate = TaskMapper.parseDate(dto.endDate ?? dto.end_date);
     return new Task(
       String(dto.id),
       sectionId,
       dto.name,
       dto.completed,
-      dto.start_date,
+      startDate,
       dto.description,
       dto.label,
-      dto.end_date,
+      endDate,
       undefined,
       parentTaskId,
       subtaskIds,
@@ -48,14 +52,22 @@ export class TaskMapper {
     };
   }
 
-  static toDto(task: Task): Partial<TaskDto> {
+  static toDto(task: Task): UpdateTaskDto {
     return {
       name: task.name,
       description: task.description,
-      start_date: task.startDate,
-      end_date: task.endDate,
+      startDate: task.startDate ? formatDateToISO(task.startDate) : undefined,
+      endDate: task.endDate ? formatDateToISO(task.endDate) : undefined,
       completed: task.completed,
       label: task.label,
     };
+  }
+
+  private static parseDate(dateValue: Date | string | null | undefined): Date | undefined {
+    if (!dateValue) return undefined;
+    if (dateValue instanceof Date) return dateValue;
+
+    const parsed = new Date(dateValue);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
   }
 }
