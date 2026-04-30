@@ -26,6 +26,84 @@ import { TodayGroupViewModel, TodayTaskViewModel } from '@features/today/present
 export class TodayStore {
   private readonly sectionStore = inject(SectionStore);
   private readonly taskStore = inject(TaskStore);
+  // TODO: Remove this temporary preview data once Today is backed by real API-driven data.
+  private readonly previewMockGroups: TodayGroupViewModel[] = [
+    {
+      label: 'Today',
+      tasks: [
+        {
+          id: 'mock-today-1',
+          sectionId: 'mock-section-1',
+          name: 'Prepare sprint demo notes',
+          completed: false,
+          startDate: new Date(),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+        {
+          id: 'mock-today-2',
+          sectionId: 'mock-section-1',
+          name: 'Review pull request feedback',
+          completed: true,
+          startDate: new Date(),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+        {
+          id: 'mock-today-3',
+          sectionId: 'mock-section-2',
+          name: 'Write QA checklist for release',
+          completed: false,
+          startDate: new Date(),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+      ],
+    },
+    {
+      label: 'Tomorrow',
+      tasks: [
+        {
+          id: 'mock-tomorrow-1',
+          sectionId: 'mock-section-3',
+          name: 'Refine onboarding copy',
+          completed: false,
+          startDate: this.offsetDaysFromToday(1),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+        {
+          id: 'mock-tomorrow-2',
+          sectionId: 'mock-section-3',
+          name: 'Plan follow-up user interviews',
+          completed: false,
+          startDate: this.offsetDaysFromToday(1),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+      ],
+    },
+    {
+      label: this.dayLabelForDate(this.offsetDaysFromToday(2), this.todayStart()),
+      tasks: [
+        {
+          id: 'mock-future-1',
+          sectionId: 'mock-section-4',
+          name: 'Finalize analytics event map',
+          completed: false,
+          startDate: this.offsetDaysFromToday(2),
+          description: 'Temporary mock item for UI preview.',
+          endDate: undefined,
+          subtasks: [],
+        },
+      ],
+    },
+  ];
 
   // ===================================================================
   // SELECTORS
@@ -33,27 +111,23 @@ export class TodayStore {
 
   /**
    * Today's tasks grouped by day label.
-   * A task is "today" when its endDate falls on the current calendar day.
+   * Tasks are grouped by startDate day label.
    */
   readonly todayGroups = computed<TodayGroupViewModel[]>(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const today = this.todayStart();
 
     const tasks = this.taskStore.tasks();
     const dayGroups = new Map<string, TodayTaskViewModel[]>();
 
     for (const task of Object.values(tasks)) {
-      // Only root tasks (no parent) and only those due today
+      // Only root tasks with an explicit start date.
       if (task.parentTaskId) continue;
-      if (!task.endDate) continue;
+      if (!task.startDate) continue;
 
-      const dueDate = new Date(task.endDate);
-      dueDate.setHours(0, 0, 0, 0);
-      if (dueDate < today || dueDate >= tomorrow) continue;
+      const startDate = new Date(task.startDate);
+      startDate.setHours(0, 0, 0, 0);
 
-      const label = this.dayLabelForDate(dueDate, today);
+      const label = this.dayLabelForDate(startDate, today);
 
       const taskVM: TodayTaskViewModel = {
         id: task.id,
@@ -74,10 +148,11 @@ export class TodayStore {
       }
     }
 
-    return Array.from(dayGroups.entries()).map(([dayLabel, groupedTasks]) => ({
+    const realGroups = Array.from(dayGroups.entries()).map(([dayLabel, groupedTasks]) => ({
       label: dayLabel,
       tasks: groupedTasks,
     }));
+    return realGroups.length > 0 ? realGroups : this.previewMockGroups;
   });
 
   // ===================================================================
@@ -151,10 +226,25 @@ export class TodayStore {
 
   private dayLabelForDate(date: Date, today: Date): string {
     if (date.getTime() === today.getTime()) return 'Today';
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    if (date.getTime() === tomorrow.getTime()) return 'Tomorrow';
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
     });
+  }
+
+  private todayStart(): Date {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  private offsetDaysFromToday(days: number): Date {
+    const date = this.todayStart();
+    date.setDate(date.getDate() + days);
+    return date;
   }
 }
