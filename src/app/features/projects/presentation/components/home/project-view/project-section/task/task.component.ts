@@ -66,6 +66,8 @@ export class TaskComponent {
 
     if (this.editing()) return;
 
+    const initialCompleted = this.taskInfo().completed;
+
     this.menuOpen.set(false);
     this.modalService.open(TaskEditModalComponent, {
       title: 'Edit Task',
@@ -83,7 +85,7 @@ export class TaskComponent {
         const modalResult = result as TaskEditModalResult;
         const startDate = this.parseDateInputValue(modalResult.startDate);
         const endDate = this.parseDateInputValue(modalResult.endDate);
-        const completedChanged = modalResult.completed !== this.taskInfo().completed;
+        const completedChanged = modalResult.completed !== initialCompleted;
 
         this.taskEdit.emit({
           id: this.taskInfo().id,
