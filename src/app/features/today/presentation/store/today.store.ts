@@ -34,7 +34,6 @@ export class TodayStore {
   // ===================================================================
 
   readonly loading = computed(() => this.state().loading);
-  readonly loaded = computed(() => this.state().loaded);
   readonly error = computed(() => this.state().error);
 
   readonly todayGroups = computed<TodayGroupViewModel[]>(() => {
@@ -84,7 +83,6 @@ export class TodayStore {
           this.state.update((s) => ({
             ...s,
             loading: false,
-            loaded: true,
             error: 'Failed to load today tasks.',
           }));
           return;
@@ -92,7 +90,6 @@ export class TodayStore {
         this.state.set({
           aggregates: result.value,
           loading: false,
-          loaded: true,
           error: null,
         });
       },
@@ -100,7 +97,6 @@ export class TodayStore {
         this.state.update((s) => ({
           ...s,
           loading: false,
-          loaded: true,
           error: 'Failed to load today tasks.',
         }));
       },
@@ -108,7 +104,7 @@ export class TodayStore {
   }
 
   ensureTodayTasksLoaded(): void {
-    if (this.state().loaded || this.state().loading) return;
+    if (this.state().loading) return;
     this.loadTodayTasks();
   }
 

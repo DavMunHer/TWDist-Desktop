@@ -10,7 +10,6 @@ import { provideZonelessChangeDetection } from '@angular/core';
 const todayStoreMock = {
   todayGroups: signal([]),
   loading: signal(false),
-  loaded: signal(false),
   error: signal<string | null>(null),
   ensureTodayTasksLoaded: vi.fn(),
   loadTodayTasks: vi.fn(),
@@ -28,7 +27,6 @@ describe('TodayComponent', () => {
     todayStoreMock.loadTodayTasks.mockReset();
     todayStoreMock.ensureTodayTasksLoaded.mockReset();
     todayStoreMock.loading.set(false);
-    todayStoreMock.loaded.set(false);
     todayStoreMock.error.set(null);
     todayStoreMock.todayGroups.set([]);
 
@@ -73,7 +71,6 @@ describe('Breadcrumb integration inside the TodayComponent', () => {
     todayStoreMock.loadTodayTasks.mockReset();
     todayStoreMock.ensureTodayTasksLoaded.mockReset();
     todayStoreMock.loading.set(false);
-    todayStoreMock.loaded.set(false);
     todayStoreMock.error.set(null);
     todayStoreMock.todayGroups.set([]);
 

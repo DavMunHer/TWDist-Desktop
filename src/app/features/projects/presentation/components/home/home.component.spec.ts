@@ -26,7 +26,6 @@ const mockAuthStore = { user: signal<User | null>(new User('1', 'test@example.co
 const todayStoreMock = {
   todayGroups: signal([]),
   loading: signal(false),
-  loaded: signal(false),
   error: signal<string | null>(null),
   ensureTodayTasksLoaded: vi.fn(),
   loadTodayTasks: vi.fn(),
@@ -87,7 +86,6 @@ describe('HomeComponent', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     todayStoreMock.loading.set(false);
-    todayStoreMock.loaded.set(false);
     todayStoreMock.error.set(null);
     todayStoreMock.todayGroups.set([]);
     routerUrl = '/projects/upcoming';

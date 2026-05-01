@@ -19,6 +19,7 @@ import { TaskFilter } from '@shared/types/task-filter.type';
 })
 export class TodayComponent {
   private readonly todayStore = inject(TodayStore);
+  private readonly initialLoadRequested = signal(false);
 
   public showIcon = input.required<boolean>();
   public showIconChange = output<boolean>();
@@ -27,7 +28,6 @@ export class TodayComponent {
   protected todayGroups = this.todayStore.todayGroups;
   protected loading = this.todayStore.loading;
   protected error = this.todayStore.error;
-  protected loaded = this.todayStore.loaded;
 
   protected readonly todayLabel = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -36,9 +36,9 @@ export class TodayComponent {
   });
 
   private readonly ensureLoaded = effect(() => {
-    if (!this.loaded()) {
-      this.todayStore.ensureTodayTasksLoaded();
-    }
+    if (this.initialLoadRequested()) return;
+    this.initialLoadRequested.set(true);
+    this.todayStore.ensureTodayTasksLoaded();
   });
 
   handleIconChange(): void {
