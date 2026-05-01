@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, effect, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { TodayGroupComponent } from '@features/today/presentation/components/today/today-group/today-group.component';
 import { TodayStore } from '@features/today/presentation/store/today.store';
@@ -25,11 +25,20 @@ export class TodayComponent {
 
   protected taskFilter = signal<TaskFilter>('uncompleted');
   protected todayGroups = this.todayStore.todayGroups;
+  protected loading = this.todayStore.loading;
+  protected error = this.todayStore.error;
+  protected loaded = this.todayStore.loaded;
 
   protected readonly todayLabel = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
+  });
+
+  private readonly ensureLoaded = effect(() => {
+    if (!this.loaded()) {
+      this.todayStore.ensureTodayTasksLoaded();
+    }
   });
 
   handleIconChange(): void {
@@ -54,5 +63,9 @@ export class TodayComponent {
 
   protected onTaskEdit(event: TaskEditEvent): void {
     this.todayStore.editTask(event);
+  }
+
+  protected retryLoadTodayTasks(): void {
+    this.todayStore.loadTodayTasks();
   }
 }

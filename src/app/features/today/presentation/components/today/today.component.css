@@ -48,4 +48,35 @@
       margin: 0;
     }
   }
+
+  & .today-loading-state,
+  & .today-error-state {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: #777;
+    font-size: 0.95rem;
+    padding: 40px;
+
+    & p {
+      margin: 0;
+    }
+  }
+
+  & .today-error-state {
+    color: #c0392b;
+
+    & .retry-button {
+      border: 1px solid #c0392b;
+      background: transparent;
+      color: #c0392b;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font: inherit;
+      cursor: pointer;
+    }
+  }
 }

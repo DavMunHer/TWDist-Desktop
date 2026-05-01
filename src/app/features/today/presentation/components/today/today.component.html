@@ -14,9 +14,18 @@
   </header>
 
   <main class="today-main-container">
-    @if (todayGroups().length === 0) {
+    @if (loading()) {
+      <div class="today-loading-state">
+        <p>Loading today tasks...</p>
+      </div>
+    } @else if (error()) {
+      <div class="today-error-state">
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-button" (click)="retryLoadTodayTasks()">Retry</button>
+      </div>
+    } @else if (todayGroups().length === 0) {
       <div class="today-empty-state">
-        <p>No tasks due today. Enjoy your day!</p>
+        <p>No tasks to show for today.</p>
       </div>
     } @else {
       @for (group of todayGroups(); track group.label) {
