@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, input, output, signal, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { TodayGroupComponent } from '@features/today/presentation/components/today/today-group/today-group.component';
 import { TodayStore } from '@features/today/presentation/store/today.store';
@@ -17,9 +17,8 @@ import { TaskFilter } from '@shared/types/task-filter.type';
   templateUrl: './today.component.html',
   styleUrl: './today.component.css',
 })
-export class TodayComponent {
+export class TodayComponent implements OnInit {
   private readonly todayStore = inject(TodayStore);
-  private readonly initialLoadRequested = signal(false);
 
   public showIcon = input.required<boolean>();
   public showIconChange = output<boolean>();
@@ -35,11 +34,9 @@ export class TodayComponent {
     day: 'numeric',
   });
 
-  private readonly ensureLoaded = effect(() => {
-    if (this.initialLoadRequested()) return;
-    this.initialLoadRequested.set(true);
+  ngOnInit(): void {
     this.todayStore.ensureTodayTasksLoaded();
-  });
+  }
 
   handleIconChange(): void {
     this.showIconChange.emit(true);
