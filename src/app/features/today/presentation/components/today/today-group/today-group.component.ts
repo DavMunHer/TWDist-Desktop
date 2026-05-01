@@ -1,4 +1,4 @@
-import { Component, computed, input, output, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, computed, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { TaskComponent } from '@shared/ui/task/task.component';
 import {
   TaskDeleteEvent,
@@ -25,8 +25,6 @@ export class TodayGroupComponent {
   public taskDelete = output<TaskDeleteEvent>();
   public taskEdit = output<TaskEditEvent>();
 
-  protected menuOpen = signal(false);
-
   protected filteredTasks = computed(() => {
     const tasks = this.groupInfo().tasks;
     switch (this.taskFilter()) {
@@ -40,14 +38,4 @@ export class TodayGroupComponent {
   });
 
   protected visibleTaskCount = computed(() => this.filteredTasks().length);
-
-  protected toggleMenu(event: Event): void {
-    event.stopPropagation();
-    this.menuOpen.update(v => !v);
-  }
-
-  protected closeMenu(event: Event): void {
-    event.stopPropagation();
-    this.menuOpen.set(false);
-  }
 }
