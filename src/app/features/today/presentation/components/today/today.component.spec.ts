@@ -9,6 +9,10 @@ import { provideZonelessChangeDetection } from '@angular/core';
 
 const todayStoreMock = {
   todayGroups: signal([]),
+  loading: signal(false),
+  error: signal<string | null>(null),
+  ensureTodayTasksLoaded: vi.fn(),
+  loadTodayTasks: vi.fn(),
   toggleTaskCompletion: vi.fn(),
   renameTask: vi.fn(),
   deleteTask: vi.fn(),
@@ -20,6 +24,12 @@ describe('TodayComponent', () => {
   let fixture: ComponentFixture<TodayComponent>;
 
   beforeEach(async () => {
+    todayStoreMock.loadTodayTasks.mockReset();
+    todayStoreMock.ensureTodayTasksLoaded.mockReset();
+    todayStoreMock.loading.set(false);
+    todayStoreMock.error.set(null);
+    todayStoreMock.todayGroups.set([]);
+
     await TestBed.configureTestingModule({
       imports: [TodayComponent],
       providers: [
@@ -38,6 +48,10 @@ describe('TodayComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('ensures today tasks are loaded through signal effect', () => {
+    expect(todayStoreMock.ensureTodayTasksLoaded).toHaveBeenCalled();
+  });
+
   it('renders today title', () => {
     const title: HTMLElement = fixture.nativeElement.querySelector('.today-title');
     expect(title?.textContent?.trim()).toBe('Today');
@@ -54,6 +68,12 @@ describe('Breadcrumb integration inside the TodayComponent', () => {
   let component: TodayComponent;
 
   beforeEach(async () => {
+    todayStoreMock.loadTodayTasks.mockReset();
+    todayStoreMock.ensureTodayTasksLoaded.mockReset();
+    todayStoreMock.loading.set(false);
+    todayStoreMock.error.set(null);
+    todayStoreMock.todayGroups.set([]);
+
     await TestBed.configureTestingModule({
       imports: [TodayComponent],
       providers: [

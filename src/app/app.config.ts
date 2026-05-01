@@ -9,6 +9,7 @@ import { credentialsInterceptor } from '@shared/interceptors/credentials.interce
 import { errorInterceptor } from '@shared/interceptors/error.interceptor';
 import { AUTH_FEATURE_PROVIDERS } from '@features/auth/auth.providers';
 import { AuthStore } from '@features/auth/presentation/store/auth.store';
+import { TODAY_FEATURE_PROVIDERS } from '@features/today/today.providers';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,6 +20,7 @@ export const appConfig: ApplicationConfig = {
     ),
     ...PROJECT_FEATURE_PROVIDERS,
     ...AUTH_FEATURE_PROVIDERS,
+    ...TODAY_FEATURE_PROVIDERS,
 
     // Check authentication status on app startup
     // This validates the cookie with the backend and updates the auth state

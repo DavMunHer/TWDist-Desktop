@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, input, output, signal, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { TodayGroupComponent } from '@features/today/presentation/components/today/today-group/today-group.component';
 import { TodayStore } from '@features/today/presentation/store/today.store';
@@ -17,7 +17,7 @@ import { TaskFilter } from '@shared/types/task-filter.type';
   templateUrl: './today.component.html',
   styleUrl: './today.component.css',
 })
-export class TodayComponent {
+export class TodayComponent implements OnInit {
   private readonly todayStore = inject(TodayStore);
 
   public showIcon = input.required<boolean>();
@@ -25,12 +25,18 @@ export class TodayComponent {
 
   protected taskFilter = signal<TaskFilter>('uncompleted');
   protected todayGroups = this.todayStore.todayGroups;
+  protected loading = this.todayStore.loading;
+  protected error = this.todayStore.error;
 
   protected readonly todayLabel = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   });
+
+  ngOnInit(): void {
+    this.todayStore.ensureTodayTasksLoaded();
+  }
 
   handleIconChange(): void {
     this.showIconChange.emit(true);
@@ -54,5 +60,9 @@ export class TodayComponent {
 
   protected onTaskEdit(event: TaskEditEvent): void {
     this.todayStore.editTask(event);
+  }
+
+  protected retryLoadTodayTasks(): void {
+    this.todayStore.loadTodayTasks();
   }
 }
