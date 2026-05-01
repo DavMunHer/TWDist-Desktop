@@ -1,9 +1,34 @@
 <section class="today-section">
-	<nav>
-		<app-breadcrumb route="Today" [showIcon]="showIcon()" (iconClick)="handleIconChange()"></app-breadcrumb>
-	</nav>
+  <nav>
+    <app-breadcrumb
+      route="Today"
+      [showIcon]="showIcon()"
+      (iconClick)="handleIconChange()"
+      (taskFilterChange)="onTaskFilterChange($event)"
+    />
+  </nav>
 
-	<main>
-		<p>today works!</p>
-	</main>
+  <header class="today-header">
+    <h1 class="today-title">Today</h1>
+    <p class="today-date">{{ todayLabel }}</p>
+  </header>
+
+  <main class="today-main-container">
+    @if (todayGroups().length === 0) {
+      <div class="today-empty-state">
+        <p>No tasks due today. Enjoy your day!</p>
+      </div>
+    } @else {
+      @for (group of todayGroups(); track group.label) {
+        <app-today-group
+          [groupInfo]="group"
+          [taskFilter]="taskFilter()"
+          (taskToggle)="onTaskToggle($event)"
+          (taskRename)="onTaskRename($event)"
+          (taskDelete)="onTaskDelete($event)"
+          (taskEdit)="onTaskEdit($event)"
+        />
+      }
+    }
+  </main>
 </section>

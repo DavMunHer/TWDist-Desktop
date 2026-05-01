@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HomeComponent } from '@features/projects/presentation/components/home/home.component';
 import { ProjectStore } from '@features/projects/presentation/store/project.store';
 import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
+import { TodayStore } from '@features/today/presentation/store/today.store';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
 import { ProjectViewComponent } from '@features/projects/presentation/components/home/project-view/project-view.component';
 import { TodayComponent } from '@features/today/presentation/components/today/today.component';
@@ -21,6 +22,14 @@ import { AuthStore } from '@features/auth/presentation/store/auth.store';
 import { User } from '@features/auth/domain/entities/user.entity';
 
 const mockAuthStore = { user: signal<User | null>(new User('1', 'test@example.com', 'TestUser')) };
+
+const todayStoreMock = {
+  todayGroups: signal([]),
+  toggleTaskCompletion: vi.fn(),
+  renameTask: vi.fn(),
+  deleteTask: vi.fn(),
+  editTask: vi.fn(),
+};
 
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -88,6 +97,7 @@ describe('HomeComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: ProjectStore, useValue: projectStoreMock },
         { provide: ProjectSummaryStore, useValue: projectSummaryStoreMock },
+        { provide: TodayStore, useValue: todayStoreMock },
         { provide: ModalService, useValue: modalServiceMock },
         { provide: AuthStore, useValue: mockAuthStore },
       ],

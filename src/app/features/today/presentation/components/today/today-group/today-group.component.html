@@ -1,0 +1,30 @@
+<section class="today-group-container">
+  <div class="today-group">
+    <header class="group-header">
+      <div class="group-header-row">
+        <div class="group-title-area">
+          <span class="group-name">{{ groupInfo().label }}</span>
+        </div>
+        <div class="group-end-area">
+          <span class="group-task-count">{{ visibleTaskCount() }}</span>
+        </div>
+      </div>
+    </header>
+    <main class="tasks-container">
+      @for (task of filteredTasks(); track task.id) {
+        <app-task
+          [taskInfo]="task"
+          [sectionId]="task.sectionId"
+          (taskToggle)="taskToggle.emit($event)"
+          (taskRename)="taskRename.emit($event)"
+          (taskDelete)="taskDelete.emit($event)"
+          (taskEdit)="taskEdit.emit($event)"
+        />
+      }
+
+      @if (filteredTasks().length === 0) {
+        <p class="empty-state">No tasks for today in this group.</p>
+      }
+    </main>
+  </div>
+</section>
