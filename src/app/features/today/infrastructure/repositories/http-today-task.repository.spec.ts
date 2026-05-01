@@ -31,6 +31,7 @@ describe('HttpTodayTaskRepository', () => {
     repository.findTodayTasks().subscribe((aggregates) => {
       expect(aggregates).toHaveLength(1);
       expect(aggregates[0].projectId).toBe('10');
+      expect(aggregates[0].projectName).toBe('Demo');
       expect(aggregates[0].task.id).toBe('1');
       expect(aggregates[0].task.completed).toBe(true);
       expect(aggregates[0].task.sectionId).toBe('20');

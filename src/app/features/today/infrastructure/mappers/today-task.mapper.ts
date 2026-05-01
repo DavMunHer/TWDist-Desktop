@@ -25,6 +25,7 @@ export class TodayTaskMapper {
       return {
         task,
         projectId: String(dto.projectId),
+        projectName: dto.projectName,
       };
     });
   }
