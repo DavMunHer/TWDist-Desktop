@@ -53,12 +53,15 @@ export class TaskMapper {
   }
 
   static toDto(task: Task): UpdateTaskDto {
+    const completedDate =
+      task.completed && task.completedDate ? formatDateToISO(task.completedDate) : undefined;
+
     return {
       name: task.name,
       description: task.description,
       startDate: task.startDate ? formatDateToISO(task.startDate) : undefined,
       endDate: task.endDate ? formatDateToISO(task.endDate) : undefined,
-      completed: task.completed,
+      ...(completedDate !== undefined ? { completedDate } : {}),
       label: task.label,
     };
   }

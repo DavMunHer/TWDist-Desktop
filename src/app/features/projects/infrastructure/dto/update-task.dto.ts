@@ -3,6 +3,7 @@ export interface UpdateTaskDto {
   description?: string;
   startDate?: string;
   endDate?: string;
-  completed?: boolean;
+  /** Set when marking complete via task update (e.g. edit modal); omit otherwise. Backend infers completion from this. */
+  completedDate?: string;
   label?: string;
 }

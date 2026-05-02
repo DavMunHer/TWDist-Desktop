@@ -43,7 +43,8 @@ describe('HttpTaskRepository', () => {
   });
 
   it('update PUTs to task update URL', () => {
-    const task = new Task('t1', 'sec', 'Job', true, start, undefined, undefined, end, undefined, undefined, []);
+    const completedAt = new Date('2026-05-02');
+    const task = new Task('t1', 'sec', 'Job', true, start, undefined, undefined, end, completedAt, undefined, []);
     repository.update('p1', task).subscribe();
     const req = httpMock.expectOne('/projects/p1/section/sec/task/t1/update');
     expect(req.request.method).toBe('PUT');
@@ -52,7 +53,7 @@ describe('HttpTaskRepository', () => {
       description: undefined,
       startDate: '2025-01-01',
       endDate: '2025-01-02',
-      completed: true,
+      completedDate: '2026-05-02',
       label: undefined,
     });
     req.flush({
