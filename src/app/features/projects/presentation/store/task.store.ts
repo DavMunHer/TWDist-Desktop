@@ -10,6 +10,12 @@ import { toProjectsUiError } from '@features/projects/presentation/mappers/proje
 import { ProjectsError } from '@features/projects/application/errors/projects.error';
 import { UiError } from '@features/projects/presentation/models/ui-error';
 
+/** Deep-cloned tasks + optional parent captured before optimistic delete (`removeTask`). */
+export interface OptimisticDeleteSnapshot {
+  readonly subtreeReplicas: readonly Task[];
+  readonly parentReplica: Task | null;
+}
+
 /**
  * Normalized store for **tasks** (and subtasks).
  *
@@ -79,6 +85,93 @@ export class TaskStore {
       }
       return { ...s, tasks: merged };
     });
+  }
+
+  /**
+   * Apply a persisted task snapshot from flows that do not run through TaskStore mutations
+   * (for example Today view). Keeps parent/subtask links when this task already exists so
+   * flat API responses cannot wipe nested structure after the user revisits Project view.
+   */
+  mergeExternalTask(task: Task): void {
+    const existing = this.state().tasks[task.id];
+    if (!existing) {
+      this.mergeTasks([task]);
+      return;
+    }
+
+    const subtaskIds = existing.subtaskIds.length > 0 ? existing.subtaskIds : task.subtaskIds;
+    const merged = new Task(
+      task.id,
+      task.sectionId,
+      task.name,
+      task.completed,
+      task.startDate,
+      task.description,
+      task.label ?? existing.label,
+      task.endDate,
+      task.completedDate,
+      existing.parentTaskId ?? task.parentTaskId,
+      subtaskIds,
+    );
+    this.mergeTasks([merged]);
+  }
+
+  /**
+   * Captures clones of the task subtree (+ parent row) immediately before optimistic delete so
+   * {@link rollbackOptimisticDelete} can rebuild `parent.subtaskIds` and descendants on failure.
+   */
+  snapshotForOptimisticDelete(taskId: string): OptimisticDeleteSnapshot | null {
+    const tasksDict = this.state().tasks;
+    const root = tasksDict[taskId];
+    if (!root) return null;
+
+    const ids = this.collectTaskAndDescendants(taskId, tasksDict);
+    const subtreeReplicas = ids.map(id => TaskStore.replicateTask(tasksDict[id]));
+
+    let parentReplica: Task | null = null;
+    if (root.parentTaskId) {
+      const p = tasksDict[root.parentTaskId];
+      if (p) parentReplica = TaskStore.replicateTask(p);
+    }
+
+    return { subtreeReplicas, parentReplica };
+  }
+
+  /** Restores dictionary rows after a failed optimistic delete. */
+  rollbackOptimisticDelete(snapshot: OptimisticDeleteSnapshot): void {
+    this.mergeTasks([...snapshot.subtreeReplicas]);
+    if (snapshot.parentReplica !== null) {
+      this.mergeTasks([snapshot.parentReplica]);
+    }
+  }
+
+  /**
+   * Reverts {@link mergeExternalTask} when the persistence call fails — pass the snapshot from
+   * {@link getTask} **before** the optimistic merge; `undefined` means the row was absent and
+   * should be dropped again after an optimistic upsert.
+   */
+  rollbackExternalTaskMerge(taskId: string, prior: Task | undefined): void {
+    if (prior !== undefined) {
+      this.mergeTasks([prior]);
+    } else {
+      this.removeTask(taskId);
+    }
+  }
+
+  private static replicateTask(task: Task): Task {
+    return new Task(
+      task.id,
+      task.sectionId,
+      task.name,
+      task.completed,
+      task.startDate,
+      task.description,
+      task.label,
+      task.endDate,
+      task.completedDate,
+      task.parentTaskId,
+      [...task.subtaskIds],
+    );
   }
 
   // ===================================================================
@@ -191,6 +284,7 @@ export class TaskStore {
       existing.description,
       existing.startDate,
       existing.endDate,
+      false,
     );
   }
 
@@ -202,22 +296,28 @@ export class TaskStore {
     description?: string,
     startDate?: Date,
     endDate?: Date,
+    completionChanged?: boolean,
   ): void {
     const existing = this.state().tasks[taskId];
     if (!existing) return;
 
     const updatedName = name.trim();
     const normalizedDescription = description?.trim() ? description.trim() : undefined;
-    const nextTask = existing
+    let nextTask = existing
       .updateName(updatedName)
       .updateDescription(normalizedDescription ?? '')
       .setStartDate(startDate)
       .setEndDate(endDate);
 
+    if (completionChanged) {
+      nextTask = existing.completed ? nextTask.uncomplete() : nextTask.complete();
+    }
+
     const hasChanges = nextTask.name !== existing.name
       || nextTask.description !== existing.description
       || nextTask.startDate?.getTime() !== existing.startDate?.getTime()
-      || nextTask.endDate?.getTime() !== existing.endDate?.getTime();
+      || nextTask.endDate?.getTime() !== existing.endDate?.getTime()
+      || nextTask.completed !== existing.completed;
     if (!hasChanges) return;
 
     this.state.update(s => ({
