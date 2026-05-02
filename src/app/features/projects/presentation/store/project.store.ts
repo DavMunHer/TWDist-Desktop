@@ -506,14 +506,21 @@ export class ProjectStore {
   }
 
   /** Update task fields from edit modal */
-  editTask(taskId: string, name: string, description?: string, startDate?: Date, endDate?: Date): void {
+  editTask(
+    taskId: string,
+    name: string,
+    description?: string,
+    startDate?: Date,
+    endDate?: Date,
+    completionChanged?: boolean,
+  ): void {
     const projectId = this.state().selectedProjectId;
     if (!projectId) {
       console.error('Cannot edit task: no project selected');
       return;
     }
 
-    this.taskStore.editTask(projectId, taskId, name, description, startDate, endDate);
+    this.taskStore.editTask(projectId, taskId, name, description, startDate, endDate, completionChanged);
   }
 
   /** Delete a task from section */

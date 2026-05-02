@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import { TaskMapper } from './task.mapper';
+import { formatDateToISO } from '@shared/utils/date.util';
 import { TaskDto } from '@features/projects/infrastructure/dto/task.dto';
 
 describe('TaskMapper', () => {
@@ -82,6 +83,16 @@ describe('TaskMapper', () => {
     expect(update.description).toBe('d');
     expect(update.startDate).toBe('2025-03-01');
     expect(update.endDate).toBe('2025-03-31');
-    expect(update.completed).toBe(false);
+    expect(update.completedDate).toBeUndefined();
+  });
+
+  it('toDto includes completedDate when task is completed with a completion timestamp', () => {
+    const done = TaskMapper.toDomain(
+      { id: 1, name: 'N', description: 'd', start_date: start, end_date: end, completed: false },
+      's',
+    ).complete();
+
+    const update = TaskMapper.toDto(done);
+    expect(update.completedDate).toBe(formatDateToISO(done.completedDate!));
   });
 });
