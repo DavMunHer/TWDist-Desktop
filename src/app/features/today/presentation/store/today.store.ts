@@ -13,6 +13,7 @@ import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/
 import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
 import { TodayState, initialTodayState } from '@features/today/presentation/models/today.state';
+import { TaskStore } from '@features/projects/presentation/store/task.store';
 
 /**
  * Store for the Today view.
@@ -27,6 +28,7 @@ export class TodayStore {
   private readonly uncompleteTaskUseCase = inject(UncompleteTaskUseCase);
   private readonly updateTaskUseCase = inject(UpdateTaskUseCase);
   private readonly deleteTaskUseCase = inject(DeleteTaskUseCase);
+  private readonly taskStore = inject(TaskStore);
   private readonly state = signal<TodayState>(initialTodayState);
 
   // ===================================================================
@@ -112,8 +114,10 @@ export class TodayStore {
     const aggregate = this.resolveAggregate(event.id);
     if (!aggregate) return;
     const previousState = this.state();
+    const priorInTaskStore = this.taskStore.getTask(event.id);
     const toggledTask = aggregate.task.completed ? aggregate.task.uncomplete() : aggregate.task.complete();
     this.replaceAggregateTask(event.id, toggledTask);
+    this.taskStore.mergeExternalTask(toggledTask);
 
     const request$ = aggregate.task.completed
       ? this.uncompleteTaskUseCase.execute(aggregate.projectId, aggregate.task)
@@ -123,13 +127,16 @@ export class TodayStore {
       next: (result) => {
         if (!result.success) {
           this.state.set(previousState);
+          this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
           this.state.update((s) => ({ ...s, error: 'Failed to update task completion.' }));
           return;
         }
         this.replaceAggregateTask(event.id, result.value);
+        this.taskStore.mergeExternalTask(result.value);
       },
       error: () => {
         this.state.set(previousState);
+        this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
         this.state.update((s) => ({ ...s, error: 'Failed to update task completion.' }));
       },
     });
@@ -139,20 +146,25 @@ export class TodayStore {
     const aggregate = this.resolveAggregate(event.id);
     if (!aggregate) return;
     const previousState = this.state();
+    const priorInTaskStore = this.taskStore.getTask(event.id);
     const renamedTask = aggregate.task.updateName(event.name.trim());
     this.replaceAggregateTask(event.id, renamedTask);
+    this.taskStore.mergeExternalTask(renamedTask);
 
     this.updateTaskUseCase.execute(aggregate.projectId, renamedTask).subscribe({
       next: (result) => {
         if (!result.success) {
           this.state.set(previousState);
+          this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
           this.state.update((s) => ({ ...s, error: 'Failed to rename task.' }));
           return;
         }
         this.replaceAggregateTask(event.id, result.value);
+        this.taskStore.mergeExternalTask(result.value);
       },
       error: () => {
         this.state.set(previousState);
+        this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
         this.state.update((s) => ({ ...s, error: 'Failed to rename task.' }));
       },
     });
@@ -162,14 +174,26 @@ export class TodayStore {
     const aggregate = this.resolveAggregate(event.id);
     if (!aggregate) return;
     const previousState = this.state();
+    const optimisticDeleteSnapshot = this.taskStore.snapshotForOptimisticDelete(event.id);
+
     this.state.update((s) => ({
       ...s,
       aggregates: s.aggregates.filter((a) => a.task.id !== event.id),
     }));
 
+    if (optimisticDeleteSnapshot !== null) {
+      this.taskStore.removeTask(event.id);
+    }
+
     this.deleteTaskUseCase.execute(aggregate.projectId, event.sectionId, event.id).subscribe({
+      next: () => {
+        /* Optimistic remove already cleared TaskStore rows. */
+      },
       error: () => {
         this.state.set(previousState);
+        if (optimisticDeleteSnapshot !== null) {
+          this.taskStore.rollbackOptimisticDelete(optimisticDeleteSnapshot);
+        }
         this.state.update((s) => ({ ...s, error: 'Failed to delete task.' }));
       },
     });
@@ -180,52 +204,35 @@ export class TodayStore {
     if (!aggregate) return;
 
     const previousState = this.state();
+    const priorInTaskStore = this.taskStore.getTask(event.id);
     const normalizedDescription = event.description?.trim() ? event.description.trim() : undefined;
     const baseUpdatedTask = aggregate.task
       .updateName(event.name.trim())
       .updateDescription(normalizedDescription ?? '')
       .setStartDate(event.startDate)
       .setEndDate(event.endDate);
-    const optimisticTask = event.completedChanged
+    const nextTask = event.completedChanged
       ? (aggregate.task.completed ? baseUpdatedTask.uncomplete() : baseUpdatedTask.complete())
       : baseUpdatedTask;
 
-    this.replaceAggregateTask(event.id, optimisticTask);
+    this.replaceAggregateTask(event.id, nextTask);
+    this.taskStore.mergeExternalTask(nextTask);
 
-    this.updateTaskUseCase.execute(aggregate.projectId, baseUpdatedTask).subscribe({
+    this.updateTaskUseCase.execute(aggregate.projectId, nextTask).subscribe({
       next: (updateResult) => {
         if (!updateResult.success) {
           this.state.set(previousState);
+          this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
           this.state.update((s) => ({ ...s, error: 'Failed to edit task.' }));
           return;
         }
 
-        if (!event.completedChanged) {
-          this.replaceAggregateTask(event.id, updateResult.value);
-          return;
-        }
-
-        const completion$ = aggregate.task.completed
-          ? this.uncompleteTaskUseCase.execute(aggregate.projectId, updateResult.value)
-          : this.completeTaskUseCase.execute(aggregate.projectId, updateResult.value);
-
-        completion$.subscribe({
-          next: (completionResult) => {
-            if (!completionResult.success) {
-              this.state.set(previousState);
-              this.state.update((s) => ({ ...s, error: 'Failed to edit task.' }));
-              return;
-            }
-            this.replaceAggregateTask(event.id, completionResult.value);
-          },
-          error: () => {
-            this.state.set(previousState);
-            this.state.update((s) => ({ ...s, error: 'Failed to edit task.' }));
-          },
-        });
+        this.replaceAggregateTask(event.id, updateResult.value);
+        this.taskStore.mergeExternalTask(updateResult.value);
       },
       error: () => {
         this.state.set(previousState);
+        this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
         this.state.update((s) => ({ ...s, error: 'Failed to edit task.' }));
       },
     });

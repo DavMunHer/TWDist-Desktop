@@ -71,10 +71,14 @@ export class ProjectViewComponent {
   }
 
   protected onTaskEdit(event: TaskEditEvent): void {
-    this.projectStore.editTask(event.id, event.name, event.description, event.startDate, event.endDate);
-    if (event.completedChanged) {
-      this.projectStore.toggleTaskCompletion(event.id);
-    }
+    this.projectStore.editTask(
+      event.id,
+      event.name,
+      event.description,
+      event.startDate,
+      event.endDate,
+      event.completedChanged,
+    );
   }
 
   protected onSectionUpdate(event: SectionUpdateEvent): void {
