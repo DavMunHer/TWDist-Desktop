@@ -31,6 +31,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-right: 18px;
 
       & .week-nav-button,
       & .week-nav-today {
