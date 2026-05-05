@@ -44,7 +44,7 @@
     <div class="date-grid">
       <div class="form-group">
         <label for="startDate">Start date</label>
-        <input id="startDate" type="date" formControlName="startDate" [min]="todayDateInput" />
+        <input id="startDate" type="date" formControlName="startDate" [attr.min]="minStartDate ?? null" />
         <button id="clearStartDate" type="button" class="clear-date-button" (click)="clearStartDate()">Clear start date</button>
         @if (taskForm.controls.startDate.touched && startDateError) {
           <span class="field-error">{{ startDateError }}</span>
