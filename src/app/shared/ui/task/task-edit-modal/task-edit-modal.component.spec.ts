@@ -9,6 +9,7 @@ describe('TaskEditModalComponent', () => {
   let fixture: ComponentFixture<TaskEditModalComponent>;
   let modalRef: ModalRef<void>;
 
+  // Base setup: task has NO pre-existing start date, so the past-date validator is active.
   beforeEach(async () => {
     modalRef = { close: vi.fn() } as unknown as ModalRef<void>;
 
@@ -23,7 +24,6 @@ describe('TaskEditModalComponent', () => {
             name: 'Write release notes',
             completed: false,
             description: 'Details',
-            startDate: new Date(),
           },
         },
         { provide: ModalRef, useValue: modalRef },
@@ -124,5 +124,50 @@ describe('TaskEditModalComponent', () => {
 
     expect(modalRef.close).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain('End date cannot be before start date');
+  });
+
+  describe('when the task already has a start date set in the past (loaded from backend)', () => {
+    beforeEach(async () => {
+      TestBed.resetTestingModule();
+      modalRef = { close: vi.fn() } as unknown as ModalRef<void>;
+
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 30);
+
+      await TestBed.configureTestingModule({
+        imports: [TaskEditModalComponent],
+        providers: [
+          provideZonelessChangeDetection(),
+          {
+            provide: MODAL_DATA,
+            useValue: {
+              id: 't2',
+              name: 'Old task',
+              completed: false,
+              description: '',
+              startDate: pastDate,
+            },
+          },
+          { provide: ModalRef, useValue: modalRef },
+        ],
+      }).compileComponents();
+
+      fixture = TestBed.createComponent(TaskEditModalComponent);
+      fixture.detectChanges();
+    });
+
+    it('allows saving when the existing start date is in the past', () => {
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(modalRef.close).toHaveBeenCalled();
+      expect(fixture.nativeElement.textContent).not.toContain('Start date cannot be before today');
+    });
+
+    it('does not apply a min-date restriction on the start date input', () => {
+      const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+      expect(startDateInput.getAttribute('min')).toBeNull();
+    });
   });
 });
