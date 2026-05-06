@@ -127,11 +127,13 @@ describe('TaskEditModalComponent', () => {
   });
 
   describe('when the task already has a start date set in the past (loaded from backend)', () => {
+    let pastDate: Date;
+
     beforeEach(async () => {
       TestBed.resetTestingModule();
       modalRef = { close: vi.fn() } as unknown as ModalRef<void>;
 
-      const pastDate = new Date();
+      pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 30);
 
       await TestBed.configureTestingModule({
@@ -156,18 +158,58 @@ describe('TaskEditModalComponent', () => {
       fixture.detectChanges();
     });
 
-    it('allows saving when the existing start date is in the past', () => {
+    it('allows saving when the existing past start date is unchanged', () => {
       const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
       form.dispatchEvent(new Event('submit'));
       fixture.detectChanges();
 
       expect(modalRef.close).toHaveBeenCalled();
-      expect(fixture.nativeElement.textContent).not.toContain('Start date cannot be before today');
+      expect(fixture.nativeElement.textContent).not.toContain('Start date cannot be');
     });
 
-    it('does not apply a min-date restriction on the start date input', () => {
+    it('sets the min attribute on the start date input to the original start date', () => {
+      const year = pastDate.getFullYear();
+      const month = `${pastDate.getMonth() + 1}`.padStart(2, '0');
+      const day = `${pastDate.getDate()}`.padStart(2, '0');
+      const expectedMin = `${year}-${month}-${day}`;
+
       const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
-      expect(startDateInput.getAttribute('min')).toBeNull();
+      expect(startDateInput.getAttribute('min')).toBe(expectedMin);
+    });
+
+    it('does not allow setting a date before the original start date', () => {
+      const beforeOriginal = new Date(pastDate);
+      beforeOriginal.setDate(beforeOriginal.getDate() - 1);
+      const value = `${beforeOriginal.getFullYear()}-${`${beforeOriginal.getMonth() + 1}`.padStart(2, '0')}-${`${beforeOriginal.getDate()}`.padStart(2, '0')}`;
+
+      const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+      startDateInput.value = value;
+      startDateInput.dispatchEvent(new Event('input'));
+      startDateInput.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(modalRef.close).not.toHaveBeenCalled();
+      expect(fixture.nativeElement.textContent).toContain('Start date cannot be moved further into the past than the original date');
+    });
+
+    it('allows saving when the start date is changed to a future date', () => {
+      const futureValue = '2099-12-31';
+
+      const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+      startDateInput.value = futureValue;
+      startDateInput.dispatchEvent(new Event('input'));
+      startDateInput.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(modalRef.close).toHaveBeenCalled();
     });
   });
 
