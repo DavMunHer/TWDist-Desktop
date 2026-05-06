@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -28,7 +27,7 @@ import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component'
   templateUrl: './upcoming.component.html',
   styleUrl: './upcoming.component.css',
 })
-export class UpcomingComponent implements AfterViewInit {
+export class UpcomingComponent {
   private readonly upcomingStore = inject(UpcomingStore);
 
   public showIcon = input.required<boolean>();
@@ -46,10 +45,6 @@ export class UpcomingComponent implements AfterViewInit {
       this.scrollToTodaySignal();
       this.scrollTodayColumnIntoView();
     });
-  }
-
-  ngAfterViewInit(): void {
-    this.scrollTodayColumnIntoView();
   }
 
   handleIconChange(): void {
