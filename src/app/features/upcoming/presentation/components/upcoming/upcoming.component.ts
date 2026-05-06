@@ -24,6 +24,7 @@ import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component'
   selector: 'app-upcoming',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BreadcrumbComponent, UpcomingGroupComponent],
+  providers: [UpcomingStore],
   templateUrl: './upcoming.component.html',
   styleUrl: './upcoming.component.css',
 })

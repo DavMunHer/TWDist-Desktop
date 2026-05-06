@@ -14,7 +14,7 @@ import {
 import { TodayTaskAggregate } from '@features/today/domain/models/today-task.aggregate';
 import { initialUpcomingState, UpcomingState } from '@features/upcoming/presentation/models/upcoming.state';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class UpcomingStore {
   private readonly today = this.dayStart(new Date());
   private readonly currentWeekMonday = this.startOfWeek(this.today);
