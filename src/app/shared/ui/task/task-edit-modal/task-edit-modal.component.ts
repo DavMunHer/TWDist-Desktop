@@ -19,6 +19,40 @@ export class TaskEditModalComponent {
   protected readonly completed = signal(this.modalData?.completed ?? false);
   protected readonly todayDateInput = this.toDateInputValue(new Date());
 
+  /**
+   * The earliest date the user may select for the start date:
+   * - No original start date     → today (cannot pick a date in the past)
+   * - Original date today/future → today (same constraint)
+   * - Original date in the past  → the original date itself (cannot push the
+   *   start date further back than it was already assigned, but today-or-later
+   *   restriction is lifted because the date is already past)
+   */
+  private readonly minAllowedStartDate: Date = (() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const existing = this.modalData?.startDate;
+    if (existing) {
+      const existingNormalized = new Date(existing);
+      existingNormalized.setHours(0, 0, 0, 0);
+      if (existingNormalized < today) return existingNormalized;
+    }
+
+    return today;
+  })();
+
+  protected readonly minStartDate: string = this.toDateInputValue(this.minAllowedStartDate);
+
+  private readonly existingStartDateIsInPast: boolean = (() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const existing = this.modalData?.startDate;
+    if (!existing) return false;
+    const existingNormalized = new Date(existing);
+    existingNormalized.setHours(0, 0, 0, 0);
+    return existingNormalized < today;
+  })();
+
   protected readonly taskForm = new FormGroup({
     name: new FormControl(this.modalData?.name ?? '', {
       nonNullable: true,
@@ -30,7 +64,10 @@ export class TaskEditModalComponent {
     }),
     startDate: new FormControl(this.toDateInputValue(this.modalData?.startDate), {
       nonNullable: true,
-      validators: [this.minTodayDateValidator()],
+      validators: [this.minDateValidator(
+        this.minAllowedStartDate,
+        this.existingStartDateIsInPast ? 'minOriginalDate' : 'minToday',
+      )],
     }),
     endDate: new FormControl(this.toDateInputValue(this.modalData?.endDate), {
       nonNullable: true,
@@ -54,6 +91,7 @@ export class TaskEditModalComponent {
     const errors = this.taskForm.controls.startDate.errors;
     if (!errors) return null;
     if (errors['minToday']) return 'Start date cannot be before today';
+    if (errors['minOriginalDate']) return 'Start date cannot be moved further into the past than the original date';
     return null;
   }
 
@@ -106,18 +144,15 @@ export class TaskEditModalComponent {
     return `${year}-${month}-${day}`;
   }
 
-  private minTodayDateValidator(): ValidatorFn {
+  private minDateValidator(minDate: Date, errorKey: string): ValidatorFn {
     return (control: AbstractControl<string>): ValidationErrors | null => {
       const value = control.value;
       if (!value) return null;
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
       const selectedDate = new Date(`${value}T00:00:00`);
       if (Number.isNaN(selectedDate.getTime())) return null;
 
-      return selectedDate < today ? { minToday: true } : null;
+      return selectedDate < minDate ? { [errorKey]: true } : null;
     };
   }
 
