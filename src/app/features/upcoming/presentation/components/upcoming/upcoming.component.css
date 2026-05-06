@@ -1,0 +1,63 @@
+.upcoming-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 5px 5px 5px;
+
+  & .upcoming-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    padding: 5px;
+
+    & .upcoming-title-block {
+      & .upcoming-title {
+        font-size: var(--section-title-size, 1.6rem);
+        font-weight: 800;
+        margin: 0 0 4px 0;
+        line-height: 1.2;
+      }
+
+      & .upcoming-week-range {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #888;
+      }
+    }
+
+    & .upcoming-week-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 18px;
+
+      & .week-nav-button,
+      & .week-nav-today {
+        border: 1px solid #cfcfcf;
+        border-radius: 8px;
+        background: #fff;
+        color: #404040;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      & .week-nav-button:disabled {
+        cursor: not-allowed;
+        color: #b8b8b8;
+        border-color: #e5e5e5;
+      }
+    }
+  }
+
+  & .upcoming-main-container {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 8px;
+  }
+}

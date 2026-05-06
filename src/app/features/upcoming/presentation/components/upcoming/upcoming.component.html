@@ -1,9 +1,39 @@
 <section class="upcoming-section">
-	<nav>
-		<app-breadcrumb route="Upcoming" [showIcon]="showIcon()" (iconClick)="handleIconChange()"></app-breadcrumb>
-	</nav>
+  <nav>
+    <app-breadcrumb
+      route="Upcoming"
+      [showIcon]="showIcon()"
+      (iconClick)="handleIconChange()"
+      (taskFilterChange)="onTaskFilterChange($event)"
+    />
+  </nav>
 
-	<main>
-		<p>upcoming works!</p>
-	</main>
+  <header class="upcoming-header">
+    <div class="upcoming-title-block">
+      <h1 class="upcoming-title">Upcoming</h1>
+      <p class="upcoming-week-range">{{ weekRange().label }}</p>
+    </div>
+
+    <div class="upcoming-week-nav">
+      <button type="button" class="week-nav-button" [disabled]="isCurrentWeek()" (click)="previousWeek()">
+        &lt;
+      </button>
+      <button type="button" class="week-nav-today" (click)="goToToday()">Today</button>
+      <button type="button" class="week-nav-button" (click)="nextWeek()">&gt;</button>
+    </div>
+  </header>
+
+  <main class="upcoming-main-container" #groupsContainer>
+    @for (group of upcomingGroups(); track group.dateLabel) {
+      <app-upcoming-group
+        [groupInfo]="group"
+        [taskFilter]="taskFilter()"
+        [attr.data-is-today]="group.isToday ? 'true' : null"
+        (taskToggle)="onTaskToggle($event)"
+        (taskRename)="onTaskRename($event)"
+        (taskDelete)="onTaskDelete($event)"
+        (taskEdit)="onTaskEdit($event)"
+      />
+    }
+  </main>
 </section>
