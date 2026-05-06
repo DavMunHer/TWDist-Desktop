@@ -170,4 +170,59 @@ describe('TaskEditModalComponent', () => {
       expect(startDateInput.getAttribute('min')).toBeNull();
     });
   });
+
+  describe('when the task already has a start date set in the future', () => {
+    beforeEach(async () => {
+      TestBed.resetTestingModule();
+      modalRef = { close: vi.fn() } as unknown as ModalRef<void>;
+
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + 30);
+
+      await TestBed.configureTestingModule({
+        imports: [TaskEditModalComponent],
+        providers: [
+          provideZonelessChangeDetection(),
+          {
+            provide: MODAL_DATA,
+            useValue: {
+              id: 't3',
+              name: 'Upcoming task',
+              completed: false,
+              description: '',
+              startDate: futureDate,
+            },
+          },
+          { provide: ModalRef, useValue: modalRef },
+        ],
+      }).compileComponents();
+
+      fixture = TestBed.createComponent(TaskEditModalComponent);
+      fixture.detectChanges();
+    });
+
+    it('still enforces the today-or-later restriction when a past date is entered', () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayValue = `${yesterday.getFullYear()}-${`${yesterday.getMonth() + 1}`.padStart(2, '0')}-${`${yesterday.getDate()}`.padStart(2, '0')}`;
+
+      const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+      startDateInput.value = yesterdayValue;
+      startDateInput.dispatchEvent(new Event('input'));
+      startDateInput.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(modalRef.close).not.toHaveBeenCalled();
+      expect(fixture.nativeElement.textContent).toContain('Start date cannot be before today');
+    });
+
+    it('applies a min-date restriction on the start date input', () => {
+      const startDateInput: HTMLInputElement = fixture.nativeElement.querySelector('#startDate');
+      expect(startDateInput.getAttribute('min')).not.toBeNull();
+    });
+  });
 });

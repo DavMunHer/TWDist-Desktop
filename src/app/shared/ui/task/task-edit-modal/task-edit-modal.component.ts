@@ -20,11 +20,19 @@ export class TaskEditModalComponent {
   protected readonly todayDateInput = this.toDateInputValue(new Date());
 
   /**
-   * Only restrict the start-date picker to today-or-later when the task has no
-   * pre-existing start date.  Tasks whose start date was already set in the past
-   * (e.g. loaded from the backend) must remain submittable as-is.
+   * True only when the task already has a start date that is strictly in the
+   * past.  Tasks with a future (or today's) start date still enforce the
+   * today-or-later constraint so the user cannot backdate them freely.
    */
-  protected readonly minStartDate: string | undefined = this.modalData?.startDate
+  private readonly existingStartDateIsInPast: boolean = (() => {
+    const existing = this.modalData?.startDate;
+    if (!existing) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return existing < today;
+  })();
+
+  protected readonly minStartDate: string | undefined = this.existingStartDateIsInPast
     ? undefined
     : this.toDateInputValue(new Date());
 
@@ -39,7 +47,7 @@ export class TaskEditModalComponent {
     }),
     startDate: new FormControl(this.toDateInputValue(this.modalData?.startDate), {
       nonNullable: true,
-      validators: this.modalData?.startDate ? [] : [this.minTodayDateValidator()],
+      validators: this.existingStartDateIsInPast ? [] : [this.minTodayDateValidator()],
     }),
     endDate: new FormControl(this.toDateInputValue(this.modalData?.endDate), {
       nonNullable: true,
