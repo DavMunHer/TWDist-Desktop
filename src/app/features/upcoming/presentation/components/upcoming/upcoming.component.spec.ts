@@ -1,18 +1,54 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { UpcomingComponent } from '@features/upcoming/presentation/components/upcoming/upcoming.component';
+import { UpcomingStore } from '@features/upcoming/presentation/store/upcoming.store';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { By } from '@angular/platform-browser';
 import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component';
-import { provideZonelessChangeDetection } from '@angular/core';
+
+const upcomingStoreMock = {
+  upcomingGroups: signal([]),
+  weekRange: signal({
+    start: new Date('2026-05-04'),
+    end: new Date('2026-05-10'),
+    label: 'May 4 - May 10, 2026',
+  }),
+  isCurrentWeek: signal(true),
+  scrollToTodaySignal: signal(0),
+  loading: signal(false),
+  error: signal<string | null>(null),
+  ensureUpcomingTasksLoaded: vi.fn(),
+  loadUpcomingTasks: vi.fn(),
+  goToPreviousWeek: vi.fn(),
+  goToNextWeek: vi.fn(),
+  goToCurrentWeek: vi.fn(),
+  toggleTaskCompletion: vi.fn(),
+  renameTask: vi.fn(),
+  deleteTask: vi.fn(),
+  editTask: vi.fn(),
+};
+
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;
   let fixture: ComponentFixture<UpcomingComponent>;
 
   beforeEach(async () => {
+    upcomingStoreMock.ensureUpcomingTasksLoaded.mockReset();
+    upcomingStoreMock.loadUpcomingTasks.mockReset();
+    upcomingStoreMock.isCurrentWeek.set(true);
+    upcomingStoreMock.loading.set(false);
+    upcomingStoreMock.error.set(null);
+
     await TestBed.configureTestingModule({
       imports: [UpcomingComponent],
       providers: [provideZonelessChangeDetection()],
-    }).compileComponents();
+    })
+      .overrideComponent(UpcomingComponent, {
+        set: {
+          providers: [{ provide: UpcomingStore, useValue: upcomingStoreMock }],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(UpcomingComponent);
     fixture.componentRef.setInput('showIcon', false);
@@ -22,6 +58,10 @@ describe('UpcomingComponent', () => {
 
   it('creates the component', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('ensures upcoming tasks are loaded on init', () => {
+    expect(upcomingStoreMock.ensureUpcomingTasksLoaded).toHaveBeenCalled();
   });
 
   it('forwards breadcrumb icon click to parent output', () => {
@@ -49,12 +89,20 @@ describe('UpcomingComponent', () => {
   });
 
   it('enables previous-week navigation after moving to next week', () => {
-    const nextButton = fixture.nativeElement.querySelectorAll('.week-nav-button')[1] as HTMLButtonElement;
-    const previousButton = fixture.nativeElement.querySelectorAll('.week-nav-button')[0] as HTMLButtonElement;
-
-    nextButton.click();
+    upcomingStoreMock.isCurrentWeek.set(false);
     fixture.detectChanges();
 
+    const previousButton = fixture.nativeElement.querySelectorAll('.week-nav-button')[0] as HTMLButtonElement;
     expect(previousButton.disabled).toBe(false);
+  });
+
+  it('retries loading on error state', () => {
+    upcomingStoreMock.error.set('Failed to load upcoming tasks.');
+    fixture.detectChanges();
+
+    const retryButton = fixture.nativeElement.querySelector('.retry-button') as HTMLButtonElement;
+    retryButton.click();
+
+    expect(upcomingStoreMock.loadUpcomingTasks).toHaveBeenCalledOnce();
   });
 });
