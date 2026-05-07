@@ -24,16 +24,31 @@
   </header>
 
   <main class="upcoming-main-container" #groupsContainer>
-    @for (group of upcomingGroups(); track group.dateLabel) {
-      <app-upcoming-group
-        [groupInfo]="group"
-        [taskFilter]="taskFilter()"
-        [attr.data-is-today]="group.isToday ? 'true' : null"
-        (taskToggle)="onTaskToggle($event)"
-        (taskRename)="onTaskRename($event)"
-        (taskDelete)="onTaskDelete($event)"
-        (taskEdit)="onTaskEdit($event)"
-      />
+    @if (loading()) {
+      <div class="upcoming-loading-state">
+        <p>Loading upcoming tasks...</p>
+      </div>
+    } @else if (error()) {
+      <div class="upcoming-error-state">
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-button" (click)="retryLoadUpcomingTasks()">Retry</button>
+      </div>
+    } @else if (upcomingGroups().length === 0) {
+      <div class="upcoming-empty-state">
+        <p>No tasks to show for this range.</p>
+      </div>
+    } @else {
+      @for (group of upcomingGroups(); track group.dateLabel) {
+        <app-upcoming-group
+          [groupInfo]="group"
+          [taskFilter]="taskFilter()"
+          [attr.data-is-today]="group.isToday ? 'true' : null"
+          (taskToggle)="onTaskToggle($event)"
+          (taskRename)="onTaskRename($event)"
+          (taskDelete)="onTaskDelete($event)"
+          (taskEdit)="onTaskEdit($event)"
+        />
+      }
     }
   </main>
 </section>

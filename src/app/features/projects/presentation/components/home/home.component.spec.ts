@@ -13,6 +13,7 @@ import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component'
 import { ProjectViewComponent } from '@features/projects/presentation/components/home/project-view/project-view.component';
 import { TodayComponent } from '@features/today/presentation/components/today/today.component';
 import { UpcomingComponent } from '@features/upcoming/presentation/components/upcoming/upcoming.component';
+import { UpcomingStore } from '@features/upcoming/presentation/store/upcoming.store';
 import { TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { ProjectViewModel } from '@features/projects/presentation/models/project.view-model';
 import { ProjectOutput } from '@features/projects/application/dtos/project-output';
@@ -29,6 +30,28 @@ const todayStoreMock = {
   error: signal<string | null>(null),
   ensureTodayTasksLoaded: vi.fn(),
   loadTodayTasks: vi.fn(),
+  toggleTaskCompletion: vi.fn(),
+  renameTask: vi.fn(),
+  deleteTask: vi.fn(),
+  editTask: vi.fn(),
+};
+
+const upcomingStoreMock = {
+  upcomingGroups: signal([]),
+  weekRange: signal({
+    start: new Date('2026-05-04'),
+    end: new Date('2026-05-10'),
+    label: 'May 4 - May 10, 2026',
+  }),
+  isCurrentWeek: signal(true),
+  scrollToTodaySignal: signal(0),
+  loading: signal(false),
+  error: signal<string | null>(null),
+  ensureUpcomingTasksLoaded: vi.fn(),
+  loadUpcomingTasks: vi.fn(),
+  goToPreviousWeek: vi.fn(),
+  goToNextWeek: vi.fn(),
+  goToCurrentWeek: vi.fn(),
   toggleTaskCompletion: vi.fn(),
   renameTask: vi.fn(),
   deleteTask: vi.fn(),
@@ -88,6 +111,12 @@ describe('HomeComponent', () => {
     todayStoreMock.loading.set(false);
     todayStoreMock.error.set(null);
     todayStoreMock.todayGroups.set([]);
+    upcomingStoreMock.loading.set(false);
+    upcomingStoreMock.error.set(null);
+    upcomingStoreMock.upcomingGroups.set([]);
+    upcomingStoreMock.isCurrentWeek.set(true);
+    upcomingStoreMock.ensureUpcomingTasksLoaded.mockReset();
+    upcomingStoreMock.loadUpcomingTasks.mockReset();
     routerUrl = '/projects/upcoming';
     routerEvents$ = new Subject<unknown>();
     routerMock.events = routerEvents$.asObservable();
@@ -108,7 +137,13 @@ describe('HomeComponent', () => {
         { provide: ModalService, useValue: modalServiceMock },
         { provide: AuthStore, useValue: mockAuthStore },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(UpcomingComponent, {
+        set: {
+          providers: [{ provide: UpcomingStore, useValue: upcomingStoreMock }],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
