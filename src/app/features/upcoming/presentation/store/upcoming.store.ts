@@ -1,4 +1,8 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { CompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/complete-task/complete-task.use-case';
+import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
+import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/uncomplete-task/uncomplete-task.use-case';
+import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { Task } from '@features/projects/domain/entities/task.entity';
 import {
   TaskDeleteEvent,
@@ -6,21 +10,31 @@ import {
   TaskRenameEvent,
   TaskToggleEvent,
 } from '@features/projects/presentation/models/project.view-model';
+import { TaskStore } from '@features/projects/presentation/store/task.store';
+import { UpcomingTaskAggregate } from '@features/upcoming/domain/models/upcoming-task.aggregate';
+import { LoadUpcomingTasksUseCase } from '@features/upcoming/application/use-cases/load-upcoming-tasks/load-upcoming-tasks.use-case';
 import {
   UpcomingGroupViewModel,
   UpcomingTaskViewModel,
   WeekRange,
 } from '@features/upcoming/presentation/models/upcoming.view-model';
-import { TodayTaskAggregate } from '@features/today/domain/models/today-task.aggregate';
 import { initialUpcomingState, UpcomingState } from '@features/upcoming/presentation/models/upcoming.state';
 
 @Injectable()
 export class UpcomingStore {
+  private readonly loadUpcomingTasksUseCase = inject(LoadUpcomingTasksUseCase);
+  private readonly completeTaskUseCase = inject(CompleteTaskUseCase);
+  private readonly uncompleteTaskUseCase = inject(UncompleteTaskUseCase);
+  private readonly updateTaskUseCase = inject(UpdateTaskUseCase);
+  private readonly deleteTaskUseCase = inject(DeleteTaskUseCase);
+  private readonly taskStore = inject(TaskStore);
+
   private readonly today = this.dayStart(new Date());
   private readonly currentWeekMonday = this.startOfWeek(this.today);
   private readonly state = signal<UpcomingState>(
     initialUpcomingState(this.currentWeekMonday),
   );
+  private readonly hasLoadedOnce = signal(false);
   private readonly scrollToTodayTick = signal(0);
 
   readonly isCurrentWeek = computed(
@@ -63,10 +77,10 @@ export class UpcomingStore {
   });
 
   readonly scrollToTodaySignal = computed(() => this.scrollToTodayTick());
+  readonly loading = computed(() => this.state().loading);
+  readonly error = computed(() => this.state().error);
 
-  constructor() {
-    this.loadMockTasks();
-  }
+  constructor() {}
 
   goToPreviousWeek(): void {
     if (this.isCurrentWeek()) return;
@@ -74,6 +88,9 @@ export class UpcomingStore {
       ...s,
       selectedWeekStart: this.addDays(s.selectedWeekStart, -7),
     }));
+    if (this.hasLoadedOnce()) {
+      this.loadUpcomingTasksForWeek(this.state().selectedWeekStart);
+    }
   }
 
   goToNextWeek(): void {
@@ -81,6 +98,9 @@ export class UpcomingStore {
       ...s,
       selectedWeekStart: this.addDays(s.selectedWeekStart, 7),
     }));
+    if (this.hasLoadedOnce()) {
+      this.loadUpcomingTasksForWeek(this.state().selectedWeekStart);
+    }
   }
 
   goToCurrentWeek(): void {
@@ -88,97 +108,167 @@ export class UpcomingStore {
       ...s,
       selectedWeekStart: this.currentWeekMonday,
     }));
+    if (this.hasLoadedOnce()) {
+      this.loadUpcomingTasksForWeek(this.state().selectedWeekStart);
+    }
     this.scrollToTodayTick.update((tick) => tick + 1);
   }
 
+  ensureUpcomingTasksLoaded(): void {
+    if (this.hasLoadedOnce()) return;
+    this.hasLoadedOnce.set(true);
+    this.loadUpcomingTasksForWeek(this.state().selectedWeekStart);
+  }
+
+  loadUpcomingTasks(): void {
+    this.loadUpcomingTasksForWeek(this.state().selectedWeekStart);
+  }
+
   toggleTaskCompletion(event: TaskToggleEvent): void {
-    this.state.update((s) => ({
-      ...s,
-      aggregates: s.aggregates.map((aggregate) =>
-        aggregate.task.id === event.id
-          ? {
-              ...aggregate,
-              task: aggregate.task.completed ? aggregate.task.uncomplete() : aggregate.task.complete(),
-            }
-          : aggregate,
-      ),
-    }));
+    const aggregate = this.resolveAggregate(event.id);
+    if (!aggregate) return;
+
+    const previousState = this.state();
+    const priorInTaskStore = this.taskStore.getTask(event.id);
+
+    if (aggregate.task.completed) {
+      const uncompletedTask = aggregate.task.uncomplete();
+      this.replaceAggregateTask(event.id, uncompletedTask);
+      this.taskStore.mergeExternalTask(uncompletedTask);
+    } else {
+      const completedTask = aggregate.task.complete();
+      this.removeAggregate(event.id);
+      this.taskStore.mergeExternalTask(completedTask);
+    }
+
+    const request$ = aggregate.task.completed
+      ? this.uncompleteTaskUseCase.execute(aggregate.projectId, aggregate.task)
+      : this.completeTaskUseCase.execute(aggregate.projectId, aggregate.task);
+
+    request$.subscribe({
+      next: (result) => {
+        if (!result.success) {
+          this.state.set(previousState);
+          this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
+          this.state.update((s) => ({ ...s, error: 'Failed to update task completion.' }));
+          return;
+        }
+
+        if (result.value.completed) {
+          this.removeAggregate(event.id);
+        } else {
+          this.replaceAggregateTask(event.id, result.value);
+        }
+        this.taskStore.mergeExternalTask(result.value);
+      },
+      error: () => {
+        this.state.set(previousState);
+        this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
+        this.state.update((s) => ({ ...s, error: 'Failed to update task completion.' }));
+      },
+    });
   }
 
   renameTask(event: TaskRenameEvent): void {
-    this.state.update((s) => ({
-      ...s,
-      aggregates: s.aggregates.map((aggregate) =>
-        aggregate.task.id === event.id
-          ? { ...aggregate, task: aggregate.task.updateName(event.name.trim()) }
-          : aggregate,
-      ),
-    }));
+    const aggregate = this.resolveAggregate(event.id);
+    if (!aggregate) return;
+
+    const previousState = this.state();
+    const priorInTaskStore = this.taskStore.getTask(event.id);
+    const renamedTask = aggregate.task.updateName(event.name.trim());
+    this.replaceAggregateTask(event.id, renamedTask);
+    this.taskStore.mergeExternalTask(renamedTask);
+
+    this.updateTaskUseCase.execute(aggregate.projectId, renamedTask).subscribe({
+      next: (result) => {
+        if (!result.success) {
+          this.state.set(previousState);
+          this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
+          this.state.update((s) => ({ ...s, error: 'Failed to rename task.' }));
+          return;
+        }
+        this.replaceAggregateTask(event.id, result.value);
+        this.taskStore.mergeExternalTask(result.value);
+      },
+      error: () => {
+        this.state.set(previousState);
+        this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
+        this.state.update((s) => ({ ...s, error: 'Failed to rename task.' }));
+      },
+    });
   }
 
   deleteTask(event: TaskDeleteEvent): void {
-    this.state.update((s) => ({
-      ...s,
-      aggregates: s.aggregates.filter((aggregate) => aggregate.task.id !== event.id),
-    }));
+    const aggregate = this.resolveAggregate(event.id);
+    if (!aggregate) return;
+
+    const previousState = this.state();
+    const optimisticDeleteSnapshot = this.taskStore.snapshotForOptimisticDelete(event.id);
+
+    this.removeAggregate(event.id);
+    if (optimisticDeleteSnapshot !== null) {
+      this.taskStore.removeTask(event.id);
+    }
+
+    this.deleteTaskUseCase.execute(aggregate.projectId, event.sectionId, event.id).subscribe({
+      next: () => {
+        // Optimistic remove already cleaned state.
+      },
+      error: () => {
+        this.state.set(previousState);
+        if (optimisticDeleteSnapshot !== null) {
+          this.taskStore.rollbackOptimisticDelete(optimisticDeleteSnapshot);
+        }
+        this.state.update((s) => ({ ...s, error: 'Failed to delete task.' }));
+      },
+    });
   }
 
   editTask(event: TaskEditEvent): void {
-    this.state.update((s) => ({
-      ...s,
-      aggregates: s.aggregates.map((aggregate) => {
-        if (aggregate.task.id !== event.id) return aggregate;
-        const normalizedDescription = event.description?.trim() ? event.description.trim() : undefined;
-        const editedTask = aggregate.task
-          .updateName(event.name.trim())
-          .updateDescription(normalizedDescription ?? '')
-          .setStartDate(event.startDate)
-          .setEndDate(event.endDate);
+    const aggregate = this.resolveAggregate(event.id);
+    if (!aggregate) return;
 
-        const completedTask = event.completedChanged
-          ? (editedTask.completed ? editedTask.uncomplete() : editedTask.complete())
-          : editedTask;
+    const previousState = this.state();
+    const priorInTaskStore = this.taskStore.getTask(event.id);
+    const normalizedDescription = event.description?.trim() ? event.description.trim() : undefined;
+    const baseUpdatedTask = aggregate.task
+      .updateName(event.name.trim())
+      .updateDescription(normalizedDescription ?? '')
+      .setStartDate(event.startDate)
+      .setEndDate(event.endDate);
+    const nextTask = event.completedChanged
+      ? (aggregate.task.completed ? baseUpdatedTask.uncomplete() : baseUpdatedTask.complete())
+      : baseUpdatedTask;
 
-        return { ...aggregate, task: completedTask };
-      }),
-    }));
-  }
+    if (nextTask.completed) {
+      this.removeAggregate(event.id);
+    } else {
+      this.replaceAggregateTask(event.id, nextTask);
+    }
+    this.taskStore.mergeExternalTask(nextTask);
 
-  private loadMockTasks(): void {
-    const monday = this.currentWeekMonday;
-    const aggregates = [
-      this.createAggregate('task-1', 'sec-1', 'Review Angular signals', this.today, 'DAM'),
-      this.createAggregate('task-2', 'sec-1', 'Solve Python exercises 4-9', this.today, 'DAW'),
-      this.createAggregate('task-3', 'sec-2', 'Prepare MongoDB exam notes', this.addDays(this.today, 1), 'DAM'),
-      this.createAggregate('task-4', 'sec-3', 'English academy speaking practice', this.addDays(this.today, 2), 'English Academy'),
-      this.createAggregate('task-5', 'sec-4', 'Finalize project architecture draft', this.addDays(this.today, 3), 'Final Project'),
-      this.createAggregate('task-6', 'sec-4', 'Refactor auth module', this.addDays(this.today, 4), 'Final Project'),
-      this.createAggregate('task-7', 'sec-5', 'Write API contract tests', this.addDays(monday, 7), 'DAW'),
-      this.createAggregate('task-8', 'sec-5', 'Implement upcoming store integration', this.addDays(monday, 8), 'DAW'),
-      this.createAggregate('task-9', 'sec-6', 'Prepare presentation slides', this.addDays(monday, 10), 'English Academy'),
-      this.createAggregate('task-10', 'sec-7', 'Mock backend payload for week 3', this.addDays(monday, 14), 'Final Project'),
-      this.createAggregate('task-11', 'sec-7', 'Review clean architecture boundaries', this.addDays(monday, 15), 'Final Project'),
-      this.createAggregate('task-12', 'sec-8', 'Polish UI spacing for columns', this.addDays(monday, 18), 'DAW'),
-    ];
+    this.updateTaskUseCase.execute(aggregate.projectId, nextTask).subscribe({
+      next: (result) => {
+        if (!result.success) {
+          this.state.set(previousState);
+          this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
+          this.state.update((s) => ({ ...s, error: 'Failed to edit task.' }));
+          return;
+        }
 
-    this.state.update((s) => ({
-      ...s,
-      aggregates,
-    }));
-  }
-
-  private createAggregate(
-    id: string,
-    sectionId: string,
-    name: string,
-    startDate: Date,
-    projectName: string,
-  ): TodayTaskAggregate {
-    return {
-      task: new Task(id, sectionId, name, false, startDate, '', undefined, undefined, undefined, undefined, []),
-      projectId: sectionId,
-      projectName,
-    };
+        if (result.value.completed) {
+          this.removeAggregate(event.id);
+        } else {
+          this.replaceAggregateTask(event.id, result.value);
+        }
+        this.taskStore.mergeExternalTask(result.value);
+      },
+      error: () => {
+        this.state.set(previousState);
+        this.taskStore.rollbackExternalTaskMerge(event.id, priorInTaskStore);
+        this.state.update((s) => ({ ...s, error: 'Failed to edit task.' }));
+      },
+    });
   }
 
   private toTaskViewModel(task: Task): UpcomingTaskViewModel {
@@ -223,5 +313,65 @@ export class UpcomingStore {
     next.setDate(next.getDate() + amount);
     next.setHours(0, 0, 0, 0);
     return next;
+  }
+
+  private loadUpcomingTasksForWeek(weekStart: Date): void {
+    if (this.state().loading) return;
+
+    const from = this.isCurrentWeekByStart(weekStart) ? this.today : weekStart;
+    const to = this.addDays(weekStart, 6);
+
+    this.state.update((s) => ({ ...s, loading: true, error: null }));
+    this.loadUpcomingTasksUseCase.execute(from, to).subscribe({
+      next: (result) => {
+        if (!result.success) {
+          this.state.update((s) => ({
+            ...s,
+            loading: false,
+            error: 'Failed to load upcoming tasks.',
+          }));
+          return;
+        }
+        this.state.update((s) => ({
+          ...s,
+          aggregates: result.value,
+          loading: false,
+          error: null,
+        }));
+      },
+      error: () => {
+        this.state.update((s) => ({
+          ...s,
+          loading: false,
+          error: 'Failed to load upcoming tasks.',
+        }));
+      },
+    });
+  }
+
+  private isCurrentWeekByStart(weekStart: Date): boolean {
+    return weekStart.getTime() === this.currentWeekMonday.getTime();
+  }
+
+  private resolveAggregate(taskId: string): UpcomingTaskAggregate | undefined {
+    return this.state().aggregates.find((aggregate) => aggregate.task.id === taskId);
+  }
+
+  private removeAggregate(taskId: string): void {
+    this.state.update((s) => ({
+      ...s,
+      aggregates: s.aggregates.filter((aggregate) => aggregate.task.id !== taskId),
+    }));
+  }
+
+  private replaceAggregateTask(taskId: string, nextTask: UpcomingTaskAggregate['task']): void {
+    this.state.update((s) => ({
+      ...s,
+      aggregates: s.aggregates.map((aggregate) =>
+        aggregate.task.id === taskId
+          ? { ...aggregate, task: nextTask }
+          : aggregate,
+      ),
+    }));
   }
 }

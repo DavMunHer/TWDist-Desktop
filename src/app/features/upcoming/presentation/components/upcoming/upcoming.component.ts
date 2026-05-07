@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  OnInit,
   output,
   signal,
   viewChild,
@@ -28,7 +29,7 @@ import { BreadcrumbComponent } from '@shared/ui/breadcrumb/breadcrumb.component'
   templateUrl: './upcoming.component.html',
   styleUrl: './upcoming.component.css',
 })
-export class UpcomingComponent {
+export class UpcomingComponent implements OnInit {
   private readonly upcomingStore = inject(UpcomingStore);
 
   public showIcon = input.required<boolean>();
@@ -40,6 +41,8 @@ export class UpcomingComponent {
   protected weekRange = this.upcomingStore.weekRange;
   protected isCurrentWeek = this.upcomingStore.isCurrentWeek;
   protected scrollToTodaySignal = this.upcomingStore.scrollToTodaySignal;
+  protected loading = this.upcomingStore.loading;
+  protected error = this.upcomingStore.error;
 
   constructor() {
     effect(() => {
@@ -82,6 +85,14 @@ export class UpcomingComponent {
 
   protected onTaskEdit(event: TaskEditEvent): void {
     this.upcomingStore.editTask(event);
+  }
+
+  ngOnInit(): void {
+    this.upcomingStore.ensureUpcomingTasksLoaded();
+  }
+
+  protected retryLoadUpcomingTasks(): void {
+    this.upcomingStore.loadUpcomingTasks();
   }
 
   private scrollTodayColumnIntoView(): void {
