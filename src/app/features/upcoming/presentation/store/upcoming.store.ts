@@ -80,8 +80,6 @@ export class UpcomingStore {
   readonly loading = computed(() => this.state().loading);
   readonly error = computed(() => this.state().error);
 
-  constructor() {}
-
   goToPreviousWeek(): void {
     if (this.isCurrentWeek()) return;
     this.state.update((s) => ({
