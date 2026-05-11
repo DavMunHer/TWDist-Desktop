@@ -5,6 +5,7 @@ describe('AuthError', () => {
   const ALL_CODES: AuthErrorCode[] = [
     'INVALID_CREDENTIALS',
     'INVALID_LOGIN_RESPONSE',
+    'REFRESH_FAILED',
     'INVALID_REGISTER_RESPONSE',
     'UNKNOWN_AUTH_ERROR',
   ];
