@@ -60,11 +60,11 @@ describe('authGuard', () => {
       expect(runGuard()).toBe(false);
     });
 
-    it('redirects to /login', () => {
+    it('redirects to /auth/login', () => {
       userSignal.set(null);
       runGuard();
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
     });
   });
 
