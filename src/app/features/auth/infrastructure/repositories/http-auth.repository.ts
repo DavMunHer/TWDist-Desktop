@@ -44,6 +44,19 @@ export class HttpAuthRepository extends AuthRepository {
       );
   }
 
+  refresh(): Observable<void> {
+    return this.http.post<unknown>('/auth/refresh', {}).pipe(
+      map(() => void 0),
+      catchError((error: unknown) => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          return throwError(() => new AuthError('REFRESH_FAILED', 'Unable to refresh session'));
+        }
+
+        return throwError(() => error);
+      })
+    );
+  }
+
   register(dto: RegisterCredentialsDto): Observable<User> {
     return this.http.post<UserResponseDto>('/users/create', dto)
       .pipe(

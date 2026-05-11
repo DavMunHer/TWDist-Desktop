@@ -11,6 +11,7 @@ import { User } from '@features/auth/domain/entities/user.entity';
 import { UserResponseDto } from '@features/auth/infrastructure/dto/response/user-response.dto';
 import { AuthResponseDto } from '@features/auth/infrastructure/dto/response/auth-response.dto';
 import { LoginCredentialsDto } from '@features/auth/infrastructure/dto/request/login-credentials.dto';
+import { REQUIRES_AUTH } from '@shared/interceptors/auth-context.token';
 
 const CREDENTIALS: LoginCredentialsDto = { email: 'test@test.com', password: 'password123' };
 const USER_DTO: UserResponseDto = { id: 1, email: 'test@test.com', username: 'testuser' };
@@ -119,6 +120,40 @@ describe('HttpAuthRepository', () => {
         .flush({}, { status: 401, statusText: 'Unauthorized' });
 
       expect(markSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('refresh()', () => {
+    it('sends a POST to /auth/refresh with an empty body', () => {
+      repository.refresh().subscribe();
+
+      const req = httpMock.expectOne('/auth/refresh');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({});
+      expect(req.request.context.get(REQUIRES_AUTH)).toBe(false);
+
+      req.flush(AUTH_RESPONSE);
+    });
+
+    it('emits void on success', () => {
+      let result: void | undefined = undefined;
+
+      repository.refresh().subscribe((value) => (result = value));
+      httpMock.expectOne('/auth/refresh').flush(AUTH_RESPONSE);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('throws AuthError("REFRESH_FAILED") on a 401 response', () => {
+      let error: AuthError | undefined;
+
+      repository.refresh().subscribe({ error: (e) => (error = e) });
+      httpMock
+        .expectOne('/auth/refresh')
+        .flush({}, { status: 401, statusText: 'Unauthorized' });
+
+      expect(error).toBeInstanceOf(AuthError);
+      expect(error?.code).toBe('REFRESH_FAILED');
     });
   });
 });
