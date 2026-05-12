@@ -9,10 +9,13 @@ import { SessionHintService } from '@features/auth/infrastructure/services/sessi
 import { AuthError } from '@features/auth/domain/errors/auth.error';
 import { User } from '@features/auth/domain/entities/user.entity';
 import { UserResponseDto } from '@features/auth/infrastructure/dto/response/user-response.dto';
+import { AuthResponseDto } from '@features/auth/infrastructure/dto/response/auth-response.dto';
 import { LoginCredentialsDto } from '@features/auth/infrastructure/dto/request/login-credentials.dto';
+import { REQUIRES_AUTH } from '@shared/interceptors/auth-context.token';
 
 const CREDENTIALS: LoginCredentialsDto = { email: 'test@test.com', password: 'password123' };
 const USER_DTO: UserResponseDto = { id: 1, email: 'test@test.com', username: 'testuser' };
+const AUTH_RESPONSE: AuthResponseDto = { user: USER_DTO };
 
 describe('HttpAuthRepository', () => {
   let repository: HttpAuthRepository;
@@ -49,14 +52,14 @@ describe('HttpAuthRepository', () => {
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(CREDENTIALS);
 
-      req.flush(USER_DTO);
+      req.flush(AUTH_RESPONSE);
     });
 
     it('maps the response DTO to a User domain entity', () => {
       let result: User | undefined;
       repository.login(CREDENTIALS).subscribe((user) => (result = user));
 
-      httpMock.expectOne('/auth/login').flush(USER_DTO);
+      httpMock.expectOne('/auth/login').flush(AUTH_RESPONSE);
 
       expect(result).toBeInstanceOf(User);
       expect(result?.id).toBe('1');
@@ -68,7 +71,7 @@ describe('HttpAuthRepository', () => {
       const markSpy = vi.spyOn(sessionHintService, 'markAuthenticated');
 
       repository.login(CREDENTIALS).subscribe();
-      httpMock.expectOne('/auth/login').flush(USER_DTO);
+      httpMock.expectOne('/auth/login').flush(AUTH_RESPONSE);
 
       expect(markSpy).toHaveBeenCalledOnce();
     });
@@ -85,12 +88,12 @@ describe('HttpAuthRepository', () => {
       expect(error?.code).toBe('INVALID_CREDENTIALS');
     });
 
-    it('throws AuthError("INVALID_LOGIN_RESPONSE") when the response body has no id', () => {
+    it('throws AuthError("INVALID_LOGIN_RESPONSE") when the response body has no user.id', () => {
       let error: AuthError | undefined;
       repository.login(CREDENTIALS).subscribe({ error: (e) => (error = e) });
 
-      // Server returns 200 but the body is missing the `id` field
-      httpMock.expectOne('/auth/login').flush({ email: 'test@test.com' });
+      // Server returns 200 but the body is missing the nested `user.id`
+      httpMock.expectOne('/auth/login').flush({ user: { email: 'test@test.com' } });
 
       expect(error).toBeInstanceOf(AuthError);
       expect(error?.code).toBe('INVALID_LOGIN_RESPONSE');
@@ -117,6 +120,40 @@ describe('HttpAuthRepository', () => {
         .flush({}, { status: 401, statusText: 'Unauthorized' });
 
       expect(markSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('refresh()', () => {
+    it('sends a POST to /auth/refresh with an empty body', () => {
+      repository.refresh().subscribe();
+
+      const req = httpMock.expectOne('/auth/refresh');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({});
+      expect(req.request.context.get(REQUIRES_AUTH)).toBe(false);
+
+      req.flush(AUTH_RESPONSE);
+    });
+
+    it('emits void on success', () => {
+      let result: void | undefined = undefined;
+
+      repository.refresh().subscribe((value) => (result = value));
+      httpMock.expectOne('/auth/refresh').flush(AUTH_RESPONSE);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('throws AuthError("REFRESH_FAILED") on a 401 response', () => {
+      let error: AuthError | undefined;
+
+      repository.refresh().subscribe({ error: (e) => (error = e) });
+      httpMock
+        .expectOne('/auth/refresh')
+        .flush({}, { status: 401, statusText: 'Unauthorized' });
+
+      expect(error).toBeInstanceOf(AuthError);
+      expect(error?.code).toBe('REFRESH_FAILED');
     });
   });
 });

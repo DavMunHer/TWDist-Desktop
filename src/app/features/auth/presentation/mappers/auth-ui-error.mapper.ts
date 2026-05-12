@@ -60,6 +60,13 @@ export function toAuthUiError(error: AuthFlowError): AuthUiError {
         message: 'Invalid login response from server',
         retryable: true,
       };
+    case 'REFRESH_FAILED':
+      return {
+        code: error.code,
+        kind: 'auth',
+        message: 'Your session has expired. Please log in again.',
+        retryable: false,
+      };
     case 'INVALID_REGISTER_RESPONSE':
       return {
         code: error.code,

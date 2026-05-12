@@ -6,6 +6,7 @@ export type AuthFlowError =
   | { code: 'USERNAME_TOO_SHORT' }
   | { code: 'INVALID_CREDENTIALS' }
   | { code: 'INVALID_LOGIN_RESPONSE' }
+  | { code: 'REFRESH_FAILED' }
   | { code: 'INVALID_REGISTER_RESPONSE' }
   | { code: 'NETWORK_ERROR' }
   | { code: 'UNKNOWN_AUTH_ERROR' };
