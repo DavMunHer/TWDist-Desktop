@@ -81,6 +81,37 @@ export function toAuthUiError(error: AuthFlowError): AuthUiError {
         message: 'Network error. Please try again.',
         retryable: true,
       };
+    case 'INVALID_OLD_PASSWORD':
+      return {
+        code: error.code,
+        kind: 'auth',
+        message: 'Old password is incorrect',
+        fieldErrors: { oldPassword: 'Old password is incorrect' },
+        retryable: false,
+      };
+    case 'NEW_PASSWORD_TOO_SHORT':
+      return {
+        code: error.code,
+        kind: 'validation',
+        message: 'New password must be at least 8 characters long',
+        fieldErrors: { newPassword: 'New password must be at least 8 characters' },
+        retryable: false,
+      };
+    case 'PASSWORDS_MUST_DIFFER':
+      return {
+        code: error.code,
+        kind: 'validation',
+        message: 'New password must be different from old password',
+        fieldErrors: { newPassword: 'Must be different from old password' },
+        retryable: false,
+      };
+    case 'INVALID_PROFILE_RESPONSE':
+      return {
+        code: error.code,
+        kind: 'unexpected',
+        message: 'Invalid profile response from server',
+        retryable: true,
+      };
     case 'UNKNOWN_AUTH_ERROR':
       return {
         code: error.code,
