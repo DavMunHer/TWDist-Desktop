@@ -3,6 +3,8 @@ import { catchError, of, tap } from "rxjs";
 import { LoginUseCase } from "@features/auth/application/use-cases/login.use-case";
 import { LogoutUseCase } from "@features/auth/application/use-cases/logout.use-case";
 import { GetCurrentUserUseCase } from "@features/auth/application/use-cases/getCurrentUser.use-case";
+import { UpdateUsernameUseCase } from "@features/auth/application/use-cases/update-username.use-case";
+import { UpdatePasswordUseCase } from "@features/auth/application/use-cases/update-password.use-case";
 import { AuthState } from "@features/auth/presentation/models/auth-state";
 import { LoginCredentialsDto } from "@features/auth/infrastructure/dto/request/login-credentials.dto";
 import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
@@ -10,12 +12,19 @@ import { CreateUserUseCase } from "@features/auth/application/use-cases/createUs
 import { toAuthUiError } from '@features/auth/presentation/mappers/auth-ui-error.mapper';
 import { AuthUiError } from '@features/auth/presentation/models/auth-ui-error';
 
+interface ProfileState {
+  status: 'idle' | 'loading' | 'success' | 'error';
+  error: AuthUiError | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
   private readonly loginUseCase = inject(LoginUseCase);
   private readonly logoutUseCase = inject(LogoutUseCase);
   private readonly createUserUseCase = inject(CreateUserUseCase);
   private readonly getCurrentUserUseCase = inject(GetCurrentUserUseCase);
+  private readonly updateUsernameUseCase = inject(UpdateUsernameUseCase);
+  private readonly updatePasswordUseCase = inject(UpdatePasswordUseCase);
 
   private readonly state = signal<AuthState>({
     user: null,
@@ -27,12 +36,16 @@ export class AuthStore {
 
   private readonly registrationSuccess = signal<boolean>(false);
 
+  private readonly profileState = signal<ProfileState>({ status: 'idle', error: null });
+
   readonly user = computed(() => this.state().user);
   readonly isAuthenticated = computed(() => this.state().isAuthenticated);
   readonly isLoading = computed(() => this.state().isLoading);
   readonly error = computed(() => this.state().error);
   readonly errorDetails = computed(() => this.state().errorDetails);
   readonly isRegistrationSuccess = computed(() => this.registrationSuccess());
+  readonly profileStatus = computed(() => this.profileState().status);
+  readonly profileError = computed(() => this.profileState().error);
 
   private setError(message: string, details: AuthUiError | null): void {
     this.state.update((s) => ({
@@ -148,5 +161,53 @@ export class AuthStore {
         return of(null);
       })
     );
+  }
+
+  updateUsername(username: string): void {
+    this.profileState.set({ status: 'loading', error: null });
+
+    this.updateUsernameUseCase.execute(username).pipe(
+      tap((result) => {
+        if (!result.success) {
+          const uiError = toAuthUiError(result.error);
+          this.profileState.set({ status: 'error', error: uiError });
+          return;
+        }
+
+        const user = result.value;
+        this.state.update(s => ({ ...s, user }));
+        this.profileState.set({ status: 'success', error: null });
+      }),
+      catchError((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unable to update username. Please try again.';
+        this.profileState.set({ status: 'error', error: { code: 'UNKNOWN', kind: 'unexpected', message, retryable: true } });
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  updatePassword(oldPassword: string, newPassword: string): void {
+    this.profileState.set({ status: 'loading', error: null });
+
+    this.updatePasswordUseCase.execute(oldPassword, newPassword).pipe(
+      tap((result) => {
+        if (!result.success) {
+          const uiError = toAuthUiError(result.error);
+          this.profileState.set({ status: 'error', error: uiError });
+          return;
+        }
+
+        this.profileState.set({ status: 'success', error: null });
+      }),
+      catchError((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Unable to update password. Please try again.';
+        this.profileState.set({ status: 'error', error: { code: 'UNKNOWN', kind: 'unexpected', message, retryable: true } });
+        return of(null);
+      })
+    ).subscribe();
+  }
+
+  resetProfileStatus(): void {
+    this.profileState.set({ status: 'idle', error: null });
   }
 }

@@ -1,4 +1,13 @@
 <div class="profile-modal">
+  @if (profileStatus() === 'success') {
+    <div class="feedback success">Changes saved successfully.</div>
+  }
+  @if (profileStatus() === 'error' && profileError(); as err) {
+    @if (err.kind !== 'validation') {
+      <div class="feedback error">{{ err.message }}</div>
+    }
+  }
+
   <section>
     <h3>Profile Picture</h3>
     <div>
@@ -7,29 +16,79 @@
       <button class="btn delete" (click)="deletePicture()">Delete Picture</button>
     </div>
   </section>
+
   <section>
     <h3>Name</h3>
-    <div>
-      <input type="text" [(ngModel)]="editableUsername">
-      <button class="btn default" (click)="updateName()">Update</button>
-    </div>
+    <form [formGroup]="usernameForm" (ngSubmit)="submitUsername()">
+      <div>
+        <input type="text" formControlName="username">
+        <button class="btn default" type="submit"
+          [disabled]="usernameForm.invalid || profileStatus() === 'loading'">Update</button>
+      </div>
+      @if (usernameForm.get('username'); as ctrl) {
+        @if (ctrl.touched && ctrl.errors) {
+          @if (ctrl.errors['required']) {
+            <span class="field-error">Username is required</span>
+          } @else if (ctrl.errors['minlength']) {
+            <span class="field-error">Username must be at least 3 characters</span>
+          }
+        }
+      }
+      @if (profileError()?.fieldErrors?.['username']; as msg) {
+        <span class="field-error">{{ msg }}</span>
+      }
+    </form>
   </section>
+
   <section>
     <h3>Email</h3>
     <div>
-      <input class="readonly-field" type="text" [value]="email()" readonly aria-readonly="true" title="Email cannot be edited yet">
+      <input class="readonly-field" type="text" [value]="email()" disabled title="Email cannot be edited yet">
     </div>
   </section>
+
   <section>
     <h3>Password</h3>
-    <div>
-      <label for="oldPassword">Old Password</label>
-      <input id="oldPassword" type="password" [(ngModel)]="oldPassword">
-      <label for="newPassword">New Password</label>
-      <input id="newPassword" type="password" [(ngModel)]="newPassword">
-      <button class="btn default" (click)="updatePassword()">Update</button>
-    </div>
+    <form [formGroup]="passwordForm" (ngSubmit)="submitPassword()">
+      <div>
+        <label for="oldPassword">Old Password</label>
+        <input id="oldPassword" type="password" formControlName="oldPassword">
+        @if (passwordForm.get('oldPassword'); as ctrl) {
+          @if (ctrl.touched && ctrl.errors?.['required']) {
+            <span class="field-error">Old password is required</span>
+          }
+        }
+        @if (profileError()?.fieldErrors?.['oldPassword']; as msg) {
+          <span class="field-error">{{ msg }}</span>
+        }
+
+        <label for="newPassword">New Password</label>
+        <input id="newPassword" type="password" formControlName="newPassword">
+        @if (passwordForm.get('newPassword'); as ctrl) {
+          @if (ctrl.touched && ctrl.errors) {
+            @if (ctrl.errors['required']) {
+              <span class="field-error">New password is required</span>
+            } @else if (ctrl.errors['minlength']) {
+              <span class="field-error">New password must be at least 8 characters</span>
+            } @else if (ctrl.errors['maxlength']) {
+              <span class="field-error">New password must be at most 40 characters</span>
+            }
+          }
+        }
+        @if (profileError()?.fieldErrors?.['newPassword']; as msg) {
+          <span class="field-error">{{ msg }}</span>
+        }
+
+        @if (passwordForm.errors?.['passwordsMustDiffer'] && passwordForm.touched) {
+          <span class="field-error">New password must be different from old password</span>
+        }
+
+        <button class="btn default" type="submit"
+          [disabled]="passwordForm.invalid || profileStatus() === 'loading'">Update</button>
+      </div>
+    </form>
   </section>
+
   <section>
     <h3>Delete Account</h3>
     <div>

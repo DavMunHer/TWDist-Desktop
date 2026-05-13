@@ -8,6 +8,8 @@ import { UserMapper } from "@features/auth/infrastructure/mappers/user.mapper";
 import { AuthResponseDto } from "@features/auth/infrastructure/dto/response/auth-response.dto";
 import { UserResponseDto } from "@features/auth/infrastructure/dto/response/user-response.dto";
 import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/request/register-credentials.dto";
+import { UpdateUsernameDto } from "@features/auth/infrastructure/dto/request/update-username.dto";
+import { UpdatePasswordDto } from "@features/auth/infrastructure/dto/request/update-password.dto";
 import { SessionHintService } from "@features/auth/infrastructure/services/session-hint.service";
 import { requiresAuthContext } from "@shared/interceptors/auth-context.token";
 import { AuthError } from "@features/auth/domain/errors/auth.error";
@@ -93,6 +95,37 @@ export class HttpAuthRepository extends AuthRepository {
           // If cookie expired or unauthorized, clear the session hint
           this.sessionHintService.clear();
           return of(null)
+        })
+      );
+  }
+
+  updateUsername(dto: UpdateUsernameDto): Observable<User> {
+    return this.http.patch<UserResponseDto>('/users/username', dto, requiresAuthContext())
+      .pipe(
+        map(responseDto => {
+          if (!responseDto?.id) {
+            throw new AuthError('INVALID_PROFILE_RESPONSE', 'Invalid profile response: missing user data');
+          }
+          return UserMapper.toDomain(responseDto);
+        }),
+        catchError((error: unknown) => {
+          if (error instanceof AuthError) {
+            return throwError(() => error);
+          }
+          return throwError(() => new AuthError('UNKNOWN_AUTH_ERROR', 'Unexpected error updating username'));
+        })
+      );
+  }
+
+  updatePassword(dto: UpdatePasswordDto): Observable<void> {
+    return this.http.patch<void>('/users/password', dto, requiresAuthContext())
+      .pipe(
+        map(() => void 0),
+        catchError((error: unknown) => {
+          if (error instanceof HttpErrorResponse && error.status === 400) {
+            return throwError(() => new AuthError('INVALID_OLD_PASSWORD', 'Old password is incorrect'));
+          }
+          return throwError(() => new AuthError('UNKNOWN_AUTH_ERROR', 'Unexpected error updating password'));
         })
       );
   }
