@@ -122,7 +122,7 @@ export class HttpAuthRepository extends AuthRepository {
       .pipe(
         map(() => void 0),
         catchError((error: unknown) => {
-          if (error instanceof HttpErrorResponse && (error.status === 400 || error.status === 401)) {
+          if (error instanceof HttpErrorResponse && error.status === 400) {
             return throwError(() => new AuthError('INVALID_OLD_PASSWORD', 'Old password is incorrect'));
           }
           return throwError(() => new AuthError('UNKNOWN_AUTH_ERROR', 'Unexpected error updating password'));
