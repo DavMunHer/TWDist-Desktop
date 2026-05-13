@@ -3,6 +3,8 @@ export type AuthErrorCode =
   | 'INVALID_LOGIN_RESPONSE'
   | 'REFRESH_FAILED'
   | 'INVALID_REGISTER_RESPONSE'
+  | 'INVALID_OLD_PASSWORD'
+  | 'INVALID_PROFILE_RESPONSE'
   | 'UNKNOWN_AUTH_ERROR';
 
 export class AuthError extends Error {
