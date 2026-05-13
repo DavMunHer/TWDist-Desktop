@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
-import { catchError, of, tap } from "rxjs";
+import { Observable, catchError, of, tap } from "rxjs";
 import { LoginUseCase } from "@features/auth/application/use-cases/login.use-case";
 import { LogoutUseCase } from "@features/auth/application/use-cases/logout.use-case";
 import { GetCurrentUserUseCase } from "@features/auth/application/use-cases/getCurrentUser.use-case";
@@ -122,13 +122,15 @@ export class AuthStore {
     ).subscribe();
   }
 
-  logout(): void {
-    this.logoutUseCase.execute().subscribe({
-      next: () => {
-        // Server cleared the cookie
+  logout(): Observable<void> {
+    this.state.update(s => ({ ...s, isLoading: true }));
+    return this.logoutUseCase.execute().pipe(
+      tap(() => this.clearSessionState()),
+      catchError(() => {
         this.clearSessionState();
-      },
-    });
+        return of(void 0);
+      })
+    );
   }
 
   clearSessionState(): void {

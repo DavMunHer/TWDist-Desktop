@@ -1,7 +1,11 @@
 <div class="confirm-modal">
   <p class="confirm-modal-message">
-    Are you sure you want to delete <strong>"{{ entityName }}"</strong>?
-    This item will be deleted <strong>permanently</strong>.
+    @if (message) {
+      {{ message }}
+    } @else {
+      Are you sure you want to delete <strong>"{{ entityName }}"</strong>?
+      This item will be deleted <strong>permanently</strong>.
+    }
     @if (cascadeMessage) {
       {{ cascadeMessage }}
     }

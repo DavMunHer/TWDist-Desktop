@@ -1,8 +1,9 @@
-import { NgClass } from '@angular/common';
+import { DOCUMENT, NgClass } from '@angular/common';
 import { Component, computed, input, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { ConfigurationComponent } from '@shared/ui/modal/configuration/configuration.component';
 import { ProfileComponent } from '@shared/ui/modal/profile/profile.component';
+import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { MenuSectionComponent } from '@shared/ui/sidebar/sidebar-menu-section/menu-section.component';
 import { ClickOutsideDirective } from '@shared/directives/click-outside.directive';
@@ -18,6 +19,7 @@ import { AuthStore } from '@features/auth/presentation/store/auth.store';
 export class SidebarComponent {
   private readonly modalService = inject(ModalService);
   private readonly authStore = inject(AuthStore);
+  private readonly document = inject(DOCUMENT);
 
   readonly user = computed(() => this.authStore.user());
 
@@ -44,6 +46,38 @@ export class SidebarComponent {
   openConfigurationModal(): void {
     this.closeDropdown();
     this.modalService.open(ConfigurationComponent, { title: 'Configuration' });
+  }
+
+  onLogoutClick(): void {
+    this.closeDropdown();
+    this.modalService.open(ConfirmComponent, {
+      title: 'Log out',
+      data: {
+        entityName: 'session',
+        message: 'Are you sure you want to log out? You will need to sign in again to access your projects.',
+        confirmLabel: 'Log out',
+        cancelLabel: 'Cancel',
+      },
+      onClose: (result) => {
+        if (result === true) {
+          this.performLogout();
+        }
+      },
+    });
+  }
+
+  private performLogout(): void {
+    this.authStore.logout().subscribe({
+      complete: () => this.hardRedirectToLogin(),
+    });
+  }
+
+  private hardRedirectToLogin(): void {
+    const win = this.document.defaultView;
+    if (win) {
+      win.location.hash = '#/auth/login';
+      win.location.reload();
+    }
   }
 
   onCreateProjectClick(): void {
