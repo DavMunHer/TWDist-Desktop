@@ -10,6 +10,8 @@ import { LoginUseCase } from '@features/auth/application/use-cases/login.use-cas
 import { LogoutUseCase } from '@features/auth/application/use-cases/logout.use-case';
 import { CreateUserUseCase } from '@features/auth/application/use-cases/createUser.use-case';
 import { GetCurrentUserUseCase } from '@features/auth/application/use-cases/getCurrentUser.use-case';
+import { UpdateUsernameUseCase } from '@features/auth/application/use-cases/update-username.use-case';
+import { UpdatePasswordUseCase } from '@features/auth/application/use-cases/update-password.use-case';
 import { RefreshSessionUseCase } from '@features/auth/application/use-cases/refresh-session.use-case';
 import { TokenRefreshCoordinator } from '@features/auth/application/services/token-refresh-coordinator.service';
 import { AuthRepository } from '@features/auth/domain/repositories/auth.repository';
@@ -41,6 +43,8 @@ describe('AuthStore refresh integration', () => {
         LogoutUseCase,
         CreateUserUseCase,
         GetCurrentUserUseCase,
+        UpdateUsernameUseCase,
+        UpdatePasswordUseCase,
         RefreshSessionUseCase,
         TokenRefreshCoordinator,
         { provide: AuthRepository, useClass: HttpAuthRepository },

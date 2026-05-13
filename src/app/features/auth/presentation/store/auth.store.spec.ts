@@ -8,6 +8,8 @@ import { LoginUseCase } from '@features/auth/application/use-cases/login.use-cas
 import { LogoutUseCase } from '@features/auth/application/use-cases/logout.use-case';
 import { GetCurrentUserUseCase } from '@features/auth/application/use-cases/getCurrentUser.use-case';
 import { CreateUserUseCase } from '@features/auth/application/use-cases/createUser.use-case';
+import { UpdateUsernameUseCase } from '@features/auth/application/use-cases/update-username.use-case';
+import { UpdatePasswordUseCase } from '@features/auth/application/use-cases/update-password.use-case';
 import { User } from '@features/auth/domain/entities/user.entity';
 import { LoginCredentialsDto } from '@features/auth/infrastructure/dto/request/login-credentials.dto';
 
@@ -18,6 +20,8 @@ const mockLoginUseCase = { execute: vi.fn() };
 const mockLogoutUseCase = { execute: vi.fn().mockReturnValue(of(void 0)) };
 const mockGetCurrentUserUseCase = { execute: vi.fn().mockReturnValue(of(null)) };
 const mockCreateUserUseCase = { execute: vi.fn() };
+const mockUpdateUsernameUseCase = { execute: vi.fn() };
+const mockUpdatePasswordUseCase = { execute: vi.fn() };
 
 describe('AuthStore - login slice', () => {
   let store: AuthStore;
@@ -33,6 +37,8 @@ describe('AuthStore - login slice', () => {
         { provide: LogoutUseCase, useValue: mockLogoutUseCase },
         { provide: GetCurrentUserUseCase, useValue: mockGetCurrentUserUseCase },
         { provide: CreateUserUseCase, useValue: mockCreateUserUseCase },
+        { provide: UpdateUsernameUseCase, useValue: mockUpdateUsernameUseCase },
+        { provide: UpdatePasswordUseCase, useValue: mockUpdatePasswordUseCase },
       ],
     });
 
