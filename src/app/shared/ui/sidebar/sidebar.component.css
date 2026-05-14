@@ -3,12 +3,15 @@
   flex-direction: column;
   background-color: #fcfaf8;
   height: 100%;
-  width: 100%;
+  width: 30vh;
   min-width: 30vh;
+  overflow: hidden;
+  transition: width 0.3s ease, min-width 0.3s ease, opacity 0.3s ease;
 
   &.invisible {
-    opacity: 0%;
-    display: none;
+    width: 0;
+    min-width: 0;
+    opacity: 0;
   }
 
   & .test {
