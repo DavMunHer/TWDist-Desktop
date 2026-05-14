@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, DestroyRef, inject, Injector, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, ActivatedRoute } from '@angular/router';
 import { filter, startWith } from 'rxjs';
@@ -8,6 +8,8 @@ import { ProjectStore } from '@features/projects/presentation/store/project.stor
 import { TodayComponent } from '@features/today/presentation/components/today/today.component';
 import { UpcomingComponent } from '@features/upcoming/presentation/components/upcoming/upcoming.component';
 import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
+import { SectionStore } from '@features/projects/presentation/store/section.store';
+import { TaskStore } from '@features/projects/presentation/store/task.store';
 import { TWDSidebarMenu, TWDSidebarMenuItem } from '@shared/ui/sidebar/sidebar-menu';
 import { ModalService } from '@shared/ui/modal/modal.service';
 import { CreateProjectComponent } from '@features/projects/presentation/components/create-project/create-project.component';
@@ -17,13 +19,15 @@ import { ConfirmComponent } from '@shared/ui/modal/confirm/confirm.component';
   selector: 'app-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SidebarComponent, ProjectViewComponent, TodayComponent, UpcomingComponent],
+  providers: [ProjectStore, ProjectSummaryStore, SectionStore, TaskStore],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit {
   private readonly projectStore = inject(ProjectStore);
   private readonly summaryStore = inject(ProjectSummaryStore);
   private readonly modalService = inject(ModalService);
+  private readonly injector = inject(Injector);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -139,6 +143,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!project) return;
     this.modalService.open(CreateProjectComponent, {
       title: 'Edit Project',
+      parentInjector: this.injector,
       data: {
         id: project.id,
         name: project.name,
@@ -168,10 +173,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   protected openCreateProjectModal(): void {
-    this.modalService.open(CreateProjectComponent, { title: 'Create Project' });
-  }
-
-  ngOnDestroy(): void {
-    this.projectStore.disconnectFromEvents();
+    this.modalService.open(CreateProjectComponent, {
+      title: 'Create Project',
+      parentInjector: this.injector,
+    });
   }
 }

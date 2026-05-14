@@ -14,6 +14,7 @@ import { TaskFilter } from '@shared/types/task-filter.type';
   selector: 'app-today',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BreadcrumbComponent, TodayGroupComponent],
+  providers: [TodayStore],
   templateUrl: './today.component.html',
   styleUrl: './today.component.css',
 })
