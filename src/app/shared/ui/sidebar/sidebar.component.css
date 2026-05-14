@@ -3,12 +3,12 @@
   flex-direction: column;
   background-color: #fcfaf8;
   height: 100%;
-  width: 100%;
+  width: 30vh;
   min-width: 30vh;
+  transition: margin-left 0.3s ease;
 
   &.invisible {
-    opacity: 0%;
-    display: none;
+    margin-left: -30vh;
   }
 
   & .test {
@@ -124,15 +124,26 @@
           border: none;
           background: none;
           font: inherit;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: #eaeaea;
+          }
         }
       }
     }
   }
 }
 
-.sidebar-hover:hover {
-  background-color: #eaeaea;
+.sidebar-hover {
+  transition: background-color 0.2s ease;
   border-radius: 8px;
   cursor: pointer;
+
+  &:hover {
+    background-color: #eaeaea;
+  }
 }
 
