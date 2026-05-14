@@ -4,6 +4,7 @@
 
     & .sidebar-container {
         flex-shrink: 0;
+        overflow: hidden;
     }
 
     & .view-section {

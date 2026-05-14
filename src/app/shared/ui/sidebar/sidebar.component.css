@@ -5,13 +5,10 @@
   height: 100%;
   width: 30vh;
   min-width: 30vh;
-  transition: width 0.3s ease, min-width 0.3s ease, opacity 0.3s ease;
+  transition: margin-left 0.3s ease;
 
   &.invisible {
-    width: 0;
-    min-width: 0;
-    opacity: 0;
-    overflow: hidden;
+    margin-left: -30vh;
   }
 
   & .test {
