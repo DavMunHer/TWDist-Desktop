@@ -23,7 +23,7 @@ export interface OptimisticDeleteSnapshot {
  * `state.tasks`, keyed by its ID. Subtask relationships are expressed
  * through `Task.subtaskIds` (children) and `Task.parentTaskId` (parent).
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class TaskStore {
   private readonly createTaskUseCase = inject(CreateTaskUseCase);
   private readonly completeTaskUseCase = inject(CompleteTaskUseCase);

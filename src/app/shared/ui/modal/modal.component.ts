@@ -38,7 +38,7 @@ export class ModalComponent {
     vcr.clear();
 
     const childInjector = Injector.create({
-      parent: this.injector,
+      parent: modal.config.parentInjector ?? this.injector,
       providers: [
         {
           provide: ModalRef,

@@ -1,7 +1,8 @@
-import { Injectable, signal, Type } from '@angular/core';
+import { Injectable, Injector, signal, Type } from '@angular/core';
 
 export interface ModalConfig {
   title: string;
+  parentInjector?: Injector;
   data?: Record<string, unknown>;
   onClose?: (result?: unknown) => void;
 }

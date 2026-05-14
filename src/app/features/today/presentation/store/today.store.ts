@@ -21,7 +21,7 @@ import { TaskStore } from '@features/projects/presentation/store/task.store';
  * Reads tasks from the dedicated `/api/tasks/today` endpoint and keeps a
  * local optimistic state for task mutations.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class TodayStore {
   private readonly loadTodayTasksUseCase = inject(LoadTodayTasksUseCase);
   private readonly completeTaskUseCase = inject(CompleteTaskUseCase);

@@ -36,7 +36,11 @@ describe('TodayComponent', () => {
         provideZonelessChangeDetection(),
         { provide: TodayStore, useValue: todayStoreMock },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(TodayComponent, {
+        set: { providers: [{ provide: TodayStore, useValue: todayStoreMock }] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(TodayComponent);
     fixture.componentRef.setInput('showIcon', false);
@@ -80,7 +84,11 @@ describe('Breadcrumb integration inside the TodayComponent', () => {
         provideZonelessChangeDetection(),
         { provide: TodayStore, useValue: todayStoreMock },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(TodayComponent, {
+        set: { providers: [{ provide: TodayStore, useValue: todayStoreMock }] },
+      })
+      .compileComponents();
     fixture = TestBed.createComponent(TodayComponent);
     fixture.componentRef.setInput('showIcon', false);
     component = fixture.componentInstance;

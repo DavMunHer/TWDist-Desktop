@@ -138,6 +138,12 @@ describe('HomeComponent', () => {
         { provide: AuthStore, useValue: mockAuthStore },
       ],
     })
+      .overrideComponent(HomeComponent, {
+        set: { providers: [] },
+      })
+      .overrideComponent(TodayComponent, {
+        set: { providers: [{ provide: TodayStore, useValue: todayStoreMock }] },
+      })
       .overrideComponent(UpcomingComponent, {
         set: {
           providers: [{ provide: UpcomingStore, useValue: upcomingStoreMock }],
@@ -159,9 +165,8 @@ describe('HomeComponent', () => {
     expect(projectStoreMock.loadAllProjects).toHaveBeenCalled();
   });
 
-  it('calls disconnectFromEvents when destroyed', () => {
-    fixture.destroy();
-    expect(projectStoreMock.disconnectFromEvents).toHaveBeenCalled();
+  it('destroys without error (SSE cleanup delegated to ProjectStore.ngOnDestroy)', () => {
+    expect(() => fixture.destroy()).not.toThrow();
   });
 
   describe('right panel from route', () => {

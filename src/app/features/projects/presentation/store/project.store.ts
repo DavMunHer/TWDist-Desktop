@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LoadProjectUseCase } from '@features/projects/application/use-cases/projects/load-project/load-project.use-case';
 import { LoadAllProjectsUseCase } from '@features/projects/application/use-cases/projects/load-all-projects/load-all-projects.use-case';
@@ -40,8 +40,8 @@ import { UiError } from '@features/projects/presentation/models/ui-error';
  * The `projectView` computed signal reads across all three stores
  * to build the denormalized tree the template needs.
  */
-@Injectable({ providedIn: 'root' })
-export class ProjectStore {
+@Injectable()
+export class ProjectStore implements OnDestroy {
   // --------------- Use-case injection ---------------
   private readonly loadProjectUseCase   = inject(LoadProjectUseCase);
   private readonly loadAllProjectsUseCase = inject(LoadAllProjectsUseCase);
@@ -565,6 +565,10 @@ export class ProjectStore {
   private disconnectFromUserEvents(): void {
     this.userEventsSubscription?.unsubscribe();
     this.userEventsSubscription = undefined;
+  }
+
+  ngOnDestroy(): void {
+    this.disconnectFromEvents();
   }
 
   /** Close all SSE connections. Call on logout / navigation away. */
