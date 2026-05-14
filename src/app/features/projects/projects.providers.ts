@@ -19,11 +19,6 @@ import { CompleteTaskUseCase } from '@features/projects/application/use-cases/ta
 import { UncompleteTaskUseCase } from '@features/projects/application/use-cases/tasks/uncomplete-task/uncomplete-task.use-case';
 import { UpdateTaskUseCase } from '@features/projects/application/use-cases/tasks/update-task/update-task.use-case';
 import { DeleteTaskUseCase } from '@features/projects/application/use-cases/tasks/delete-task/delete-task.use-case';
-import { ProjectStore } from '@features/projects/presentation/store/project.store';
-import { ProjectSummaryStore } from '@features/projects/presentation/store/project-summary.store';
-import { SectionStore } from '@features/projects/presentation/store/section.store';
-import { TaskStore } from '@features/projects/presentation/store/task.store';
-
 export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   // Repositories
   { provide: ProjectRepository, useClass: HttpProjectRepository },
@@ -45,10 +40,4 @@ export const PROJECT_FEATURE_PROVIDERS: Provider[] = [
   UpdateTaskUseCase,
   DeleteTaskUseCase,
   ToggleFavoriteUseCase,
-
-  // Presentation — Stores
-  ProjectStore,
-  ProjectSummaryStore,
-  SectionStore,
-  TaskStore,
 ];

@@ -14,7 +14,7 @@ import { UiError } from '@features/projects/presentation/models/ui-error';
  * Each section lives as a flat entry keyed by ID.
  * `Section.taskIds` points into the TaskStore's dictionary.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class SectionStore {
   private readonly createSectionUseCase = inject(CreateSectionUseCase);
   private readonly updateSectionUseCase = inject(UpdateSectionUseCase);

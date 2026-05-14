@@ -17,7 +17,7 @@ import { TaskStore } from '@features/projects/presentation/store/task.store';
  * Deliberately kept separate from {@link ProjectStore} so the main project
  * state is not polluted with sidebar-only concerns.
  */
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ProjectSummaryStore {
   private readonly sectionStore = inject(SectionStore);
   private readonly taskStore = inject(TaskStore);
