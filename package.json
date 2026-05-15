@@ -1,6 +1,7 @@
 {
   "name": "twdist-desktop",
   "version": "0.0.0",
+  "description": "TWDist Desktop Application",
   "main": "dist-electron/main.js",
   "scripts": {
     "ng": "ng",
@@ -62,7 +63,8 @@
       "target": "dmg"
     },
     "linux": {
-      "target": ["AppImage", "deb"]
+      "target": ["AppImage", "deb"],
+      "maintainer": "David M. <davmunher@users.noreply.github.com>, Oscar Barber <oscbarcan@users.noreply.github.com>"
     }
   }
 }
