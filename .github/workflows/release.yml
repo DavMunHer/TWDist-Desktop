@@ -2,7 +2,7 @@ name: Release Build
 
 on:
   push:
-    branches: [ chore/electron-releases ]
+    branches: [ main ]
 
 jobs:
   build-linux:
