@@ -1,0 +1,116 @@
+name: Release Build
+
+on:
+  push:
+    branches: [ chore/electron-releases ]
+
+jobs:
+  build-linux:
+    name: Build Linux (.AppImage + .deb)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Angular app
+        run: bunx ng build --configuration=production --base-href ./
+
+      - name: Compile Electron TypeScript
+        run: bun run electron:tsc
+
+      - name: Package with electron-builder (Linux)
+        run: bunx electron-builder --linux --publish never
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: |
+            release/*.AppImage
+            release/*.deb
+          if-no-files-found: error
+
+  build-windows:
+    name: Build Windows (.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Angular app
+        run: bunx ng build --configuration=production --base-href ./
+
+      - name: Compile Electron TypeScript
+        run: bun run electron:tsc
+
+      - name: Package with electron-builder (Windows)
+        run: bunx electron-builder --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            release/**/*.exe
+            release/*.exe
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: [ build-linux, build-windows ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Generate version tag and release name
+        id: version
+        run: |
+          DATE=$(date +'%Y%m%d')
+          DISPLAY_DATE=$(date +'%Y-%m-%d')
+          TAG="alpha-${DATE}-${{ github.run_number }}"
+          NAME="Alpha ${DISPLAY_DATE} (Build #${{ github.run_number }})"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "name=${NAME}" >> $GITHUB_OUTPUT
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-artifacts
+          path: dist/linux
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-artifacts
+          path: dist/windows
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.name }}
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            dist/linux/*.AppImage
+            dist/linux/*.deb
+            dist/windows/**/*.exe
+            dist/windows/*.exe

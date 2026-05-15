@@ -62,7 +62,7 @@
       "target": "dmg"
     },
     "linux": {
-      "target": "AppImage"
+      "target": ["AppImage", "deb"]
     }
   }
 }
