@@ -11,6 +11,8 @@ import { RefreshSessionUseCase } from '@features/auth/application/use-cases/refr
 import { AuthRepository } from '@features/auth/domain/repositories/auth.repository';
 import { HttpAuthRepository } from '@features/auth/infrastructure/repositories/http-auth.repository';
 import { AuthStore } from '@features/auth/presentation/store/auth.store';
+import { RuntimeConfigService } from '@shared/config/runtime-config.service';
+import { Router } from '@angular/router';
 
 describe('refreshTokenInterceptor', () => {
   let http: HttpClient;
@@ -32,6 +34,11 @@ describe('refreshTokenInterceptor', () => {
         RefreshSessionUseCase,
         { provide: AuthRepository, useClass: HttpAuthRepository },
         { provide: AuthStore, useValue: authStoreMock },
+        { provide: Router, useValue: { url: '/projects/upcoming', navigate: vi.fn() } },
+        {
+          provide: RuntimeConfigService,
+          useValue: { isBearerAuthEnabled: () => false, apiBaseUrl: '/api' },
+        },
       ],
     });
 
@@ -45,6 +52,7 @@ describe('refreshTokenInterceptor', () => {
   });
 
   it('refreshes once and replays the original request after a protected 401', () => {
+    localStorage.setItem('has_session', 'true');
     let result: unknown;
 
     http.get('/projects/get', requiresAuthContext()).subscribe((response) => (result = response));
@@ -65,6 +73,7 @@ describe('refreshTokenInterceptor', () => {
   });
 
   it('queues concurrent protected 401s behind one refresh request', () => {
+    localStorage.setItem('has_session', 'true');
     const results: unknown[] = [];
 
     http.get('/projects/get', requiresAuthContext()).subscribe((response) => results.push(response));
@@ -136,7 +145,23 @@ describe('refreshTokenInterceptor', () => {
     expect(emittedError?.status).toBe(401);
   });
 
+  it('refreshes on 403 when a session can be restored', () => {
+    localStorage.setItem('has_session', 'true');
+    let result: unknown;
+
+    http.get('/projects/get', requiresAuthContext()).subscribe((response) => (result = response));
+
+    httpMock
+      .expectOne('/projects/get')
+      .flush({}, { status: 403, statusText: 'Forbidden' });
+    httpMock.expectOne('/auth/refresh').flush({});
+    httpMock.expectOne('/projects/get').flush({ ok: true });
+
+    expect(result).toEqual({ ok: true });
+  });
+
   it('retries each protected request only once', () => {
+    localStorage.setItem('has_session', 'true');
     let emittedError: HttpErrorResponse | undefined;
 
     http.get('/projects/get', requiresAuthContext()).subscribe({

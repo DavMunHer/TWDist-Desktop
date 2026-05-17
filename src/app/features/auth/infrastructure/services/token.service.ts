@@ -14,14 +14,15 @@ export class TokenService {
   private readonly runtimeConfig = inject(RuntimeConfigService);
 
   isBearerAuthEnabled(): boolean {
-    return this.runtimeConfig.isBearerAuthEnabled();
+    if (this.runtimeConfig.isBearerAuthEnabled()) {
+      return true;
+    }
+
+    // Tokens in storage imply bearer mode even if runtime config is not ready yet.
+    return !!localStorage.getItem(ACCESS_TOKEN_KEY) || !!localStorage.getItem(REFRESH_TOKEN_KEY);
   }
 
   save(tokens: StoredTokens): void {
-    if (!this.isBearerAuthEnabled()) {
-      return;
-    }
-
     localStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
   }

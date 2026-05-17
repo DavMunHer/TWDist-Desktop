@@ -2,13 +2,22 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { beforeEach, afterEach, describe, it, expect } from 'vitest';
 import { SessionHintService } from './session-hint.service';
+import { TokenService } from './token.service';
+import { RuntimeConfigService } from '@shared/config/runtime-config.service';
 
 describe('SessionHintService', () => {
   let service: SessionHintService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection()],
+      providers: [
+        provideZonelessChangeDetection(),
+        TokenService,
+        {
+          provide: RuntimeConfigService,
+          useValue: { isBearerAuthEnabled: () => false },
+        },
+      ],
     });
     service = TestBed.inject(SessionHintService);
     // Always start each test with a clean localStorage
@@ -67,6 +76,30 @@ describe('SessionHintService', () => {
 
     it('does not throw if there is no hint to clear', () => {
       expect(() => service.clear()).not.toThrow();
+    });
+  });
+
+  describe('hasSessionHint() with bearer auth', () => {
+    beforeEach(() => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          provideZonelessChangeDetection(),
+          TokenService,
+          {
+            provide: RuntimeConfigService,
+            useValue: { isBearerAuthEnabled: () => true },
+          },
+        ],
+      });
+      service = TestBed.inject(SessionHintService);
+      localStorage.clear();
+    });
+
+    it('returns true when a refresh token is stored even without has_session', () => {
+      localStorage.setItem('twdist_refresh_token', 'refresh-abc');
+
+      expect(service.hasSessionHint()).toBe(true);
     });
   });
 });

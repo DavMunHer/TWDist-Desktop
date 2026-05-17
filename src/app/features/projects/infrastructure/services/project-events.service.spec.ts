@@ -1,30 +1,34 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { provideZonelessChangeDetection } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { describe, expect, it, vi } from 'vitest';
+import { of } from 'rxjs';
 
 import { ProjectEventsService } from './project-events.service';
+import { SseRuntimeService } from '@shared/infrastructure/sse/sse-runtime';
 
 describe('ProjectEventsService', () => {
-  const closeSpy = vi.fn();
+  const connectSpy = vi.fn(() => of());
 
   beforeEach(() => {
-    closeSpy.mockClear();
-    vi.stubGlobal(
-      'EventSource',
-      class MockEventSource {
-        addEventListener = vi.fn();
-        close = closeSpy;
-        constructor(public url: string) {}
-      },
+    connectSpy.mockClear();
+    TestBed.configureTestingModule({
+      providers: [
+        provideZonelessChangeDetection(),
+        ProjectEventsService,
+        {
+          provide: SseRuntimeService,
+          useValue: { connect: connectSpy },
+        },
+      ],
+    });
+  });
+
+  it('connect() passes project id in SSE path', () => {
+    const service = TestBed.inject(ProjectEventsService);
+    service.connect('42').subscribe();
+    expect(connectSpy).toHaveBeenCalledWith(
+      '/projects/42/events',
+      expect.arrayContaining(['task_created']),
     );
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it('connect(projectId) subscribes to project-scoped URL and closes on teardown', () => {
-    const service = new ProjectEventsService();
-    const sub = service.connect('proj-1').subscribe();
-    sub.unsubscribe();
-    expect(closeSpy).toHaveBeenCalledTimes(1);
   });
 });
