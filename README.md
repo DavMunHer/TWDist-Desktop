@@ -17,8 +17,17 @@ npm install
 bun install
 ```
 
-## Start developing!
-For starting developing in this project you can just run `bun run start` and it will automatically start a new Electron app with the content of the Angular app.
+## Start developing
+
+**Quick start (Electron + hot reload):**
+
+```sh
+cp electron/config.example.json electron/config.local.json   # once — edit apiBaseUrl if needed
+bun run start
+```
+
+**Contributor guide** (web vs Electron, local vs production API, preview & packaged builds):  
+[docs/local-development.md](docs/local-development.md)
 
 ## Testing templates
 
