@@ -1,23 +1,20 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+
+import { TokenService } from '@features/auth/infrastructure/services/token.service';
 
 /**
- * Credentials Interceptor
- * Automatically sends HTTP-only cookies with all requests
- * 
- * This interceptor adds `withCredentials: true` to all outgoing requests,
- * which tells the browser to include any HTTP-only cookies in the request.
- * This is essential for cookie-based authentication where the auth token
- * is stored in an HTTP-only cookie (set by the server during login).
- * 
- * The HTTP-only flag prevents JavaScript from accessing the cookie,
- * protecting against XSS attacks while still allowing it to be sent
- * automatically with each request.
+ * Sends HTTP-only cookies with requests in browser/dev (proxy) mode.
+ * Skipped when Bearer auth is enabled (Electron release).
  */
 export const credentialsInterceptor: HttpInterceptorFn = (req, next) => {
-  // Clone the request and enable credentials (cookies)
-  const credentializedReq = req.clone({
-    withCredentials: true,
-  });
+  if (inject(TokenService).isBearerAuthEnabled()) {
+    return next(req);
+  }
 
-  return next(credentializedReq);
+  return next(
+    req.clone({
+      withCredentials: true,
+    }),
+  );
 };
