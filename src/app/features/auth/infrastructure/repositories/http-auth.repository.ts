@@ -94,10 +94,7 @@ export class HttpAuthRepository extends AuthRepository {
     return this.http.get<UserResponseDto>('/auth/me', requiresAuthContext())
       .pipe(
         map(dto => UserMapper.toDomain(dto)),
-        catchError(() => {
-          this.clearLocalSession();
-          return of(null)
-        })
+        catchError(() => of(null)),
       );
   }
 
@@ -133,14 +130,26 @@ export class HttpAuthRepository extends AuthRepository {
   }
 
   private persistTokens(dto: AuthResponseDto): void {
-    if (!dto.accessToken || !dto.refreshToken) {
+    const accessToken = this.normalizeToken(
+      dto.accessToken ?? (dto as { access_token?: string }).access_token,
+    );
+    const refreshToken = this.normalizeToken(
+      dto.refreshToken ?? (dto as { refresh_token?: string }).refresh_token,
+    );
+
+    if (!accessToken || !refreshToken) {
       return;
     }
 
-    this.tokenService.save({
-      accessToken: dto.accessToken.replace(/^Bearer\s+/i, '').trim(),
-      refreshToken: dto.refreshToken.replace(/^Bearer\s+/i, '').trim(),
-    });
+    this.tokenService.save({ accessToken, refreshToken });
+  }
+
+  private normalizeToken(value: string | undefined): string | null {
+    if (!value) {
+      return null;
+    }
+
+    return value.replace(/^Bearer\s+/i, '').trim();
   }
 
   private clearLocalSession(): void {

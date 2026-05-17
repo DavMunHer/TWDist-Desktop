@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -27,6 +28,7 @@ describe('TokenRefreshCoordinator', () => {
         TokenRefreshCoordinator,
         { provide: RefreshSessionUseCase, useValue: refreshSessionUseCaseMock },
         { provide: AuthStore, useValue: authStoreMock },
+        { provide: Router, useValue: { url: '/projects/upcoming', navigate: vi.fn() } },
       ],
     });
 

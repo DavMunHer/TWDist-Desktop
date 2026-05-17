@@ -1,46 +1,30 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { EMPTY, catchError, throwError } from 'rxjs';
-import { AuthStore } from '@features/auth/presentation/store/auth.store';
 import { Router } from '@angular/router';
+import { EMPTY } from 'rxjs';
+
 import { SessionHintService } from '@features/auth/infrastructure/services/session-hint.service';
+import { TokenService } from '@features/auth/infrastructure/services/token.service';
+import { canAttemptTokenRefresh } from '@shared/interceptors/auth-refresh.util';
 import { REQUIRES_AUTH } from '@shared/interceptors/auth-context.token';
 
 /**
- * Error Interceptor
- * Catches HTTP responses and globally handles 401 Unauthorized errors 
- * indicating an expired or invalid session token.
+ * Blocks protected requests when there is no restorable session.
+ * Does not handle 401/403 — {@link refreshTokenInterceptor} attempts refresh first;
+ * {@link TokenRefreshCoordinator} clears state and redirects when refresh fails.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const authStore = inject(AuthStore);
   const router = inject(Router);
   const sessionHintService = inject(SessionHintService);
+  const tokenService = inject(TokenService);
   const requiresAuth = req.context.get(REQUIRES_AUTH);
-  const hasSessionHint = sessionHintService.hasSessionHint();
 
-  if (requiresAuth && !hasSessionHint) {
+  if (requiresAuth && !canAttemptTokenRefresh(tokenService, sessionHintService)) {
     if (router.url !== '/auth/login') {
       router.navigate(['/auth/login']);
     }
     return EMPTY;
   }
 
-  return next(req).pipe(
-    catchError((error: HttpErrorResponse) => {
-      const isUnauthorized = error.status === 401;
-
-      if (isUnauthorized && requiresAuth) {
-        sessionHintService.clear();
-        authStore.clearSessionState();
-
-        if (router.url !== '/auth/login') {
-          router.navigate(['/auth/login']);
-        }
-
-        return EMPTY;
-      }
-      
-      return throwError(() => error);
-    })
-  );
+  return next(req);
 };

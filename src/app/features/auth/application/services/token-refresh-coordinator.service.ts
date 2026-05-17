@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, catchError, finalize, shareReplay, tap, throwError } from 'rxjs';
 
 import { RefreshSessionUseCase } from '@features/auth/application/use-cases/refresh-session.use-case';
@@ -14,6 +15,7 @@ export class TokenRefreshCoordinator {
   private readonly sessionHintService = inject(SessionHintService);
   private readonly tokenService = inject(TokenService);
   private readonly authStore = inject(AuthStore);
+  private readonly router = inject(Router);
   private inFlightRefresh$: Observable<void> | null = null;
 
   readonly state = new BehaviorSubject<RefreshState>('idle');
@@ -39,6 +41,10 @@ export class TokenRefreshCoordinator {
         this.tokenService.clear();
         this.authStore.clearSessionState();
         this.state.next({ error });
+
+        if (this.router.url !== '/auth/login') {
+          this.router.navigate(['/auth/login']);
+        }
 
         return throwError(() => error);
       }),
