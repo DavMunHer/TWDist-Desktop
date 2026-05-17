@@ -30,6 +30,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/shared/config/environment.ts",
+                  "with": "src/app/shared/config/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -45,6 +51,17 @@
               "outputHashing": "all"
             },
             "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "electron-local": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/shared/config/environment.ts",
+                  "with": "src/app/shared/config/environment.electron-local.ts"
+                }
+              ],
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
