@@ -46,3 +46,7 @@ Thumbs.db
 
 # Electron dist
 dist-electron
+
+# Electron runtime config (secrets / local overrides — use config.example.json)
+electron/config.local.json
+electron/config.packaged.json
