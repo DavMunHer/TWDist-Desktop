@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, catchError, finalize, shareReplay, tap, th
 
 import { RefreshSessionUseCase } from '@features/auth/application/use-cases/refresh-session.use-case';
 import { SessionHintService } from '@features/auth/infrastructure/services/session-hint.service';
+import { TokenService } from '@features/auth/infrastructure/services/token.service';
 import { AuthStore } from '@features/auth/presentation/store/auth.store';
 
 export type RefreshState = 'idle' | 'refreshing' | { error: unknown };
@@ -11,6 +12,7 @@ export type RefreshState = 'idle' | 'refreshing' | { error: unknown };
 export class TokenRefreshCoordinator {
   private readonly refreshSessionUseCase = inject(RefreshSessionUseCase);
   private readonly sessionHintService = inject(SessionHintService);
+  private readonly tokenService = inject(TokenService);
   private readonly authStore = inject(AuthStore);
   private inFlightRefresh$: Observable<void> | null = null;
 
@@ -34,6 +36,7 @@ export class TokenRefreshCoordinator {
       }),
       catchError((error: unknown) => {
         this.sessionHintService.clear();
+        this.tokenService.clear();
         this.authStore.clearSessionState();
         this.state.next({ error });
 
