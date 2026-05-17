@@ -148,7 +148,18 @@ bun run electron:build
 
 Artifacts appear under `release/`.
 
-**CI note:** GitHub Actions release workflow should set `TWDIST_API_BASE_URL` from a repository secret and run `bun run electron:config` before `electron-builder` so installers include the correct API URL. That secret is not stored in git.
+### GitHub Releases (CI)
+
+Installers built by [`.github/workflows/release.yml`](../.github/workflows/release.yml) **do not** read `config.local.json`. They embed API settings from a repository secret at build time.
+
+1. In the repo: **Settings → Secrets and variables → Actions → New repository secret**
+2. Name: **`TWDIST_API_BASE_URL`**
+3. Value: absolute API base URL, including the `/api` suffix, e.g.  
+   `https://twdist-back-123456789.europe-west9.run.app/api`
+
+On each push to `main`, the release workflow runs `bun run electron:config` (writes gitignored `electron/config.packaged.json`) and then `electron-builder`, which copies it to `resources/config.json` inside the `.AppImage` / `.exe` / `.deb`.
+
+If the secret is missing or empty, the config step fails in CI and no broken release is published. If you see the runtime error in an **older** release artifact, that build was produced before this step was wired in — trigger a new release after merging the workflow fix and setting the secret.
 
 ---
 

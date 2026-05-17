@@ -2,7 +2,7 @@ name: Release Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ fix/auto-releases ]
 
 jobs:
   build-linux:
@@ -25,6 +25,11 @@ jobs:
 
       - name: Compile Electron TypeScript
         run: bun run electron:tsc
+
+      - name: Generate packaged API config
+        run: bun run electron:config
+        env:
+          TWDIST_API_BASE_URL: ${{ secrets.TWDIST_API_BASE_URL }}
 
       - name: Package with electron-builder (Linux)
         run: bunx electron-builder --linux --publish never
@@ -58,6 +63,11 @@ jobs:
 
       - name: Compile Electron TypeScript
         run: bun run electron:tsc
+
+      - name: Generate packaged API config
+        run: bun run electron:config
+        env:
+          TWDIST_API_BASE_URL: ${{ secrets.TWDIST_API_BASE_URL }}
 
       - name: Package with electron-builder (Windows)
         run: bunx electron-builder --win --publish never
