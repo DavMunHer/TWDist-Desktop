@@ -20,7 +20,7 @@ export function registerAppScheme(): void {
   ]);
 }
 
-function resolveDistFile(browserDistPath: string, requestUrl: string): string {
+function resolveDistFile(browserDistPath: string, requestUrl: string): string | null {
   const url = new URL(requestUrl);
   let resourcePath = decodeURIComponent(url.pathname);
 
@@ -31,13 +31,27 @@ function resolveDistFile(browserDistPath: string, requestUrl: string): string {
   }
 
   const relativePath = resourcePath.replace(/^\//, '');
-  return path.join(browserDistPath, relativePath);
+  const root = path.resolve(browserDistPath);
+  const filePath = path.resolve(root, relativePath);
+  const relativeToRoot = path.relative(root, filePath);
+
+  if (relativeToRoot.startsWith('..') || path.isAbsolute(relativeToRoot)) {
+    console.warn(`[app protocol] Blocked path traversal: ${requestUrl}`);
+    return null;
+  }
+
+  return filePath;
 }
 
 /** Serves the Angular browser bundle over app:// (reload-safe; avoids file:// quirks). */
 export function registerAppProtocol(browserDistPath: string): void {
+  const root = path.resolve(browserDistPath);
+
   protocol.handle(APP_SCHEME, (request) => {
-    const filePath = resolveDistFile(browserDistPath, request.url);
+    const filePath = resolveDistFile(root, request.url);
+    if (!filePath) {
+      return new Response('Forbidden', { status: 403 });
+    }
     return net.fetch(pathToFileURL(filePath).href);
   });
 }

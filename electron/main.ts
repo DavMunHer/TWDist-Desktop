@@ -23,6 +23,12 @@ function createWindow(): void {
     ? [encodeConfigForPreload(electronConfig)]
     : [];
 
+  if (!electronConfig) {
+    console.warn(
+      '[electron] No app config found. Expected resources/config.json (packaged) or electron/config.local.json (local).',
+    );
+  }
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -31,7 +37,7 @@ function createWindow(): void {
       contextIsolation: true,
       preload: preloadPath,
       additionalArguments,
-      webSecurity: isDev,
+      webSecurity: true,
     },
   });
 
@@ -74,8 +80,6 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
-ipcMain.handle('get-app-config', () => loadElectronAppConfig());
 
 ipcMain.on('message-channel', (event, message) => {
   console.log(`Mensaje recibido desde Angular: ${message}`);

@@ -24,8 +24,17 @@ if (cachedAppConfig) {
   contextBridge.exposeInMainWorld('__electronRuntimeConfig', cachedAppConfig);
 }
 
+function getAppConfig(): Promise<ElectronAppConfig | null> {
+  if (!cachedAppConfig) {
+    console.warn(
+      '[preload] No app config in additionalArguments; apiBaseUrl must come from build-time injection.',
+    );
+  }
+  return Promise.resolve(cachedAppConfig);
+}
+
 contextBridge.exposeInMainWorld('electronAPI', {
-  getAppConfig: () => Promise.resolve(cachedAppConfig ?? ipcRenderer.invoke('get-app-config')),
+  getAppConfig,
 
   sendMessage: (message: string) =>
     ipcRenderer.send('message-channel', message),
