@@ -12,7 +12,9 @@
     "electron:tsc": "tsc -p electron/tsconfig.json",
     "electron:serve": "wait-on tcp:4200 && cross-env NODE_ENV=development electron .",
     "electron:dev": "concurrently -k \"ng serve\" \"bun run electron:tsc && bun run electron:serve\"",
-    "electron:build": "bun run build && bun run electron:tsc && electron-builder",
+    "electron:config": "node scripts/write-electron-config.mjs",
+    "electron:preview": "ng build --configuration=electron-local --base-href ./ && bun run electron:tsc && cross-env NODE_ENV=production electron .",
+    "electron:build": "bun run electron:config && bun run build && bun run electron:tsc && electron-builder",
     "lint": "ng lint"
   },
   "private": true,
@@ -55,6 +57,12 @@
     "files": [
       "dist-electron/**/*",
       "dist/twdist-desktop/browser/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "electron/config.packaged.json",
+        "to": "config.json"
+      }
     ],
     "win": {
       "target": "nsis"
