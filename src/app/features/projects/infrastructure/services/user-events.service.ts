@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from '@shared/config/environment';
+import { Injectable, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
 import { UserEvent, UserEventType } from '@features/projects/infrastructure/dto/sse/user-event';
+import { SseRuntimeService } from '@shared/infrastructure/sse/sse-runtime';
 
 @Injectable({ providedIn: 'root' })
 export class UserEventsService {
+  private readonly sseRuntime = inject(SseRuntimeService);
 
   private static readonly EVENT_TYPES: UserEventType[] = [
     'project_created',
@@ -13,22 +14,8 @@ export class UserEventsService {
   ];
 
   connect(): Observable<UserEvent> {
-    return new Observable(subscriber => {
-      const url = `${environment.apiBaseUrl}/users/events`;
-      const source = new EventSource(url, { withCredentials: true });
-
-      for (const type of UserEventsService.EVENT_TYPES) {
-        source.addEventListener(type, ((e: MessageEvent) => {
-          try {
-            subscriber.next({ type, data: JSON.parse(e.data) });
-          } catch (error) {
-            console.error(`[SSE:User] Failed to parse "${type}" event:`, error, e.data);
-            subscriber.error(error);
-          }
-        }) as EventListener);
-      }
-
-      return () => source.close();
-    });
+    return this.sseRuntime.connect<UserEventType>('/users/events', UserEventsService.EVENT_TYPES).pipe(
+      map(({ type, data }) => ({ type, data }) as UserEvent),
+    );
   }
 }

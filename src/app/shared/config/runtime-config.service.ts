@@ -41,7 +41,7 @@ export class RuntimeConfigService {
 
     const electronConfig = await window.electronAPI.getAppConfig();
     if (!electronConfig?.apiBaseUrl) {
-      if (environment.isElectronRelease) {
+      if (environment.isElectronRelease || this.isElectronShell()) {
         console.error(
           '[RuntimeConfig] Missing electron/config.local.json (or packaged config.json). ' +
             'Copy electron/config.example.json and set apiBaseUrl.',
@@ -59,10 +59,21 @@ export class RuntimeConfigService {
       return this.configFromElectron(syncConfig);
     }
 
+    if (this.isElectronShell()) {
+      return {
+        apiBaseUrl: environment.isElectronRelease ? '' : environment.apiBaseUrl,
+        isBearerAuthEnabled: true,
+      };
+    }
+
     return {
       apiBaseUrl: environment.apiBaseUrl,
       isBearerAuthEnabled: environment.isElectronRelease,
     };
+  }
+
+  private isElectronShell(): boolean {
+    return typeof window !== 'undefined' && !!window.electronAPI;
   }
 
   private getSyncElectronConfig(): ElectronAppConfig | null {
