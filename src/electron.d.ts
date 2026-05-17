@@ -4,15 +4,15 @@ export interface ElectronAppConfig {
 }
 
 export interface IElectronAPI {
-  getAppConfig: () => Promise<ElectronAppConfig | null>;
+  getAppConfig?: () => Promise<ElectronAppConfig | null>;
   sendMessage: (msg: string) => void;
   onResponse: (callback: (response: unknown) => void) => void;
 }
 
 declare global {
   interface Window {
-    electronAPI: IElectronAPI;
-    /** Synchronous config from preload (available before Angular boot). */
+    electronAPI?: IElectronAPI;
+    /** Set synchronously by Electron preload when the shell injects config. */
     __electronRuntimeConfig?: ElectronAppConfig;
   }
 }

@@ -11,6 +11,7 @@ import { RegisterCredentialsDto } from "@features/auth/infrastructure/dto/reques
 import { UpdateUsernameDto } from "@features/auth/infrastructure/dto/request/update-username.dto";
 import { UpdatePasswordDto } from "@features/auth/infrastructure/dto/request/update-password.dto";
 import { SessionHintService } from "@features/auth/infrastructure/services/session-hint.service";
+import { TokenService } from "@features/auth/infrastructure/services/token.service";
 import { requiresAuthContext } from "@shared/interceptors/auth-context.token";
 import { AuthError } from "@features/auth/domain/errors/auth.error";
 
@@ -18,11 +19,12 @@ import { AuthError } from "@features/auth/domain/errors/auth.error";
 export class HttpAuthRepository extends AuthRepository {
   private http = inject(HttpClient);
   private sessionHintService = inject(SessionHintService);
-
+  private tokenService = inject(TokenService);
 
   login(credentials: LoginCredentialsDto): Observable<User> {
     return this.http.post<AuthResponseDto>('/auth/login', credentials)
       .pipe(
+        tap((dto) => this.persistTokens(dto)),
         map(dto => {
           if (!dto?.user?.id) {
             throw new AuthError('INVALID_LOGIN_RESPONSE', 'Invalid login response: missing user data');
@@ -30,8 +32,6 @@ export class HttpAuthRepository extends AuthRepository {
           return UserMapper.toDomain(dto.user);
         }),
         tap(() => this.sessionHintService.markAuthenticated()),
-        // `unknown` is intentional here: RxJS error channels can contain any value,
-        // so we narrow explicitly (`instanceof`) before reading error details.
         catchError((error: unknown) => {
           if (error instanceof HttpErrorResponse && error.status === 401) {
             return throwError(() => new AuthError('INVALID_CREDENTIALS', 'Invalid email or password'));
@@ -47,7 +47,12 @@ export class HttpAuthRepository extends AuthRepository {
   }
 
   refresh(): Observable<void> {
-    return this.http.post<unknown>('/auth/refresh', {}).pipe(
+    const body = this.tokenService.isBearerAuthEnabled()
+      ? { refreshToken: this.tokenService.getRefreshToken() ?? '' }
+      : {};
+
+    return this.http.post<AuthResponseDto>('/auth/refresh', body).pipe(
+      tap((dto) => this.persistTokens(dto)),
       map(() => void 0),
       catchError((error: unknown) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
@@ -72,12 +77,10 @@ export class HttpAuthRepository extends AuthRepository {
   }
 
   logout(): Observable<void> {
-    // Server clears the cookie
     return this.http.post<void>('/auth/logout', {}, requiresAuthContext()).pipe(
-      tap(() => this.sessionHintService.clear()),
+      tap(() => this.clearLocalSession()),
       catchError(() => {
-        // Even if the server fails, clear local session hint
-        this.sessionHintService.clear();
+        this.clearLocalSession();
         return of(void 0);
       })
     );
@@ -92,8 +95,7 @@ export class HttpAuthRepository extends AuthRepository {
       .pipe(
         map(dto => UserMapper.toDomain(dto)),
         catchError(() => {
-          // If cookie expired or unauthorized, clear the session hint
-          this.sessionHintService.clear();
+          this.clearLocalSession();
           return of(null)
         })
       );
@@ -128,5 +130,21 @@ export class HttpAuthRepository extends AuthRepository {
           return throwError(() => new AuthError('UNKNOWN_AUTH_ERROR', 'Unexpected error updating password'));
         })
       );
+  }
+
+  private persistTokens(dto: AuthResponseDto): void {
+    if (!dto.accessToken || !dto.refreshToken) {
+      return;
+    }
+
+    this.tokenService.save({
+      accessToken: dto.accessToken.replace(/^Bearer\s+/i, '').trim(),
+      refreshToken: dto.refreshToken.replace(/^Bearer\s+/i, '').trim(),
+    });
+  }
+
+  private clearLocalSession(): void {
+    this.sessionHintService.clear();
+    this.tokenService.clear();
   }
 }

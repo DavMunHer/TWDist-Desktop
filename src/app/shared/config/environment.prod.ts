@@ -1,6 +1,7 @@
-// Production Angular build for packaged Electron.
+// Production Angular build for packaged Electron (file://).
 // apiBaseUrl is injected at runtime via resources/config.json (see scripts/write-electron-config.mjs).
 export const environment = {
   production: true,
   apiBaseUrl: '',
+  isElectronRelease: true,
 };

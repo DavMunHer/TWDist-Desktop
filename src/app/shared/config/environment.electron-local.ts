@@ -1,6 +1,6 @@
-// Local Electron preview (`npm run electron:preview`).
-// apiBaseUrl comes from electron/config.local.json at runtime.
+// Local packaged Electron preview (file://) — API URL comes from electron/config.local.json.
 export const environment = {
-  production: false,
+  production: true,
   apiBaseUrl: '',
+  isElectronRelease: true,
 };

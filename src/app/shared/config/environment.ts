@@ -7,4 +7,6 @@ const API_BASE_URL = '/api';
 export const environment = {
   production: false,
   apiBaseUrl: API_BASE_URL,
+  /** When true, use Bearer tokens instead of cookie-based auth (Electron packaged builds). */
+  isElectronRelease: false,
 };
