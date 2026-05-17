@@ -1,6 +1,7 @@
 import { ApplicationConfig, inject, provideAppInitializer, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
 import { PROJECT_FEATURE_PROVIDERS } from '@features/projects/projects.providers';
@@ -21,11 +22,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withHashLocation()),
     provideHttpClient(
       withInterceptors([
+        refreshTokenInterceptor,
         baseUrlInterceptor,
         authInterceptor,
         credentialsInterceptor,
         errorInterceptor,
-        refreshTokenInterceptor,
       ])
     ),
     ...PROJECT_FEATURE_PROVIDERS,
@@ -37,7 +38,9 @@ export const appConfig: ApplicationConfig = {
       const runtimeConfig = inject(RuntimeConfigService);
       const authStore = inject(AuthStore);
       await runtimeConfig.load();
-      return authStore.checkAuthStatus();
+      // Must await the auth check — returning the Observable from an async fn only
+      // resolves a Promise<Observable>, so bootstrap would finish before /auth/me.
+      await firstValueFrom(authStore.checkAuthStatus());
     }),
   ],
 };
